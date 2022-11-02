@@ -1,58 +1,10 @@
-use std::{error::Error, fmt};
+use crate::errors::vehicle::{
+    negative_capacity::NegativeVehicleCapacityError, vehicle_overload::VehicleOverloadError,
+};
 
 pub struct Vehicle {
     usage: u32,
     capacity: u32,
-}
-
-#[derive(Debug)]
-pub struct VehicleOverloadError<'a> {
-    description: &'a str,
-}
-
-#[derive(Debug)]
-pub struct NegativeVehicleCapacityError<'a> {
-    description: &'a str,
-}
-
-impl<'a> NegativeVehicleCapacityError<'a> {
-    fn new() -> NegativeVehicleCapacityError<'a> {
-        NegativeVehicleCapacityError {
-            description: "The capacity of vehicle cannot be lesser than zero",
-        }
-    }
-}
-
-impl<'a> fmt::Display for NegativeVehicleCapacityError<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description)
-    }
-}
-
-impl<'a> Error for NegativeVehicleCapacityError<'a> {
-    fn description(&self) -> &str {
-        self.description
-    }
-}
-
-impl<'a> VehicleOverloadError<'a> {
-    fn new() -> VehicleOverloadError<'a> {
-        VehicleOverloadError {
-            description: "The capacity of vehicle was overloaded",
-        }
-    }
-}
-
-impl<'a> fmt::Display for VehicleOverloadError<'a> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", self.description)
-    }
-}
-
-impl<'a> Error for VehicleOverloadError<'a> {
-    fn description(&self) -> &str {
-        self.description
-    }
 }
 
 impl Vehicle {
