@@ -4,8 +4,8 @@ pub struct Stop {
 }
 
 impl Stop {
-    pub fn new(id: u32) -> Stop {
-        Stop { id, usage: 0 }
+    pub fn new(id: u32, usage: u32) -> Stop {
+        Stop { id, usage }
     }
 
     pub fn get_id(&self) -> u32 {
