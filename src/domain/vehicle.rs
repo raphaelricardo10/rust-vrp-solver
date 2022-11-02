@@ -12,8 +12,8 @@ impl Vehicle {
         Vehicle { capacity, usage: 0 }
     }
 
-    pub fn get_capacity(&self) {
-        self.capacity;
+    pub fn get_capacity(&self) -> u32{
+        self.capacity
     }
 
     pub fn load(&mut self, quantity: u32) -> Result<(), VehicleOverloadError> {
