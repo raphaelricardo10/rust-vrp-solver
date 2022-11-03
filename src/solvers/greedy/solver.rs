@@ -16,14 +16,9 @@ pub fn solve<'a>(
     route_service.assign_stop_to_route(vehicle_id, 0);
 
     while !route_service.has_available_stop() {
-        let current_stop_id = route_service
-            .get_route(vehicle_id)
-            .get_current_stop()
-            .get_id();
+        let stop_id = route_service.get_nearest_stop(vehicle_id).get_id();
 
-        let nearest_stop = route_service.get_nearest_stop(current_stop_id);
-
-        route_service.assign_stop_to_route(vehicle_id, nearest_stop.get_id());
+        route_service.assign_stop_to_route(vehicle_id, stop_id);
     }
 
     route_service
