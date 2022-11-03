@@ -85,13 +85,13 @@ impl<'a> RouteService<'a> {
 
     pub fn assign_starting_points(&mut self) {
         let stop = self.available_stops.remove(&0).unwrap();
-        
+
         for (_, route) in &mut self.routes {
             route.add_stop(stop).unwrap();
         }
     }
 
-    pub fn get_nearest_stop(&self, vehicle_id: u32) -> &Stop {
+    pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&&Stop> {
         let current_stop_id = self.get_route(vehicle_id).get_current_stop().get_id();
 
         let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine = self
@@ -101,9 +101,8 @@ impl<'a> RouteService<'a> {
             .filter(|((src_stop_id, _dest_stop_id), _distance)| *src_stop_id == current_stop_id)
             .min_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
                 x1.1.partial_cmp(x2.1).unwrap()
-            })
-            .unwrap();
+            })?;
 
-        self.available_stops.get(dest_stop_id).unwrap()
+        self.available_stops.get(dest_stop_id)
     }
 }

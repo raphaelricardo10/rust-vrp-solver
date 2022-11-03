@@ -50,7 +50,10 @@ impl<'a> GreedySolver<'a> {
 
     fn construct_routes_in_parallel(&mut self, vehicle_ids: &Vec<u32>) {
         for vehicle_id in vehicle_ids.iter() {
-            let stop_id = self.route_service.get_nearest_stop(*vehicle_id).get_id();
+            let stop_id = match self.route_service.get_nearest_stop(*vehicle_id) {
+                None => break,
+                Some(stop) => stop.get_id(),
+            };
 
             self.route_service
                 .assign_stop_to_route(*vehicle_id, stop_id);
