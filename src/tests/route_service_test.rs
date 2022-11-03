@@ -56,7 +56,8 @@ fn can_get_nearest_stop() {
     distances.insert((0, 2), 1.0);
     distances.insert((0, 3), 3.0);
 
-    let route_service = RouteService::new(&mut vehicles, &distances, &stops);
+    let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
+    route_service.assign_stop_to_route(0, 0);
 
     assert_eq!(route_service.get_nearest_stop(0).get_id(), 2);
 }
