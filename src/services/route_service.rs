@@ -83,6 +83,14 @@ impl<'a> RouteService<'a> {
         vehicle.add_stop(stop).unwrap();
     }
 
+    pub fn assign_starting_points(&mut self) {
+        let stop = self.available_stops.remove(&0).unwrap();
+        
+        for (_, route) in &mut self.routes {
+            route.add_stop(stop).unwrap();
+        }
+    }
+
     pub fn get_nearest_stop(&self, vehicle_id: u32) -> &Stop {
         let current_stop_id = self.get_route(vehicle_id).get_current_stop().get_id();
 
