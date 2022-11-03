@@ -1,11 +1,10 @@
 use std::collections::HashMap;
 
 use crate::domain::{
-    route::{DistanceMatrix, Route},
+    route::{DistanceMatrix, DistanceMatrixLine, Route},
     stop::Stop,
     vehicle::Vehicle,
 };
-
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
 pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
@@ -13,6 +12,7 @@ pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
 pub struct RouteService<'a> {
     routes: RouteMap<'a>,
     available_stops: StopMap<'a>,
+    distances: &'a DistanceMatrix,
 }
 
 impl<'a> RouteService<'a> {
@@ -24,7 +24,11 @@ impl<'a> RouteService<'a> {
         let routes: RouteMap = RouteService::populate_routes(vehicles, distances);
         let available_stops: StopMap = RouteService::populate_available_stops(stops);
 
-        RouteService { available_stops, routes }
+        RouteService {
+            available_stops,
+            routes,
+            distances,
+        }
     }
 
     pub fn populate_routes(
@@ -42,7 +46,7 @@ impl<'a> RouteService<'a> {
         routes
     }
 
-    fn populate_available_stops(stops: &'a Vec<Stop>) -> StopMap{
+    fn populate_available_stops(stops: &'a Vec<Stop>) -> StopMap {
         let mut available_stops: StopMap = HashMap::new();
 
         for stop in stops {
@@ -73,5 +77,17 @@ impl<'a> RouteService<'a> {
         let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
 
         vehicle.add_stop(stop).unwrap();
+    }
+
+    pub fn get_closest_stop(&self, stop_id: u32) -> &Stop {
+        let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine = self
+            .distances
+            .iter()
+            .filter(|x| self.available_stops.contains_key(&x.0 .1))
+            .filter(|((src_stop_id, _dest_stop_id), _distance)| *src_stop_id == stop_id)
+            .min_by(|x1, x2| x1.1.partial_cmp(x2.1).unwrap())
+            .unwrap();
+
+        self.available_stops.get(dest_stop_id).unwrap()
     }
 }
