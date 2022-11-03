@@ -1,58 +1,19 @@
-use rstest::{fixture, rstest};
-use std::collections::HashMap;
+use rstest::rstest;
 
 use crate::{
-    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
+    domain::{route::DistanceMatrix, stop::Stop},
     solvers::greedy::solver::GreedySolver,
+    tests::fixtures::VehicleFactory,
 };
 
-type VehicleFactory = fn (number: u32) -> Vec<Vehicle>;
-
-#[fixture]
-fn distances() -> DistanceMatrix {
-    HashMap::from([
-        ((0, 1), 2.0),
-        ((0, 2), 1.0),
-        ((0, 3), 3.0),
-        ((1, 0), 2.0),
-        ((1, 2), 5.0),
-        ((1, 3), 3.0),
-        ((2, 0), 1.0),
-        ((2, 1), 5.0),
-        ((2, 3), 2.0),
-        ((3, 0), 3.0),
-        ((3, 1), 3.0),
-        ((3, 2), 2.0),
-    ])
-}
-
-#[fixture]
-fn stops() -> Vec<Stop> {
-    Vec::from([
-        Stop::new(0, 0),
-        Stop::new(1, 0),
-        Stop::new(2, 0),
-        Stop::new(3, 0),
-    ])
-}
-
-#[fixture]
-fn vehicle_factory() -> VehicleFactory {
-    fn wrapper(number: u32) -> Vec<Vehicle> {
-        let mut vehicles = Vec::new();
-    
-        for i in 0..number {
-            vehicles.push(Vehicle::new(i, 10));
-        }
-
-        vehicles
-    }
-
-    wrapper
-}
+use super::fixtures::{distances, stops, vehicle_factory};
 
 #[rstest]
-fn greedy_solution_is_correct_single_vehicle(distances: DistanceMatrix, stops: Vec<Stop>, vehicle_factory: VehicleFactory) {
+fn greedy_solution_is_correct_single_vehicle(
+    distances: DistanceMatrix,
+    stops: Vec<Stop>,
+    vehicle_factory: VehicleFactory,
+) {
     let mut vehicles = vehicle_factory(1);
 
     let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
@@ -67,7 +28,11 @@ fn greedy_solution_is_correct_single_vehicle(distances: DistanceMatrix, stops: V
 }
 
 #[rstest]
-fn greedy_solution_is_correct_multiple_vehicles(distances: DistanceMatrix, stops: Vec<Stop>, vehicle_factory: VehicleFactory) {
+fn greedy_solution_is_correct_multiple_vehicles(
+    distances: DistanceMatrix,
+    stops: Vec<Stop>,
+    vehicle_factory: VehicleFactory,
+) {
     let mut vehicles = vehicle_factory(2);
 
     let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
