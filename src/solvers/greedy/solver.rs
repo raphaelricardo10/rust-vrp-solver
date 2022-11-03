@@ -1,11 +1,15 @@
+use std::collections::HashMap;
+
 use crate::{
     domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
     services::route_service::RouteService,
 };
 
+pub type Solution = HashMap<u32, Vec<u32>>;
+
 pub struct GreedySolver<'a> {
     route_service: RouteService<'a>,
-    solution: Vec<u32>,
+    solution: Solution,
 }
 
 impl<'a> GreedySolver<'a> {
@@ -16,7 +20,7 @@ impl<'a> GreedySolver<'a> {
     ) -> GreedySolver {
         GreedySolver {
             route_service: RouteService::new(vehicles, distances, stops),
-            solution: Vec::new(),
+            solution: HashMap::new(),
         }
     }
 
@@ -40,10 +44,10 @@ impl<'a> GreedySolver<'a> {
             self.route_service.assign_stop_to_route(vehicle_id, stop_id);
         }
 
-        self.solution = self.construct_solution(vehicle_id)
+        self.solution.insert(vehicle_id, self.construct_solution(vehicle_id));
     }
 
-    pub fn get_solution(&self) -> &Vec<u32> {
+    pub fn get_solution(&self) -> &Solution{
         &self.solution
     }
 }

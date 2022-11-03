@@ -36,7 +36,7 @@ fn greedy_solution_is_correct() {
     let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
     solver.solve();
 
-    let solution = solver.get_solution();
+    let solution = solver.get_solution().get(&0).unwrap();
 
     assert_eq!(solution[0], 0);
     assert_eq!(solution[1], 2);
