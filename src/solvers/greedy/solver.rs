@@ -44,8 +44,13 @@ impl<'a> GreedySolver<'a> {
         self.route_service.assign_starting_points();
 
         while !self.route_service.has_available_stop() {
-            let vehicle_ids: Vec<u32> = self.route_service.get_vehicles().iter().map(|x| x.get_id()).collect();
-            
+            let vehicle_ids: Vec<u32> = self
+                .route_service
+                .get_vehicles()
+                .iter()
+                .map(|x| x.get_id())
+                .collect();
+
             for vehicle_id in vehicle_ids {
                 let stop_id = self.route_service.get_nearest_stop(vehicle_id).get_id();
                 self.route_service.assign_stop_to_route(vehicle_id, stop_id);
