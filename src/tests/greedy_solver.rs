@@ -1,13 +1,13 @@
 use std::collections::HashMap;
 
 use crate::{
-    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
-    solvers::greedy::solver::solve,
+    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle}, solvers::greedy::solver::GreedySolver
 };
 
 #[test]
 fn greedy_solution_is_correct() {
     let vehicle = Vehicle::new(0, 10);
+    let mut vehicles = vec![vehicle];
 
     let mut stops: Vec<Stop> = Vec::new();
     stops.push(Stop::new(0, 0));
@@ -32,7 +32,10 @@ fn greedy_solution_is_correct() {
     distances.insert((3, 1), 3.0);
     distances.insert((3, 2), 2.0);
 
-    let solution = solve(vehicle, &distances, &stops);
+    let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
+    solver.solve();
+
+    let solution = solver.get_solution();
 
     assert_eq!(solution[0], 0);
     assert_eq!(solution[1], 2);
