@@ -21,7 +21,7 @@ impl<'a> RouteService<'a> {
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
-        let routes = RouteService::populate_routes(vehicles, distances);
+        let routes: RouteMap = RouteService::populate_routes(vehicles, distances);
         let available_stops: StopMap = RouteService::populate_available_stops(stops);
 
         RouteService { available_stops, routes }
