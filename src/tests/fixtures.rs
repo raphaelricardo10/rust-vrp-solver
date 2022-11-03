@@ -1,11 +1,10 @@
-
 use rstest::fixture;
 
 use std::collections::HashMap;
 
-use crate::domain::{route::DistanceMatrix, vehicle::Vehicle, stop::Stop};
+use crate::domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle};
 
-pub type VehicleFactory = fn (number: u32) -> Vec<Vehicle>;
+pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -37,17 +36,14 @@ pub fn stops() -> Vec<Stop> {
 
 #[fixture]
 pub fn full_stops() -> Vec<Stop> {
-    Vec::from([
-        Stop::new(0, 5),
-        Stop::new(0, 100),
-    ])
+    Vec::from([Stop::new(0, 5), Stop::new(0, 100)])
 }
 
 #[fixture]
 pub fn vehicle_factory() -> VehicleFactory {
     fn wrapper(number: u32) -> Vec<Vehicle> {
         let mut vehicles = Vec::new();
-    
+
         for i in 0..number {
             vehicles.push(Vehicle::new(i, 10));
         }
