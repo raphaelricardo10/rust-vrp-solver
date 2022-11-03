@@ -5,8 +5,8 @@ use crate::{domain::{vehicle::Vehicle, stop::Stop, route::DistanceMatrix}, servi
 #[test]
 fn route_service_started() {
     let mut vehicles: Vec<Vehicle> = Vec::new();
-    vehicles.push(Vehicle::new(5));
-    vehicles.push(Vehicle::new(10));
+    vehicles.push(Vehicle::new(0, 5));
+    vehicles.push(Vehicle::new(1, 10));
 
     let mut stops: Vec<Stop> = Vec::new();
     stops.push(Stop::new(0, 2));

@@ -4,7 +4,7 @@ use crate::domain::{vehicle::Vehicle, route::{DistanceMatrix, Route}, stop::Stop
 
 #[test]
 fn route_distance_calculation() {
-    let mut vehicle = Vehicle::new(10);
+    let mut vehicle = Vehicle::new(0, 10);
     
     let mut distances: DistanceMatrix = HashMap::new();
     distances.insert((0, 1), 20.0);
@@ -23,7 +23,7 @@ fn route_distance_calculation() {
 
 #[test]
 fn route_cannot_overload_vehicle() {
-    let mut vehicle = Vehicle::new(10);
+    let mut vehicle = Vehicle::new(0, 10);
     let distances: DistanceMatrix = HashMap::new();
 
     let mut route = Route::new(&mut vehicle, &distances);

@@ -2,14 +2,20 @@ use crate::errors::vehicle::{
     negative_capacity::NegativeVehicleCapacityError, vehicle_overload::VehicleOverloadError,
 };
 
+#[derive(PartialEq, Eq, Hash)]
 pub struct Vehicle {
+    id: u32,
     usage: u32,
     capacity: u32,
 }
 
 impl Vehicle {
-    pub fn new(capacity: u32) -> Vehicle {
-        Vehicle { capacity, usage: 0 }
+    pub fn new(id: u32, capacity: u32) -> Vehicle {
+        Vehicle { id, capacity, usage: 0 }
+    }
+
+    pub fn get_id(&self) -> u32{
+        self.id
     }
 
     pub fn get_capacity(&self) -> u32{
