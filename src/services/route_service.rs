@@ -56,7 +56,11 @@ impl<'a> RouteService<'a> {
         &self.available_stops
     }
 
-    pub fn get_routes(&self) -> &RouteMap {
+    pub fn get_route(&self, vehicle_id: u32) -> &'a Route {
+        self.routes.get(&vehicle_id).unwrap()
+    }
+
+    pub fn get_all_routes(&self) -> &'a RouteMap {
         &self.routes
     }
 
