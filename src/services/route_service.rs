@@ -5,19 +5,19 @@ use crate::domain::{
 };
 
 pub struct RouteService<'a> {
-    stops: &'a Vec<Stop>,
     routes: Vec<Route<'a>>,
+    available_stops: &'a Vec<Stop>,
 }
 
 impl<'a> RouteService<'a> {
     pub fn new(
         vehicles: &'a mut Vec<Vehicle>,
         distances: &'a DistanceMatrix,
-        stops: &'a Vec<Stop>,
+        available_stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
         let routes = RouteService::populate_routes(vehicles, distances);
 
-        RouteService { stops, routes }
+        RouteService { available_stops, routes }
     }
 
     pub fn populate_routes(
@@ -33,7 +33,7 @@ impl<'a> RouteService<'a> {
     }
 
     pub fn get_stops(&self) -> &Vec<Stop> {
-        &self.stops
+        &self.available_stops
     }
 
     pub fn get_routes(&self) -> &Vec<Route> {
