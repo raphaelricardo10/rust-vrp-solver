@@ -43,4 +43,8 @@ impl<'a> Route<'a> {
 
         total
     }
+
+    pub fn get_vehicle(&self) -> &Vehicle {
+        &self.vehicle
+    }
 }
