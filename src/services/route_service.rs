@@ -72,6 +72,10 @@ impl<'a> RouteService<'a> {
         self.routes.values().map(|x| x.get_vehicle()).collect()
     }
 
+    pub fn has_available_stop(&self) -> bool {
+        self.available_stops.len() == 0
+    }
+
     pub fn assign_stop_to_route(&mut self, vehicle_id: u32, stop_id: u32) {
         let stop = self.available_stops.remove(&stop_id).unwrap();
         let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
