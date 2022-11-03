@@ -45,4 +45,8 @@ impl<'a> Route<'a> {
     pub fn get_vehicle(&self) -> &Vehicle {
         &self.vehicle
     }
+
+    pub fn get_stops(&self) -> &Vec<&'a Stop> {
+        &self.stops
+    }
 }
