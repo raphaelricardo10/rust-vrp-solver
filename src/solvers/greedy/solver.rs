@@ -3,8 +3,11 @@ use crate::{
     services::route_service::RouteService,
 };
 
-pub fn solve<'a>(vehicle: Vehicle, distances: &'a DistanceMatrix, stops: &'a Vec<Stop>) -> Vec<u32> {
-
+pub fn solve<'a>(
+    vehicle: Vehicle,
+    distances: &'a DistanceMatrix,
+    stops: &'a Vec<Stop>,
+) -> Vec<u32> {
     let vehicles = &mut vec![vehicle];
     let mut route_service = RouteService::new(vehicles, distances, stops);
 
@@ -27,5 +30,6 @@ pub fn solve<'a>(vehicle: Vehicle, distances: &'a DistanceMatrix, stops: &'a Vec
         .get_route(vehicle_id)
         .get_stops()
         .iter()
-        .map(|x| x.get_id()).collect()
+        .map(|x| x.get_id())
+        .collect()
 }
