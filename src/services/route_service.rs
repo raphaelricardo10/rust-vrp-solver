@@ -1,26 +1,36 @@
 use crate::domain::{
     route::{DistanceMatrix, Route},
-    vehicle::Vehicle, stop::Stop,
+    stop::Stop,
+    vehicle::Vehicle,
 };
 
 pub struct RouteService<'a> {
-    stops: Vec<Stop>,
+    stops: &'a Vec<Stop>,
     routes: Vec<Route<'a>>,
-    vehicles: Vec<Vehicle>,
-    distances: DistanceMatrix,
 }
 
 impl<'a> RouteService<'a> {
-    pub fn new(&'a mut self, vehicles: Vec<Vehicle>, distances: DistanceMatrix, stops: Vec<Stop>) {
-        self.stops = stops;
-        self.vehicles = vehicles;
-        self.distances = distances;
+    pub fn new(
+        vehicles: &'a mut Vec<Vehicle>,
+        distances: &'a DistanceMatrix,
+        stops: &'a Vec<Stop>,
+    ) -> RouteService<'a> {
 
-        self.routes = Vec::new();
-
-        for vehicle in &mut self.vehicles {
-            self.routes.push(Route::new(vehicle, &self.distances));
+        let routes = RouteService::populate_routes(vehicles, distances);
+        
+        RouteService {
+            stops,
+            routes,
         }
+    }
+    
+    pub fn populate_routes(vehicles: &'a mut Vec<Vehicle>, distances: &'a DistanceMatrix) -> Vec<Route>{
+        let mut routes: Vec<Route> = Vec::new();
+        for vehicle in vehicles {
+            routes.push(Route::new(vehicle, distances));
+        }
+
+        routes
     }
 
     pub fn get_stops(&self) -> &Vec<Stop> {
@@ -31,8 +41,8 @@ impl<'a> RouteService<'a> {
         &self.routes
     }
 
-    pub fn get_vehicles(&self) -> &Vec<Vehicle> {
-        &self.vehicles
+    pub fn get_vehicles(&self) -> Vec<&Vehicle> {
+        self.routes.iter().map(|x| x.get_vehicle()).collect()
     }
 
 }
