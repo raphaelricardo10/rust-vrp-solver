@@ -8,9 +8,10 @@ use crate::domain::{
 
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
+pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
 
 pub struct RouteService<'a> {
-    routes: Vec<Route<'a>>,
+    routes: RouteMap<'a>,
     available_stops: StopMap<'a>,
 }
 
@@ -29,10 +30,10 @@ impl<'a> RouteService<'a> {
     pub fn populate_routes(
         vehicles: &'a mut Vec<Vehicle>,
         distances: &'a DistanceMatrix,
-    ) -> Vec<Route> {
-        let mut routes: Vec<Route> = Vec::new();
+    ) -> RouteMap {
+        let mut routes: RouteMap = HashMap::new();
         for vehicle in vehicles {
-            routes.push(Route::new(vehicle, distances));
+            routes.insert(vehicle.get_id(), Route::new(vehicle, distances));
         }
 
         routes
@@ -52,11 +53,11 @@ impl<'a> RouteService<'a> {
         &self.available_stops
     }
 
-    pub fn get_routes(&self) -> &Vec<Route> {
+    pub fn get_routes(&self) -> &RouteMap {
         &self.routes
     }
 
     pub fn get_vehicles(&self) -> Vec<&Vehicle> {
-        self.routes.iter().map(|x| x.get_vehicle()).collect()
+        self.routes.values().map(|x| x.get_vehicle()).collect()
     }
 }
