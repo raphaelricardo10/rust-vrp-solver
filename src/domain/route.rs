@@ -21,6 +21,10 @@ impl<'a> Route<'a> {
         }
     }
 
+    pub fn get_current_stop(&self) -> &Stop {
+        self.stops.last().unwrap()
+    }
+
     pub fn add_stop(&mut self, stop: &'a Stop) -> Result<(), VehicleOverloadError> {
         if let Err(e) = self.vehicle.load(stop.usage) {
             return Err(e);

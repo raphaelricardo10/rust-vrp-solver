@@ -11,14 +11,13 @@ pub fn solve<'a>(vehicle: Vehicle, distances: &'a DistanceMatrix, stops: &'a Vec
     route_service.assign_stop_to_route(0, 0);
 
     while !route_service.has_available_stop() {
-        let current_stop_pos = route_service.get_route(0).get_stops().len() - 1;
         let current_stop_id = route_service
             .get_route(0)
-            .get_stops()
-            .get(current_stop_pos)
-            .unwrap()
+            .get_current_stop()
             .get_id();
+
         let nearest_stop = route_service.get_nearest_stop(current_stop_id);
+        
         route_service.assign_stop_to_route(0, nearest_stop.get_id());
     }
 
