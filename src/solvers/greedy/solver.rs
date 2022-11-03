@@ -18,8 +18,8 @@ pub fn solve<'a>(vehicle: Vehicle, distances: &'a DistanceMatrix, stops: &'a Vec
             .get(current_stop_pos)
             .unwrap()
             .get_id();
-        let closest_stop = route_service.get_closest_stop(current_stop_id);
-        route_service.assign_stop_to_route(0, closest_stop.get_id());
+        let nearest_stop = route_service.get_nearest_stop(current_stop_id);
+        route_service.assign_stop_to_route(0, nearest_stop.get_id());
     }
 
     route_service

@@ -83,7 +83,7 @@ impl<'a> RouteService<'a> {
         vehicle.add_stop(stop).unwrap();
     }
 
-    pub fn get_closest_stop(&self, stop_id: u32) -> &Stop {
+    pub fn get_nearest_stop(&self, stop_id: u32) -> &Stop {
         let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine = self
             .distances
             .iter()

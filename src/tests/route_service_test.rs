@@ -41,7 +41,7 @@ fn can_assign_stop_to_route() {
 }
 
 #[test]
-fn can_get_closes_stop() {
+fn can_get_nearest_stop() {
     let mut vehicles: Vec<Vehicle> = Vec::new();
     vehicles.push(Vehicle::new(0, 5));
 
@@ -58,5 +58,5 @@ fn can_get_closes_stop() {
 
     let route_service = RouteService::new(&mut vehicles, &distances, &stops);
 
-    assert_eq!(route_service.get_closest_stop(0).get_id(), 2);
+    assert_eq!(route_service.get_nearest_stop(0).get_id(), 2);
 }
