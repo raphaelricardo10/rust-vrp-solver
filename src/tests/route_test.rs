@@ -1,39 +1,36 @@
-use std::collections::HashMap;
+use rstest::rstest;
 
-use crate::domain::{vehicle::Vehicle, route::{DistanceMatrix, Route}, stop::Stop};
+use crate::domain::{
+    route::{DistanceMatrix, Route},
+    stop::Stop,
+    vehicle::Vehicle,
+};
 
-#[test]
-fn route_distance_calculation() {
+use super::fixtures::{distances, full_stops, stops};
+
+#[rstest]
+fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
     let mut vehicle = Vehicle::new(0, 10);
-    
-    let mut distances: DistanceMatrix = HashMap::new();
-    distances.insert((0, 1), 20.0);
-    distances.insert((1, 0), 18.0);
 
     let mut route = Route::new(&mut vehicle, &distances);
-    
-    let stop1 = Stop::new(0, 4);
-    let stop2 = Stop::new(1, 5);
 
-    route.add_stop(&stop1).unwrap();
-    route.add_stop(&stop2).unwrap();
+    route.add_stop(&stops[0]).unwrap();
+    route.add_stop(&stops[1]).unwrap();
+    route.add_stop(&stops[2]).unwrap();
+    route.add_stop(&stops[3]).unwrap();
 
-    assert_eq!(route.total_distance(), 20.0);
+    assert_eq!(route.total_distance(), 9.0);
 }
 
-#[test]
-fn route_cannot_overload_vehicle() {
+#[rstest]
+fn route_cannot_overload_vehicle(full_stops: Vec<Stop>, distances: DistanceMatrix) {
     let mut vehicle = Vehicle::new(0, 10);
-    let distances: DistanceMatrix = HashMap::new();
 
     let mut route = Route::new(&mut vehicle, &distances);
 
-    let stop1 = Stop::new(0, 4);
-    let stop2 = Stop::new(1, 10);
+    route.add_stop(&full_stops[0]).unwrap();
 
-    route.add_stop(&stop1).unwrap();
-    
-    match route.add_stop(&stop2) {
+    match route.add_stop(&full_stops[1]) {
         Ok(_) => assert!(false),
         Err(_) => assert!(true),
     }
