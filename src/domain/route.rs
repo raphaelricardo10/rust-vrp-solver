@@ -4,7 +4,7 @@ use super::{stop::Stop, vehicle::Vehicle};
 use std::collections::HashMap;
 
 pub type DistanceMatrix = HashMap<(u32, u32), f64>;
-pub type DistanceMatrixLine = HashMap<u32, f64>;
+pub type DistanceMatrixLine<'a> = (&'a (u32, u32), &'a f64);
 
 pub struct Route<'a> {
     stops: Vec<&'a Stop>,
