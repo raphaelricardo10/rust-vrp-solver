@@ -11,14 +11,18 @@ pub struct Vehicle {
 
 impl Vehicle {
     pub fn new(id: u32, capacity: u32) -> Vehicle {
-        Vehicle { id, capacity, usage: 0 }
+        Vehicle {
+            id,
+            capacity,
+            usage: 0,
+        }
     }
 
-    pub fn get_id(&self) -> u32{
+    pub fn get_id(&self) -> u32 {
         self.id
     }
 
-    pub fn get_capacity(&self) -> u32{
+    pub fn get_capacity(&self) -> u32 {
         self.capacity
     }
 

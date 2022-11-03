@@ -91,7 +91,9 @@ impl<'a> RouteService<'a> {
             .iter()
             .filter(|x: &DistanceMatrixLine| self.available_stops.contains_key(&x.0 .1))
             .filter(|((src_stop_id, _dest_stop_id), _distance)| *src_stop_id == current_stop_id)
-            .min_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| x1.1.partial_cmp(x2.1).unwrap())
+            .min_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
+                x1.1.partial_cmp(x2.1).unwrap()
+            })
             .unwrap();
 
         self.available_stops.get(dest_stop_id).unwrap()

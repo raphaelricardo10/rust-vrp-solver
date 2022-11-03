@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use crate::{domain::{vehicle::Vehicle, stop::Stop, route::DistanceMatrix}, services::route_service::RouteService};
+use crate::{
+    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
+    services::route_service::RouteService,
+};
 
 #[test]
 fn route_service_started() {

@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle}, solvers::greedy::solver::GreedySolver
+    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
+    solvers::greedy::solver::GreedySolver,
 };
 
 #[test]
