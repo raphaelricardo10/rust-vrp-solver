@@ -1,9 +1,7 @@
 use crate::errors::vehicle::vehicle_overload::VehicleOverloadError;
 
 use super::{stop::Stop, vehicle::Vehicle};
-use std::{
-    collections::HashMap,
-};
+use std::collections::HashMap;
 
 pub type DistanceMatrix = HashMap<(u32, u32), f64>;
 pub type DistanceMatrixLine = HashMap<u32, f64>;
