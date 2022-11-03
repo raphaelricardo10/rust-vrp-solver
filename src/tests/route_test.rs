@@ -15,8 +15,8 @@ fn route_distance_calculation() {
     let stop1 = Stop::new(0, 4);
     let stop2 = Stop::new(1, 5);
 
-    route.add_stop(stop1).unwrap();
-    route.add_stop(stop2).unwrap();
+    route.add_stop(&stop1).unwrap();
+    route.add_stop(&stop2).unwrap();
 
     assert_eq!(route.total_distance(), 20.0);
 }
@@ -31,9 +31,9 @@ fn route_cannot_overload_vehicle() {
     let stop1 = Stop::new(0, 4);
     let stop2 = Stop::new(1, 10);
 
-    route.add_stop(stop1).unwrap();
+    route.add_stop(&stop1).unwrap();
     
-    match route.add_stop(stop2) {
+    match route.add_stop(&stop2) {
         Ok(_) => assert!(false),
         Err(_) => assert!(true),
     }
