@@ -1,3 +1,4 @@
+use rstest::{fixture, rstest};
 use std::collections::HashMap;
 
 use crate::{
@@ -5,33 +6,54 @@ use crate::{
     solvers::greedy::solver::GreedySolver,
 };
 
-#[test]
-fn greedy_solution_is_correct_single_vehicle() {
-    let vehicle = Vehicle::new(0, 10);
-    let mut vehicles = vec![vehicle];
+type VehicleFactory = fn (number: u32) -> Vec<Vehicle>;
 
-    let mut stops: Vec<Stop> = Vec::new();
-    stops.push(Stop::new(0, 0));
-    stops.push(Stop::new(1, 0));
-    stops.push(Stop::new(2, 0));
-    stops.push(Stop::new(3, 0));
+#[fixture]
+fn distances() -> DistanceMatrix {
+    HashMap::from([
+        ((0, 1), 2.0),
+        ((0, 2), 1.0),
+        ((0, 3), 3.0),
+        ((1, 0), 2.0),
+        ((1, 2), 5.0),
+        ((1, 3), 3.0),
+        ((2, 0), 1.0),
+        ((2, 1), 5.0),
+        ((2, 3), 2.0),
+        ((3, 0), 3.0),
+        ((3, 1), 3.0),
+        ((3, 2), 2.0),
+    ])
+}
 
-    let mut distances: DistanceMatrix = HashMap::new();
-    distances.insert((0, 1), 2.0);
-    distances.insert((0, 2), 1.0);
-    distances.insert((0, 3), 3.0);
+#[fixture]
+fn stops() -> Vec<Stop> {
+    Vec::from([
+        Stop::new(0, 0),
+        Stop::new(1, 0),
+        Stop::new(2, 0),
+        Stop::new(3, 0),
+    ])
+}
 
-    distances.insert((1, 0), 2.0);
-    distances.insert((1, 2), 5.0);
-    distances.insert((1, 3), 3.0);
+#[fixture]
+fn vehicle_factory() -> VehicleFactory {
+    fn wrapper(number: u32) -> Vec<Vehicle> {
+        let mut vehicles = Vec::new();
+    
+        for i in 0..number {
+            vehicles.push(Vehicle::new(i, 10));
+        }
 
-    distances.insert((2, 0), 1.0);
-    distances.insert((2, 1), 5.0);
-    distances.insert((2, 3), 2.0);
+        vehicles
+    }
 
-    distances.insert((3, 0), 3.0);
-    distances.insert((3, 1), 3.0);
-    distances.insert((3, 2), 2.0);
+    wrapper
+}
+
+#[rstest]
+fn greedy_solution_is_correct_single_vehicle(distances: DistanceMatrix, stops: Vec<Stop>, vehicle_factory: VehicleFactory) {
+    let mut vehicles = vehicle_factory(1);
 
     let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
     solver.solve();
@@ -44,32 +66,9 @@ fn greedy_solution_is_correct_single_vehicle() {
     assert_eq!(solution[3], 1);
 }
 
-#[test]
-fn greedy_solution_is_correct_multiple_vehicles() {
-    let mut vehicles = vec![Vehicle::new(0, 10), Vehicle::new(1, 10)];
-
-    let mut stops: Vec<Stop> = Vec::new();
-    stops.push(Stop::new(0, 0));
-    stops.push(Stop::new(1, 0));
-    stops.push(Stop::new(2, 0));
-    stops.push(Stop::new(3, 0));
-
-    let mut distances: DistanceMatrix = HashMap::new();
-    distances.insert((0, 1), 2.0);
-    distances.insert((0, 2), 1.0);
-    distances.insert((0, 3), 3.0);
-
-    distances.insert((1, 0), 2.0);
-    distances.insert((1, 2), 5.0);
-    distances.insert((1, 3), 3.0);
-
-    distances.insert((2, 0), 1.0);
-    distances.insert((2, 1), 5.0);
-    distances.insert((2, 3), 2.0);
-
-    distances.insert((3, 0), 3.0);
-    distances.insert((3, 1), 3.0);
-    distances.insert((3, 2), 2.0);
+#[rstest]
+fn greedy_solution_is_correct_multiple_vehicles(distances: DistanceMatrix, stops: Vec<Stop>, vehicle_factory: VehicleFactory) {
+    let mut vehicles = vehicle_factory(2);
 
     let mut solver = GreedySolver::new(&mut vehicles, &distances, &stops);
     solver.solve();
