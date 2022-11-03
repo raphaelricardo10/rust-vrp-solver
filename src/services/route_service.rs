@@ -33,7 +33,10 @@ impl<'a> RouteService<'a> {
     ) -> RouteMap {
         let mut routes: RouteMap = HashMap::new();
         for vehicle in vehicles {
-            routes.insert(vehicle.get_id(), Route::new(vehicle, distances));
+            let id = vehicle.get_id();
+            let route = Route::new(vehicle, distances);
+
+            routes.insert(id, route);
         }
 
         routes
@@ -59,5 +62,12 @@ impl<'a> RouteService<'a> {
 
     pub fn get_vehicles(&self) -> Vec<&Vehicle> {
         self.routes.values().map(|x| x.get_vehicle()).collect()
+    }
+
+    pub fn assign_stop_to_route(&mut self, vehicle_id: u32, stop_id: u32) {
+        let stop = self.available_stops.remove(&stop_id).unwrap();
+        let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
+
+        vehicle.add_stop(stop).unwrap();
     }
 }
