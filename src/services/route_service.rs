@@ -15,16 +15,15 @@ impl<'a> RouteService<'a> {
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
-
         let routes = RouteService::populate_routes(vehicles, distances);
-        
-        RouteService {
-            stops,
-            routes,
-        }
+
+        RouteService { stops, routes }
     }
-    
-    pub fn populate_routes(vehicles: &'a mut Vec<Vehicle>, distances: &'a DistanceMatrix) -> Vec<Route>{
+
+    pub fn populate_routes(
+        vehicles: &'a mut Vec<Vehicle>,
+        distances: &'a DistanceMatrix,
+    ) -> Vec<Route> {
         let mut routes: Vec<Route> = Vec::new();
         for vehicle in vehicles {
             routes.push(Route::new(vehicle, distances));
@@ -44,5 +43,4 @@ impl<'a> RouteService<'a> {
     pub fn get_vehicles(&self) -> Vec<&Vehicle> {
         self.routes.iter().map(|x| x.get_vehicle()).collect()
     }
-
 }
