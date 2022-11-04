@@ -26,8 +26,12 @@ impl Vehicle {
         self.capacity
     }
 
+    pub fn can_support_load(&self, quantity: u32) -> bool {
+        self.usage + quantity < self.capacity
+    }
+
     pub fn load(&mut self, quantity: u32) -> Result<(), VehicleOverloadError> {
-        if self.usage + quantity > self.capacity {
+        if !self.can_support_load(quantity) {
             return Err(VehicleOverloadError::new());
         }
 

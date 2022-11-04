@@ -25,6 +25,10 @@ impl<'a> Route<'a> {
         Some(self.stops.last()?)
     }
 
+    pub fn can_add_stop(&self, stop: &Stop) -> bool {
+        self.vehicle.can_support_load(stop.usage)
+    }
+
     pub fn add_stop(&mut self, stop: &'a Stop) -> Result<(), VehicleOverloadError> {
         if let Err(e) = self.vehicle.load(stop.usage) {
             return Err(e);
