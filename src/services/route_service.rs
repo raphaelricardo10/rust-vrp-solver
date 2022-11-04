@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, BTreeMap};
 
 use crate::{
     domain::{
@@ -10,7 +10,7 @@ use crate::{
 };
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
-pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
+pub type RouteMap<'a> = BTreeMap<u32, Route<'a>>;
 
 pub struct RouteService<'a> {
     routes: RouteMap<'a>,
@@ -38,7 +38,7 @@ impl<'a> RouteService<'a> {
         vehicles: &'a mut Vec<Vehicle>,
         distances: &'a DistanceMatrix,
     ) -> RouteMap {
-        let mut routes: RouteMap = HashMap::new();
+        let mut routes: RouteMap = BTreeMap::new();
         for vehicle in vehicles {
             let id = vehicle.get_id();
             let route = Route::new(vehicle, distances);
