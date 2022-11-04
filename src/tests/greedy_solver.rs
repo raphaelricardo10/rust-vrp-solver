@@ -1,3 +1,4 @@
+use crate::solvers::solver::Solver;
 use rstest::rstest;
 
 use crate::{
