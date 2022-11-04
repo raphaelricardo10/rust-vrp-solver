@@ -57,7 +57,8 @@ impl<'a> GreedySolver<'a> {
             };
 
             self.route_service
-                .assign_stop_to_route(*vehicle_id, stop_id).unwrap();
+                .assign_stop_to_route(*vehicle_id, stop_id)
+                .unwrap();
         }
     }
 
@@ -67,6 +68,10 @@ impl<'a> GreedySolver<'a> {
         while !self.route_service.has_available_stop() {
             self.construct_routes_in_parallel(&vehicle_ids);
         }
+    }
+
+    pub fn solution_total_distance(&self) -> f64 {
+        self.route_service.total_distance()
     }
 
     pub fn solve(&mut self) {
