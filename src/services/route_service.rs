@@ -1,10 +1,13 @@
 use std::collections::HashMap;
 
-use crate::{domain::{
-    route::{DistanceMatrix, DistanceMatrixLine, Route},
-    stop::Stop,
-    vehicle::Vehicle,
-}, errors::vehicle::vehicle_overload::VehicleOverloadError};
+use crate::{
+    domain::{
+        route::{DistanceMatrix, DistanceMatrixLine, Route},
+        stop::Stop,
+        vehicle::Vehicle,
+    },
+    errors::vehicle::vehicle_overload::VehicleOverloadError,
+};
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
 pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
@@ -72,11 +75,22 @@ impl<'a> RouteService<'a> {
         self.routes.values().map(|x| x.get_vehicle()).collect()
     }
 
+    pub fn total_distance(&self) -> f64 {
+        self.routes
+            .iter()
+            .map(|(_, route)| route.total_distance().unwrap())
+            .sum()
+    }
+
     pub fn has_available_stop(&self) -> bool {
         self.available_stops.len() == 0
     }
 
-    pub fn assign_stop_to_route(&mut self, vehicle_id: u32, stop_id: u32) -> Result<(), VehicleOverloadError>  {
+    pub fn assign_stop_to_route(
+        &mut self,
+        vehicle_id: u32,
+        stop_id: u32,
+    ) -> Result<(), VehicleOverloadError> {
         let stop = self.available_stops.remove(&stop_id).unwrap();
         let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
 
