@@ -40,13 +40,13 @@ fn greedy_solution_is_correct_multiple_vehicles(
 
     let solution_v1 = solver.get_solution().get(&0).unwrap();
     let solution_v2 = solver.get_solution().get(&1).unwrap();
-    
+
     assert_eq!(solution_v1[0], 0);
-    assert_eq!(solution_v1[1], 1);
+    assert_eq!(solution_v1[1], 2);
+    assert_eq!(solution_v1[2], 3);
 
     assert_eq!(solution_v2[0], 0);
-    assert_eq!(solution_v2[1], 2);
-    assert_eq!(solution_v2[2], 3);
+    assert_eq!(solution_v2[1], 1);
 }
 
 #[rstest]
