@@ -1,10 +1,10 @@
 use std::collections::HashMap;
 
-use crate::domain::{
+use crate::{domain::{
     route::{DistanceMatrix, DistanceMatrixLine, Route},
     stop::Stop,
     vehicle::Vehicle,
-};
+}, errors::vehicle::vehicle_overload::VehicleOverloadError};
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
 pub type RouteMap<'a> = HashMap<u32, Route<'a>>;
@@ -60,8 +60,8 @@ impl<'a> RouteService<'a> {
         &self.available_stops
     }
 
-    pub fn get_route(&self, vehicle_id: u32) -> &'a Route {
-        self.routes.get(&vehicle_id).unwrap()
+    pub fn get_route(&self, vehicle_id: u32) -> Option<&'a Route> {
+        Some(self.routes.get(&vehicle_id)?)
     }
 
     pub fn get_all_routes(&self) -> &'a RouteMap {
@@ -76,23 +76,25 @@ impl<'a> RouteService<'a> {
         self.available_stops.len() == 0
     }
 
-    pub fn assign_stop_to_route(&mut self, vehicle_id: u32, stop_id: u32) {
+    pub fn assign_stop_to_route(&mut self, vehicle_id: u32, stop_id: u32) -> Result<(), VehicleOverloadError>  {
         let stop = self.available_stops.remove(&stop_id).unwrap();
         let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
 
-        vehicle.add_stop(stop).unwrap();
+        vehicle.add_stop(stop)
     }
 
-    pub fn assign_starting_points(&mut self) {
-        let stop = self.available_stops.remove(&0).unwrap();
+    pub fn assign_starting_points(&mut self) -> Option<()> {
+        let stop = self.available_stops.remove(&0)?;
 
         for (_, route) in &mut self.routes {
-            route.add_stop(stop).unwrap();
+            route.add_stop(stop).ok();
         }
+
+        Some(())
     }
 
     pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&&Stop> {
-        let current_stop_id = self.get_route(vehicle_id).get_current_stop().get_id();
+        let current_stop_id = self.get_route(vehicle_id)?.get_current_stop()?.get_id();
 
         let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine = self
             .distances

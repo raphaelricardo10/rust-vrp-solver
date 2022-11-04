@@ -21,8 +21,8 @@ impl<'a> Route<'a> {
         }
     }
 
-    pub fn get_current_stop(&self) -> &Stop {
-        self.stops.last().unwrap()
+    pub fn get_current_stop(&self) -> Option<&Stop> {
+        Some(self.stops.last()?)
     }
 
     pub fn add_stop(&mut self, stop: &'a Stop) -> Result<(), VehicleOverloadError> {
@@ -35,15 +35,15 @@ impl<'a> Route<'a> {
         Ok(())
     }
 
-    pub fn total_distance(&self) -> f64 {
+    pub fn total_distance(&self) -> Option<f64> {
         let mut total: f64 = 0.0;
 
         for (prev_pos, stop) in self.stops[1..].iter().enumerate() {
             let prev_stop_id = self.stops[prev_pos].get_id();
-            total += self.distances.get(&(prev_stop_id, stop.get_id())).unwrap();
+            total += self.distances.get(&(prev_stop_id, stop.get_id()))?;
         }
 
-        total
+        Some(total)
     }
 
     pub fn get_vehicle(&self) -> &Vehicle {

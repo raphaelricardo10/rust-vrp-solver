@@ -33,9 +33,9 @@ fn can_assign_stop_to_route(
 
     let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
 
-    route_service.assign_stop_to_route(0, 0);
+    route_service.assign_stop_to_route(0, 0).unwrap();
 
-    assert_eq!(route_service.get_route(0).get_stops().len(), 1)
+    assert_eq!(route_service.get_route(0).unwrap().get_stops().len(), 1)
 }
 
 #[rstest]
@@ -47,7 +47,7 @@ fn can_get_nearest_stop(
     let mut vehicles = vehicle_factory(1);
 
     let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
-    route_service.assign_stop_to_route(0, 0);
+    route_service.assign_stop_to_route(0, 0).unwrap();
 
     assert_eq!(route_service.get_nearest_stop(0).unwrap().get_id(), 2);
 }

@@ -39,6 +39,7 @@ impl<'a> GreedySolver<'a> {
             let solution = self
                 .route_service
                 .get_route(vehicle.get_id())
+                .unwrap()
                 .get_stops()
                 .iter()
                 .map(|x| x.get_id())
@@ -56,7 +57,7 @@ impl<'a> GreedySolver<'a> {
             };
 
             self.route_service
-                .assign_stop_to_route(*vehicle_id, stop_id);
+                .assign_stop_to_route(*vehicle_id, stop_id).unwrap();
         }
     }
 

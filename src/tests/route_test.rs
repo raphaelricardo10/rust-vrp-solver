@@ -19,7 +19,7 @@ fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
     route.add_stop(&stops[2]).unwrap();
     route.add_stop(&stops[3]).unwrap();
 
-    assert_eq!(route.total_distance(), 9.0);
+    assert_eq!(route.total_distance().unwrap(), 9.0);
 }
 
 #[rstest]
