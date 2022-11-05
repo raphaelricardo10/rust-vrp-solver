@@ -24,11 +24,11 @@ impl<'a> DistanceMatrixEntry<'a> {
         self.distance
     }
 
-    pub(crate) fn get_source_route(&'a self) -> &'a Stop {
+    pub(crate) fn get_source_stop(&'a self) -> &'a Stop {
         self.source
     }
 
-    pub(crate) fn get_destination_route(&'a self) -> &'a Stop {
+    pub(crate) fn get_destination_stop(&'a self) -> &'a Stop {
         self.destination
     }
 }
