@@ -124,19 +124,46 @@ impl<'a> RouteService<'a> {
         Some(())
     }
 
-    pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&&Stop> {
-        let current_stop_id = self.get_route(vehicle_id)?.get_current_stop()?.get_id();
+    fn get_feasible_stops(&self, vehicle_id: u32) -> impl Iterator<Item = DistanceMatrixLine> {
+        let current_stop_id = self
+            .get_route(vehicle_id)
+            .unwrap()
+            .get_current_stop()
+            .unwrap()
+            .get_id();
 
-        let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine = self
-            .distances
+        self.distances
             .iter()
             .filter(|x: &DistanceMatrixLine| self.available_stops.contains_key(&x.0 .1))
-            .filter(|x: &DistanceMatrixLine| self.can_add_stop(&x.0 .1, &vehicle_id).unwrap())
-            .filter(|((src_stop_id, _dest_stop_id), _distance)| *src_stop_id == current_stop_id)
-            .min_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
-                x1.1.partial_cmp(x2.1).unwrap()
-            })?;
+            .filter(move |x: &DistanceMatrixLine| self.can_add_stop(&x.0 .1, &vehicle_id).unwrap())
+            .filter(
+                move |((src_stop_id, _dest_stop_id), _distance): &DistanceMatrixLine| {
+                    *src_stop_id == current_stop_id
+                },
+            )
+    }
+
+    pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&&Stop> {
+        let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine =
+            self.get_feasible_stops(vehicle_id).min_by(
+                |x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| x1.1.partial_cmp(x2.1).unwrap(),
+            )?;
 
         self.available_stops.get(dest_stop_id)
+    }
+
+    pub fn get_k_nearest_stops(&self, vehicle_id: u32, k: usize) -> Vec<&&Stop> {
+        let mut stops: Vec<DistanceMatrixLine> = self
+            .get_feasible_stops(vehicle_id)
+            .collect::<Vec<DistanceMatrixLine>>();
+
+        stops.sort_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
+            x1.1.partial_cmp(x2.1).unwrap()
+        });
+
+        stops[0..k]
+            .iter()
+            .map(|x: &DistanceMatrixLine| self.available_stops.get(&x.0 .1).unwrap())
+            .collect::<Vec<&&Stop>>()
     }
 }
