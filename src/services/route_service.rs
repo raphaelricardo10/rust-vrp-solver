@@ -59,6 +59,12 @@ impl<'a> RouteService<'a> {
         available_stops
     }
 
+    fn can_add_stop(&self, stop_id: &u32, vehicle_id: &u32) -> Option<bool> {
+        let stop = self.available_stops.get(&stop_id)?;
+
+        Some(self.get_route(*vehicle_id)?.can_add_stop(stop))
+    }
+
     pub fn get_available_stops(&self) -> &StopMap {
         &self.available_stops
     }
@@ -83,7 +89,18 @@ impl<'a> RouteService<'a> {
     }
 
     pub fn has_available_stop(&self) -> bool {
-        self.available_stops.len() == 0
+        for vehicle in self.get_vehicles().iter() {
+            let feasible_stops = self
+                .available_stops
+                .iter()
+                .filter(|x| self.can_add_stop(x.0, &vehicle.get_id()).unwrap());
+
+            if feasible_stops.count() > 0 {
+                return true;
+            }
+        }
+
+        false
     }
 
     pub fn assign_stop_to_route(
@@ -114,10 +131,7 @@ impl<'a> RouteService<'a> {
             .distances
             .iter()
             .filter(|x: &DistanceMatrixLine| self.available_stops.contains_key(&x.0 .1))
-            .filter(|x: &DistanceMatrixLine| {
-                let stop = self.available_stops.get(&x.0 .1).unwrap();
-                self.get_route(vehicle_id).unwrap().can_add_stop(stop)
-            })
+            .filter(|x: &DistanceMatrixLine| self.can_add_stop(&x.0 .1, &vehicle_id).unwrap())
             .filter(|((src_stop_id, _dest_stop_id), _distance)| *src_stop_id == current_stop_id)
             .min_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
                 x1.1.partial_cmp(x2.1).unwrap()
