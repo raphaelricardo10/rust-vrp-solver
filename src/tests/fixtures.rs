@@ -39,7 +39,7 @@ pub fn stops() -> Vec<Stop> {
         Stop::new(1, 0),
         Stop::new(2, 0),
         Stop::new(3, 0),
-        Stop::new(4, 100)
+        Stop::new(4, 100),
     ])
 }
 

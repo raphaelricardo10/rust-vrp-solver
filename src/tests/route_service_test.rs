@@ -56,9 +56,8 @@ fn can_get_nearest_stop(
 fn can_get_k_nearest_stops(
     vehicle_factory: VehicleFactory,
     stops: Vec<Stop>,
-    distances: DistanceMatrix,   
+    distances: DistanceMatrix,
 ) {
-   
     let mut vehicles = vehicle_factory(1);
 
     let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
@@ -70,5 +69,5 @@ fn can_get_k_nearest_stops(
 
     assert_eq!(k_nearest[0].get_id(), 2);
     assert_eq!(k_nearest[1].get_id(), 1);
-    assert_eq!(k_nearest[2].get_id(), 3); 
+    assert_eq!(k_nearest[2].get_id(), 3);
 }
