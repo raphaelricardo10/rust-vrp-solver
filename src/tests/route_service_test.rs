@@ -51,3 +51,24 @@ fn can_get_nearest_stop(
 
     assert_eq!(route_service.get_nearest_stop(0).unwrap().get_id(), 2);
 }
+
+#[rstest]
+fn can_get_k_nearest_stops(
+    vehicle_factory: VehicleFactory,
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,   
+) {
+   
+    let mut vehicles = vehicle_factory(1);
+
+    let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
+    route_service.assign_stop_to_route(0, 0).unwrap();
+
+    let k_nearest = route_service.get_k_nearest_stops(0, 3);
+
+    assert_eq!(k_nearest.len(), 3);
+
+    assert_eq!(k_nearest[0].get_id(), 2);
+    assert_eq!(k_nearest[1].get_id(), 1);
+    assert_eq!(k_nearest[2].get_id(), 3); 
+}
