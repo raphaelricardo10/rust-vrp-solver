@@ -38,6 +38,6 @@ impl<'a> DistanceMatrix<u32, &DistanceMatrixEntry<'a>> {
     pub fn get_nearest_stop(&self, stop: &'a Stop) -> Option<&Stop> {
         self.get_distances_from(stop)
             .min_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap())
-            .map(|x| x.get_source_route())
+            .map(|x| x.get_destination_stop())
     }
 }
