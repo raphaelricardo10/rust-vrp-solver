@@ -1,4 +1,4 @@
-use crate::solvers::solver::Solver;
+use crate::{services::route_service::RouteService, solvers::solver::Solver};
 use rstest::rstest;
 
 use crate::{
@@ -62,4 +62,20 @@ fn greedy_solution_total_distance_is_correct(
     solver.solve();
 
     assert_eq!(solver.solution_total_distance(), 5.0);
+}
+
+#[rstest]
+fn cannot_get_infeasible_near_stops(
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,
+    vehicle_factory: VehicleFactory,
+) {
+    let mut vehicles = vehicle_factory(1);
+    let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
+
+    route_service.assign_stop_to_route(0, 0).unwrap();
+
+    let stop = route_service.get_nearest_stop(0).unwrap();
+
+    assert_ne!(stop.get_id(), 4)
 }
