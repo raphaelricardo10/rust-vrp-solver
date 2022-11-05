@@ -18,7 +18,7 @@ fn route_service_started(
 
     let route_service = RouteService::new(&mut vehicles, &distances, &stops);
 
-    assert_eq!(route_service.get_available_stops().len(), 4);
+    assert_eq!(route_service.get_available_stops().len(), 5);
     assert_eq!(route_service.get_all_routes().len(), 2);
     assert_eq!(route_service.get_vehicles().len(), 2);
 }
