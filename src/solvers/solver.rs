@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
-    services::route_service::RouteService,
+    services::route::route_service::RouteService,
 };
 
 pub type Solution = HashMap<u32, Vec<u32>>;
@@ -27,7 +27,7 @@ pub trait Solver<'a, T> {
             .collect()
     }
 
-    fn construct_solutions(route_service: &RouteService) -> Solution{
+    fn construct_solutions(route_service: &RouteService) -> Solution {
         let mut solution: Solution = HashMap::new();
 
         for vehicle in route_service.get_vehicles().iter() {

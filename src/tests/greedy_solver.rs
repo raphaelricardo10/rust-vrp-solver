@@ -1,4 +1,4 @@
-use crate::{services::route_service::RouteService, solvers::solver::Solver};
+use crate::{services::route::route_service::RouteService, solvers::solver::Solver};
 use rstest::rstest;
 
 use crate::{

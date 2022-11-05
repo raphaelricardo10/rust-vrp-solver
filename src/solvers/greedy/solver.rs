@@ -2,7 +2,8 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
-    services::route_service::RouteService, solvers::solver::{Solution, Solver},
+    services::route::route_service::RouteService,
+    solvers::solver::{Solution, Solver},
 };
 
 pub struct GreedySolver<'a> {
