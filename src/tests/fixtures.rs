@@ -45,7 +45,7 @@ pub fn stops() -> Vec<Stop> {
 
 #[fixture]
 pub fn full_stops() -> Vec<Stop> {
-    Vec::from([Stop::new(0, 5), Stop::new(0, 100)])
+    Vec::from([Stop::new(0, 5), Stop::new(1, 100)])
 }
 
 #[fixture]
