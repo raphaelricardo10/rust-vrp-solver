@@ -6,7 +6,7 @@ use super::distance_matrix::DistanceMatrixEntry;
 
 pub type DistancesMatrixKey = (u32, u32);
 pub type DistanceMatrixInput = HashMap<DistancesMatrixKey, f64>;
-pub type DistanceMatrix<'a> = HashMap<DistancesMatrixKey, DistanceMatrixEntry<'a>>;
+pub(crate) type DistanceMatrix<'a> = HashMap<DistancesMatrixKey, DistanceMatrixEntry<'a>>;
 
 pub type StopsMap<'a> = HashMap<u32, &'a Stop>;
 
