@@ -24,7 +24,7 @@ impl<'a> RouteService<'a> {
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
-        let routes: RouteMap = RouteService::populate_routes(vehicles, distances);
+        let routes: RouteMap = RouteService::populate_routes(vehicles);
         let available_stops: StopMap = RouteService::populate_available_stops(stops);
 
         RouteService {
@@ -36,12 +36,11 @@ impl<'a> RouteService<'a> {
 
     pub fn populate_routes(
         vehicles: &'a mut Vec<Vehicle>,
-        distances: &'a DistanceMatrix,
     ) -> RouteMap {
         let mut routes: RouteMap = BTreeMap::new();
         for vehicle in vehicles {
             let id = vehicle.get_id();
-            let route = Route::new(vehicle, distances);
+            let route = Route::new(vehicle);
 
             routes.insert(id, route);
         }
@@ -84,7 +83,7 @@ impl<'a> RouteService<'a> {
     pub fn total_distance(&self) -> f64 {
         self.routes
             .iter()
-            .map(|(_, route)| route.total_distance().unwrap())
+            .map(|(_, route)| route.total_distance())
             .sum()
     }
 
@@ -108,17 +107,26 @@ impl<'a> RouteService<'a> {
         vehicle_id: u32,
         stop_id: u32,
     ) -> Result<(), VehicleOverloadError> {
-        let stop = self.available_stops.remove(&stop_id).unwrap();
-        let vehicle = self.routes.get_mut(&vehicle_id).unwrap();
+        let route = self.routes.get_mut(&vehicle_id).unwrap();
 
-        vehicle.add_stop(stop)
+        let new_stop = self.available_stops.remove(&stop_id).unwrap();
+
+        let distance = match route.get_current_stop() {
+            Some(last_stop) => *self
+                .distances
+                .get(&(last_stop.get_id(), new_stop.get_id()))
+                .unwrap(),
+            None => 0.0,
+        };
+
+        route.add_stop(new_stop, distance)
     }
 
     pub fn assign_starting_points(&mut self) -> Option<()> {
-        let stop = self.available_stops.remove(&0)?;
+        let starting_stop = self.available_stops.remove(&0)?;
 
         for (_, route) in &mut self.routes {
-            route.add_stop(stop).ok();
+            route.add_stop(starting_stop, 0.0).ok();
         }
 
         Some(())
