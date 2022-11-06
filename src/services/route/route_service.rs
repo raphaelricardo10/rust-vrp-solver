@@ -5,11 +5,12 @@ use std::{
 
 use crate::{
     domain::{
-        route::{DistanceMatrix, DistanceMatrixLine, Route},
+        route::{DistanceMatrix, Route},
         stop::Stop,
         vehicle::Vehicle,
     },
     errors::vehicle::vehicle_overload::VehicleOverloadError,
+    services::distance::distance_service::DistanceService,
 };
 
 pub type StopMap<'a> = HashMap<u32, &'a Stop>;
@@ -19,6 +20,7 @@ pub struct RouteService<'a> {
     routes: RouteMap<'a>,
     available_stops: StopMap<'a>,
     distances: &'a DistanceMatrix,
+    distance_service: DistanceService<'a>,
 }
 
 impl<'a> RouteService<'a> {
@@ -34,6 +36,7 @@ impl<'a> RouteService<'a> {
             routes,
             distances,
             available_stops,
+            distance_service: DistanceService::new(stops, distances),
         }
     }
 
@@ -123,46 +126,38 @@ impl<'a> RouteService<'a> {
         Some(())
     }
 
-    fn get_feasible_stops(&self, vehicle_id: u32) -> impl Iterator<Item = DistanceMatrixLine> {
-        let current_stop_id = self
-            .get_route(vehicle_id)
-            .unwrap()
-            .get_current_stop()
-            .unwrap()
-            .get_id();
+    fn is_stop_feasible(&self, stop: &Stop, route: &Route) -> bool {
+        if !self.available_stops.contains_key(&stop.get_id()) {
+            return false;
+        }
 
-        self.distances
-            .iter()
-            .filter(|x: &DistanceMatrixLine| self.available_stops.contains_key(&x.0 .1))
-            .filter(move |x: &DistanceMatrixLine| self.can_add_stop(&x.0 .1, &vehicle_id).unwrap())
-            .filter(
-                move |((src_stop_id, _dest_stop_id), _distance): &DistanceMatrixLine| {
-                    *src_stop_id == current_stop_id
-                },
-            )
+        if !route.can_add_stop(stop) {
+            return false;
+        }
+
+        true
     }
 
-    pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&&Stop> {
-        let ((_src_stop_id, dest_stop_id), _distance): DistanceMatrixLine =
-            self.get_feasible_stops(vehicle_id).min_by(
-                |x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| x1.1.partial_cmp(x2.1).unwrap(),
-            )?;
+    pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&Stop> {
+        let route = self.get_route(vehicle_id)?;
+        let current_stop = route.get_current_stop()?;
 
-        self.available_stops.get(dest_stop_id)
+        self.distance_service
+            .get_nearest_stop(current_stop)
+            .filter(|next_stop| self.is_stop_feasible(*next_stop, route))
     }
 
-    pub fn get_k_nearest_stops(&self, vehicle_id: u32, k: usize) -> Vec<&&Stop> {
-        let mut stops: Vec<DistanceMatrixLine> = self
-            .get_feasible_stops(vehicle_id)
-            .collect::<Vec<DistanceMatrixLine>>();
+    pub fn get_k_nearest_stops(&self, vehicle_id: u32, k: usize) -> Option<Vec<&Stop>> {
+        let route = self.get_route(vehicle_id)?;
+        let current_stop = route.get_current_stop()?;
+        let stops = self.distance_service.get_k_nearest_stops(current_stop, k);
 
-        stops.sort_by(|x1: &DistanceMatrixLine, x2: &DistanceMatrixLine| {
-            x1.1.partial_cmp(x2.1).unwrap()
-        });
-
-        stops[0..k]
-            .iter()
-            .map(|x: &DistanceMatrixLine| self.available_stops.get(&x.0 .1).unwrap())
-            .collect::<Vec<&&Stop>>()
+        Some(
+            stops[0..k]
+                .iter()
+                .filter(|stop| self.is_stop_feasible(stop, route))
+                .map(|stop| *stop)
+                .collect(),
+        )
     }
 }
