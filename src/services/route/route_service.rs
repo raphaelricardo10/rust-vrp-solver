@@ -27,17 +27,17 @@ impl<'a> RouteService<'a> {
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
-        let routes: RouteMap = RouteService::populate_routes(vehicles);
-        let available_stops: StopMap = RouteService::populate_available_stops(stops);
+        let routes: RouteMap = RouteService::map_routes(vehicles);
+        let available_stops: StopMap = RouteService::map_stops(stops);
 
         RouteService {
-            available_stops,
             routes,
             distances,
+            available_stops,
         }
     }
 
-    pub fn populate_routes(vehicles: &'a mut Vec<Vehicle>) -> RouteMap {
+    pub fn map_routes(vehicles: &'a mut Vec<Vehicle>) -> RouteMap {
         vehicles
             .iter_mut()
             .borrow_mut()
@@ -45,7 +45,7 @@ impl<'a> RouteService<'a> {
             .collect()
     }
 
-    fn populate_available_stops(stops: &'a Vec<Stop>) -> StopMap {
+    fn map_stops(stops: &'a Vec<Stop>) -> StopMap {
         stops.iter().map(|stop| (stop.get_id(), stop)).collect()
     }
 
