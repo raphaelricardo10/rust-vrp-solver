@@ -26,8 +26,7 @@ impl<'a> DistanceService<'a> {
             let source_stop = *stops.get(&source_stop_id).unwrap();
             let destination_stop = *stops.get(&source_stop_id).unwrap();
 
-            let stop_distance =
-                DistanceMatrixEntry::new(source_stop, destination_stop, *distance);
+            let stop_distance = DistanceMatrixEntry::new(source_stop, destination_stop, *distance);
 
             mapped_distances.insert((source_stop_id, destination_stop_id), stop_distance);
         }
@@ -38,7 +37,11 @@ impl<'a> DistanceService<'a> {
     }
 
     pub fn get_distance(&self, from: &Stop, to: &Stop) -> Option<f64> {
-        Some(self.distances.get(&(from.get_id(), to.get_id()))?.get_distance())
+        Some(
+            self.distances
+                .get(&(from.get_id(), to.get_id()))?
+                .get_distance(),
+        )
     }
 
     fn get_distances_from(&self, stop: &'a Stop) -> impl Iterator<Item = &DistanceMatrixEntry> {

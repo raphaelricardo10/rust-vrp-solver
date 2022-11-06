@@ -1,4 +1,7 @@
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    borrow::BorrowMut,
+    collections::{BTreeMap, HashMap},
+};
 
 use crate::{
     domain::{
@@ -34,28 +37,16 @@ impl<'a> RouteService<'a> {
         }
     }
 
-    pub fn populate_routes(
-        vehicles: &'a mut Vec<Vehicle>,
-    ) -> RouteMap {
-        let mut routes: RouteMap = BTreeMap::new();
-        for vehicle in vehicles {
-            let id = vehicle.get_id();
-            let route = Route::new(vehicle);
-
-            routes.insert(id, route);
-        }
-
-        routes
+    pub fn populate_routes(vehicles: &'a mut Vec<Vehicle>) -> RouteMap {
+        vehicles
+            .iter_mut()
+            .borrow_mut()
+            .map(|vehicle| (vehicle.get_id(), Route::new(vehicle)))
+            .collect()
     }
 
     fn populate_available_stops(stops: &'a Vec<Stop>) -> StopMap {
-        let mut available_stops: StopMap = HashMap::new();
-
-        for stop in stops {
-            available_stops.insert(stop.get_id(), stop);
-        }
-
-        available_stops
+        stops.iter().map(|stop| (stop.get_id(), stop)).collect()
     }
 
     fn can_add_stop(&self, stop_id: &u32, vehicle_id: &u32) -> Option<bool> {
