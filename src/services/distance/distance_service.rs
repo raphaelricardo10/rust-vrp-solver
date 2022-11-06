@@ -15,25 +15,26 @@ pub struct DistanceService<'a> {
 }
 
 impl<'a> DistanceService<'a> {
-    pub fn new(stops: StopsMap<'a>, distances: &'a DistanceMatrixInput) -> DistanceService<'a> {
-        let mut mapped_distances: DistanceMatrix = HashMap::new();
-
-        for distance in distances {
-            let source_stop_id = distance.0 .0;
-            let destination_stop_id = distance.0 .1;
-            let distance = distance.1;
-
-            let source_stop = *stops.get(&source_stop_id).unwrap();
-            let destination_stop = *stops.get(&source_stop_id).unwrap();
-
-            let stop_distance = DistanceMatrixEntry::new(source_stop, destination_stop, *distance);
-
-            mapped_distances.insert((source_stop_id, destination_stop_id), stop_distance);
-        }
-
+    pub fn new(stops: &StopsMap<'a>, distances: &'a DistanceMatrixInput) -> DistanceService<'a> {
         DistanceService {
-            distances: mapped_distances,
+            distances: Self::map_distances(stops, distances),
         }
+    }
+
+    fn map_distances(stops: &StopsMap<'a>, distances: &'a DistanceMatrixInput) -> DistanceMatrix<'a> {
+        distances
+            .iter()
+            .map(|x| {
+                (
+                    (x.0 .0, x.0 .1),
+                    DistanceMatrixEntry::new(
+                        stops.get(&x.0 .0).unwrap(),
+                        stops.get(&x.0 .0).unwrap(),
+                        *x.1,
+                    ),
+                )
+            })
+            .collect()
     }
 
     pub fn get_distance(&self, from: &Stop, to: &Stop) -> Option<f64> {
