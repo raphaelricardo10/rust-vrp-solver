@@ -52,12 +52,6 @@ impl<'a> RouteService<'a> {
         stops.iter().map(|stop| (stop.get_id(), stop)).collect()
     }
 
-    fn can_add_stop(&self, stop_id: &u32, vehicle_id: &u32) -> Option<bool> {
-        let stop = self.available_stops.get(&stop_id)?;
-
-        Some(self.get_route(*vehicle_id)?.can_add_stop(stop))
-    }
-
     pub fn get_available_stops(&self) -> &StopMap {
         &self.available_stops
     }
