@@ -19,7 +19,6 @@ pub type RouteMap<'a> = BTreeMap<u32, Route<'a>>;
 pub struct RouteService<'a> {
     routes: RouteMap<'a>,
     available_stops: StopMap<'a>,
-    distances: &'a DistanceMatrix,
     distance_service: DistanceService<'a>,
 }
 
@@ -34,7 +33,6 @@ impl<'a> RouteService<'a> {
 
         RouteService {
             routes,
-            distances,
             available_stops,
             distance_service: DistanceService::new(stops, distances),
         }
@@ -104,10 +102,7 @@ impl<'a> RouteService<'a> {
         let new_stop = self.available_stops.remove(&stop_id).unwrap();
 
         let distance = match route.get_current_stop() {
-            Some(last_stop) => *self
-                .distances
-                .get(&(last_stop.get_id(), new_stop.get_id()))
-                .unwrap(),
+            Some(last_stop) => self.distance_service.get_distance(last_stop, new_stop).unwrap(),
             None => 0.0,
         };
 
