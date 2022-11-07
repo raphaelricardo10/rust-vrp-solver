@@ -71,17 +71,15 @@ impl<'a> RouteService<'a> {
     }
 
     pub fn has_available_stop(&self) -> Option<bool> {
-        for vehicle in self.get_vehicles().iter() {
-            let route = self.get_route(vehicle.get_id())?;
-
-            let feasible_stops: Vec<&Stop> = self
+        for route in self.routes.values(){
+            let feasible_stops_number = self
                 .available_stops
                 .values()
                 .filter(|stop| self.is_stop_feasible(stop, route))
                 .map(|stop| *stop)
-                .collect();
+                .count();
 
-            if feasible_stops.len() > 0 {
+            if feasible_stops_number > 0 {
                 return Some(true);
             }
         }
