@@ -63,7 +63,7 @@ fn can_get_k_nearest_stops(
     let mut route_service = RouteService::new(&mut vehicles, &distances, &stops);
     route_service.assign_stop_to_route(0, 0).unwrap();
 
-    let k_nearest = route_service.get_k_nearest_stops(0, 3);
+    let k_nearest = route_service.get_k_nearest_stops(0, 3).unwrap();
 
     assert_eq!(k_nearest.len(), 3);
 
