@@ -81,19 +81,23 @@ impl<'a> RouteService<'a> {
             .sum()
     }
 
-    pub fn has_available_stop(&self) -> bool {
+    pub fn has_available_stop(&self) -> Option<bool> {
         for vehicle in self.get_vehicles().iter() {
-            let feasible_stops = self
-                .available_stops
-                .iter()
-                .filter(|x| self.can_add_stop(x.0, &vehicle.get_id()).unwrap());
+            let route = self.get_route(vehicle.get_id())?;
 
-            if feasible_stops.count() > 0 {
-                return true;
+            let feasible_stops: Vec<&Stop> = self
+                .available_stops
+                .values()
+                .filter(|stop| self.is_stop_feasible(stop, route))
+                .map(|stop| *stop)
+                .collect();
+
+            if feasible_stops.len() > 0 {
+                return Some(true);
             }
         }
 
-        false
+        Some(false)
     }
 
     pub fn assign_stop_to_route(
@@ -143,21 +147,16 @@ impl<'a> RouteService<'a> {
         let current_stop = route.get_current_stop()?;
 
         self.distance_service
-            .get_nearest_stop(current_stop)
-            .filter(|next_stop| self.is_stop_feasible(*next_stop, route))
+            .get_nearest_stop(current_stop, |stop| self.is_stop_feasible(stop, route))
     }
 
     pub fn get_k_nearest_stops(&self, vehicle_id: u32, k: usize) -> Option<Vec<&Stop>> {
         let route = self.get_route(vehicle_id)?;
         let current_stop = route.get_current_stop()?;
-        let stops = self.distance_service.get_k_nearest_stops(current_stop, k);
 
         Some(
-            stops[0..k]
-                .iter()
-                .filter(|stop| self.is_stop_feasible(stop, route))
-                .map(|stop| *stop)
-                .collect(),
+            self.distance_service
+                .get_k_nearest_stops(current_stop, k, |stop| self.is_stop_feasible(stop, route)),
         )
     }
 }
