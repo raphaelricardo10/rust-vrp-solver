@@ -21,7 +21,10 @@ impl<'a> DistanceService<'a> {
         }
     }
 
-    fn map_distances(stops: &'a Vec<Stop>, distances: &'a DistanceMatrixInput) -> DistanceMatrix<'a> {
+    fn map_distances(
+        stops: &'a Vec<Stop>,
+        distances: &'a DistanceMatrixInput,
+    ) -> DistanceMatrix<'a> {
         let stops_map: StopsMap = stops.iter().map(|stop| (stop.get_id(), stop)).collect();
 
         distances
@@ -31,7 +34,7 @@ impl<'a> DistanceService<'a> {
                     (x.0 .0, x.0 .1),
                     DistanceMatrixEntry::new(
                         stops_map.get(&x.0 .0).unwrap(),
-                        stops_map.get(&x.0 .0).unwrap(),
+                        stops_map.get(&x.0 .1).unwrap(),
                         *x.1,
                     ),
                 )
@@ -47,22 +50,36 @@ impl<'a> DistanceService<'a> {
         )
     }
 
-    fn get_distances_from(&self, stop: &'a Stop) -> impl Iterator<Item = &DistanceMatrixEntry> {
+    pub(crate) fn get_distances_from(
+        &self,
+        stop: &'a Stop,
+    ) -> impl Iterator<Item = &DistanceMatrixEntry> {
         self.distances
             .iter()
             .filter(|x| x.0 .0 == stop.get_id())
             .map(|x| x.1)
     }
 
-    pub fn get_nearest_stop(&self, stop: &'a Stop) -> Option<&Stop> {
+    pub fn get_nearest_stop(
+        &self,
+        stop: &'a Stop,
+        filter: impl Fn(&Stop) -> bool,
+    ) -> Option<&Stop> {
         self.get_distances_from(stop)
+            .filter(|entry| filter(entry.get_destination_stop()))
             .min_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap())
             .map(|x| x.get_destination_stop())
     }
 
-    pub fn get_k_nearest_stops(&'a self, stop: &'a Stop, k: usize) -> Vec<&Stop> {
+    pub fn get_k_nearest_stops(
+        &'a self,
+        stop: &'a Stop,
+        k: usize,
+        filter: impl Fn(&Stop) -> bool,
+    ) -> Vec<&Stop> {
         let mut stops = self
             .get_distances_from(stop)
+            .filter(|entry| filter(entry.get_destination_stop()))
             .collect::<Vec<&DistanceMatrixEntry>>();
 
         stops.sort_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap());
