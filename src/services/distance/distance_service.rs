@@ -33,7 +33,6 @@ impl<'a> DistanceService<'a> {
                 (
                     (x.0 .0, x.0 .1),
                     DistanceMatrixEntry::new(
-                        stops_map.get(&x.0 .0).unwrap(),
                         stops_map.get(&x.0 .1).unwrap(),
                         *x.1,
                     ),

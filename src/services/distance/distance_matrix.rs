@@ -4,18 +4,15 @@ use crate::domain::stop::Stop;
 
 pub(crate) struct DistanceMatrixEntry<'a> {
     distance: f64,
-    source: &'a Stop,
     destination: &'a Stop,
 }
 
 impl<'a> DistanceMatrixEntry<'a> {
     pub(crate) fn new(
-        source: &'a Stop,
         destination: &'a Stop,
         distance: f64,
     ) -> DistanceMatrixEntry {
         DistanceMatrixEntry {
-            source,
             distance,
             destination,
         }
@@ -23,10 +20,6 @@ impl<'a> DistanceMatrixEntry<'a> {
 
     pub(crate) fn get_distance(&self) -> f64 {
         self.distance
-    }
-
-    pub(crate) fn get_source_stop(&'a self) -> &'a Stop {
-        self.source
     }
 
     pub(crate) fn get_destination_stop(&'a self) -> &'a Stop {
