@@ -28,12 +28,9 @@ impl<'a> RouteService<'a> {
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
     ) -> RouteService<'a> {
-        let routes: RouteMap = RouteService::map_routes(vehicles);
-        let available_stops: StopMap = RouteService::map_stops(stops);
-
         RouteService {
-            routes,
-            available_stops,
+            routes: Self::map_routes(vehicles),
+            available_stops: Self::map_stops(stops),
             distance_service: DistanceService::new(stops, distances),
         }
     }
