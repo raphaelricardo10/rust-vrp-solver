@@ -50,7 +50,7 @@ pub trait Solver<'a, T> {
     fn construct_all_routes(route_service: &mut RouteService) {
         let vehicle_ids: Vec<u32> = Self::get_all_vehicle_ids(route_service);
 
-        while route_service.has_available_stop() {
+        while route_service.has_available_stop().unwrap() {
             Self::construct_routes_in_parallel(route_service, &vehicle_ids);
         }
     }
