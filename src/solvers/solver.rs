@@ -28,23 +28,16 @@ pub trait Solver<'a, T> {
     }
 
     fn construct_solutions(route_service: &RouteService) -> Solution {
-        let mut solution: Solution = HashMap::new();
-
-        for vehicle in route_service.get_vehicles().iter() {
-            let vehicle_id = vehicle.get_id();
-
-            let route = route_service
-                .get_route(vehicle.get_id())
-                .unwrap()
-                .get_stops()
-                .iter()
-                .map(|x| x.get_id())
-                .collect();
-
-            solution.insert(vehicle_id, route);
-        }
-
-        solution
+        route_service
+            .get_all_routes()
+            .iter()
+            .map(|(vehicle_id, route)| -> (u32, Vec<u32>) {
+                (
+                    *vehicle_id,
+                    route.get_stops().iter().map(|stop| stop.get_id()).collect(),
+                )
+            })
+            .collect()
     }
 
     fn construct_all_routes(route_service: &mut RouteService) {
