@@ -25,22 +25,24 @@ impl<'a> GreedySolver<'a> {
 }
 
 impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
-    fn construct_routes_in_parallel(route_service: &mut RouteService, vehicle_ids: &Vec<u32>) {
-        for vehicle_id in vehicle_ids.iter() {
-            let stop_id = match route_service.get_nearest_stop(*vehicle_id) {
+    fn construct_routes_in_parallel(&mut self) {
+        let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
+
+        for vehicle_id in vehicle_ids {
+            let stop_id = match self.route_service.get_nearest_stop(vehicle_id) {
                 None => break,
                 Some(stop) => stop.get_id(),
             };
 
-            route_service
-                .assign_stop_to_route(*vehicle_id, stop_id)
+            self.route_service
+                .assign_stop_to_route(vehicle_id, stop_id)
                 .unwrap();
         }
     }
 
     fn solve(&mut self) {
         self.route_service.assign_starting_points();
-        Self::construct_all_routes(&mut self.route_service);
+        self.construct_all_routes();
         self.solution = Self::construct_solutions(&self.route_service);
     }
 
@@ -50,5 +52,9 @@ impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
 
     fn solution_total_distance(&self) -> f64 {
         self.route_service.total_distance()
+    }
+
+    fn stop_condition_met(&self) -> bool {
+        !self.route_service.has_available_stop().unwrap()
     }
 }
