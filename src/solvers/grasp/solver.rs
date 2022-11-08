@@ -14,7 +14,7 @@ pub struct GraspSolver {
     route_service: RouteService,
 }
 
-impl<'a> GraspSolver {
+impl GraspSolver {
     pub fn new(
         rcl_size: usize,
         vehicles: Vec<Vehicle>,

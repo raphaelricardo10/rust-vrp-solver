@@ -1,25 +1,25 @@
 use std::{fmt, error::Error};
 
 #[derive(Debug)]
-pub struct NegativeVehicleCapacityError<'a> {
-    description: &'a str,
+pub struct NegativeVehicleCapacityError {
+    description: &'static str,
 }
 
-impl<'a> NegativeVehicleCapacityError<'a> {
-    pub fn new() -> NegativeVehicleCapacityError<'a> {
+impl NegativeVehicleCapacityError {
+    pub fn new() -> NegativeVehicleCapacityError {
         NegativeVehicleCapacityError {
             description: "The capacity of vehicle cannot be lesser than zero",
         }
     }
 }
 
-impl<'a> fmt::Display for NegativeVehicleCapacityError<'a> {
+impl fmt::Display for NegativeVehicleCapacityError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.description)
     }
 }
 
-impl<'a> Error for NegativeVehicleCapacityError<'a> {
+impl Error for NegativeVehicleCapacityError {
     fn description(&self) -> &str {
         self.description
     }

@@ -11,7 +11,7 @@ pub struct GreedySolver {
     route_service: RouteService,
 }
 
-impl<'a> GreedySolver {
+impl GreedySolver {
     pub fn new(
         vehicles: Vec<Vehicle>,
         distances: DistanceMatrix,
@@ -24,7 +24,7 @@ impl<'a> GreedySolver {
     }
 }
 
-impl<'a> Solver<'a, GreedySolver> for GreedySolver {
+impl Solver<GreedySolver> for GreedySolver {
     fn run_iteration(&mut self) {
         let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
 
@@ -56,7 +56,7 @@ impl<'a> Solver<'a, GreedySolver> for GreedySolver {
         self.solution = solution
     }
 
-    fn get_route_service(&'a mut self) -> &'a mut RouteService {
+    fn get_route_service(&mut self) -> &mut RouteService {
         &mut self.route_service
     }
 }

@@ -27,16 +27,16 @@ impl DistanceMatrixEntry {
     }
 }
 
-impl<'a> PartialOrd for DistanceMatrixEntry {
+impl PartialOrd for DistanceMatrixEntry {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.get_distance().partial_cmp(&other.get_distance())
     }
 }
 
-impl<'a> PartialEq for DistanceMatrixEntry {
+impl PartialEq for DistanceMatrixEntry {
     fn eq(&self, other: &Self) -> bool {
         self.get_distance() == other.get_distance()
     }
 }
 
-impl<'a> Eq for DistanceMatrixEntry {}
+impl Eq for DistanceMatrixEntry {}
