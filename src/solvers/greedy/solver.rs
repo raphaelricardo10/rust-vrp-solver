@@ -2,9 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::{
-        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
-    },
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
     solvers::solver::{Solution, Solver},
 };
 

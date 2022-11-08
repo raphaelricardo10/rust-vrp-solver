@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{services::route::route_service::RouteService};
+use crate::services::route::route_service::RouteService;
 
 pub type Solution = HashMap<u32, Vec<u32>>;
 

@@ -1,4 +1,4 @@
-use std::{collections::HashMap, cmp::min};
+use std::{cmp::min, collections::HashMap};
 
 use crate::domain::stop::Stop;
 

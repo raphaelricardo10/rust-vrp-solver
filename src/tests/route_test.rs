@@ -5,7 +5,7 @@ use crate::{
     services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
-use super::fixtures::{distances, full_stops, stops, distance_service};
+use super::fixtures::{distance_service, distances, full_stops, stops};
 
 #[rstest]
 fn route_distance_calculation(stops: Vec<Stop>, distance_service: DistanceService) {

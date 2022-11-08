@@ -8,10 +8,7 @@ pub(crate) struct DistanceMatrixEntry {
 }
 
 impl DistanceMatrixEntry {
-    pub(crate) fn new(
-        destination: Stop,
-        distance: f64,
-    ) -> DistanceMatrixEntry {
+    pub(crate) fn new(destination: Stop, distance: f64) -> DistanceMatrixEntry {
         DistanceMatrixEntry {
             distance,
             destination,

@@ -2,9 +2,7 @@ use rstest::rstest;
 
 use crate::{
     domain::stop::Stop,
-    services::{
-        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
-    },
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
     tests::fixtures::VehicleFactory,
 };
 
