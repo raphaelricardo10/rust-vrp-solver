@@ -36,13 +36,7 @@ impl<'a> GraspSolver {
     }
 }
 
-impl<'a> Solver<'a, GraspSolver> for GraspSolver {
-    fn solve(&mut self) {
-        self.route_service.assign_starting_points();
-        self.run_all_iterations();
-        self.solution = Self::map_solutions(&self.route_service);
-    }
-
+impl Solver<GraspSolver> for GraspSolver {
     fn get_solution(&self) -> &Solution {
         &self.solution
     }
@@ -68,5 +62,13 @@ impl<'a> Solver<'a, GraspSolver> for GraspSolver {
 
     fn stop_condition_met(&self) -> bool {
         !self.route_service.has_available_stop().unwrap()
+    }
+
+    fn set_solution(&mut self, solution: Solution) {
+        self.solution = solution
+    }
+
+    fn get_route_service(&mut self) -> &mut RouteService {
+        &mut self.route_service
     }
 }

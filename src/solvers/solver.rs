@@ -1,17 +1,16 @@
 use std::collections::HashMap;
 
-use crate::{
-    services::route::route_service::RouteService,
-};
+use crate::{services::route::route_service::RouteService};
 
 pub type Solution = HashMap<u32, Vec<u32>>;
 
 pub trait Solver<'a, T> {
-    fn solve(&mut self);
     fn run_iteration(&mut self);
     fn stop_condition_met(&self) -> bool;
     fn get_solution(&self) -> &Solution;
+    fn set_solution(&mut self, solution: Solution);
     fn solution_total_distance(&self) -> f64;
+    fn get_route_service(&'a mut self) -> &'a mut RouteService;
 
     fn get_all_vehicle_ids(route_service: &RouteService) -> Vec<u32> {
         route_service
@@ -21,8 +20,8 @@ pub trait Solver<'a, T> {
             .collect()
     }
 
-    fn map_solutions(route_service: &RouteService) -> Solution {
-        route_service
+    fn map_solutions(&self) -> Solution {
+        self.get_route_service()
             .get_all_routes()
             .iter()
             .map(|(vehicle_id, route)| -> (u32, Vec<u32>) {
@@ -34,9 +33,16 @@ pub trait Solver<'a, T> {
             .collect()
     }
 
-    fn run_all_iterations(&mut self) {
-        while !self.stop_condition_met() {
+    fn solve(&'a mut self) {
+        self.get_route_service().assign_starting_points();
+        let mut stop_condition_met = false;
+
+        while !stop_condition_met {
             self.run_iteration();
+            stop_condition_met = self.stop_condition_met();
         }
+
+        let solution = self.map_solutions();
+        self.set_solution(solution);
     }
 }
