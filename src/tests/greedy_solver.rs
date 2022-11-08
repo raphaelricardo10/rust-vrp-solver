@@ -80,3 +80,21 @@ fn cannot_get_infeasible_near_stops(
 
     assert_ne!(stop.get_id(), 4)
 }
+
+#[rstest]
+fn the_vehicle_returned_to_depot(
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,
+    vehicle_factory: VehicleFactory,
+) {
+    let vehicles = vehicle_factory(2);
+
+    let mut solver = GreedySolver::new(vehicles, distances, stops);
+    solver.solve();
+
+    let solution = solver.get_solution().get(&0).unwrap();
+
+    let last_stop = *solution.last().unwrap();
+
+    assert_eq!(last_stop, 0);
+}
