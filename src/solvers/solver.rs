@@ -21,7 +21,7 @@ pub trait Solver<'a, T> {
             .collect()
     }
 
-    fn construct_solutions(route_service: &RouteService) -> Solution {
+    fn map_solutions(route_service: &RouteService) -> Solution {
         route_service
             .get_all_routes()
             .iter()

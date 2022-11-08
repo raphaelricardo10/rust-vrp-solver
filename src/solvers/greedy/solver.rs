@@ -43,7 +43,7 @@ impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
     fn solve(&mut self) {
         self.route_service.assign_starting_points();
         self.run_all_iterations();
-        self.solution = Self::construct_solutions(&self.route_service);
+        self.solution = Self::map_solutions(&self.route_service);
     }
 
     fn get_solution(&self) -> &Solution {
