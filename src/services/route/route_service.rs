@@ -1,15 +1,9 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-};
+use std::collections::{BTreeMap, HashMap};
 
 use crate::{
-    domain::{
-        route::{DistanceMatrix, Route},
-        stop::Stop,
-        vehicle::Vehicle,
-    },
+    domain::{route::Route, stop::Stop, vehicle::Vehicle},
     errors::vehicle::vehicle_overload::VehicleOverloadError,
-    services::distance::distance_service::DistanceService,
+    services::distance::distance_service::{DistanceMatrixInput, DistanceService},
 };
 
 pub type StopMap = HashMap<u32, Stop>;
@@ -24,7 +18,7 @@ pub struct RouteService {
 impl RouteService {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: DistanceMatrixInput,
         stops: Vec<Stop>,
     ) -> RouteService {
         RouteService {
@@ -72,7 +66,7 @@ impl RouteService {
     }
 
     pub fn has_available_stop(&self) -> Option<bool> {
-        for route in self.routes.values(){
+        for route in self.routes.values() {
             let feasible_stops_number = self
                 .available_stops
                 .values()
@@ -98,7 +92,10 @@ impl RouteService {
         let new_stop = self.available_stops.remove(&stop_id).unwrap();
 
         let distance = match route.get_current_stop() {
-            Some(last_stop) => self.distance_service.get_distance(&last_stop, &new_stop).unwrap(),
+            Some(last_stop) => self
+                .distance_service
+                .get_distance(&last_stop, &new_stop)
+                .unwrap(),
             None => 0.0,
         };
 

@@ -3,8 +3,10 @@ use rand::thread_rng;
 use std::collections::HashMap;
 
 use crate::{
-    domain::{stop::Stop, vehicle::Vehicle, route::DistanceMatrix},
-    services::route::route_service::RouteService,
+    domain::{stop::Stop, vehicle::Vehicle},
+    services::{
+        distance::distance_service::DistanceMatrixInput, route::route_service::RouteService,
+    },
     solvers::solver::{Solution, Solver},
 };
 
@@ -18,7 +20,7 @@ impl GraspSolver {
     pub fn new(
         rcl_size: usize,
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: DistanceMatrixInput,
         stops: Vec<Stop>,
     ) -> GraspSolver {
         GraspSolver {
@@ -29,7 +31,9 @@ impl GraspSolver {
     }
 
     pub fn get_random_near_stop(&self, vehicle_id: u32) -> Option<&Stop> {
-        let near_stops = self.route_service.get_k_nearest_stops(vehicle_id, self.rcl_size)?;
+        let near_stops = self
+            .route_service
+            .get_k_nearest_stops(vehicle_id, self.rcl_size)?;
         let chosen = *near_stops.choose(&mut thread_rng())?;
 
         Some(chosen)

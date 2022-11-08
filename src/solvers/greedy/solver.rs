@@ -1,8 +1,10 @@
 use std::collections::HashMap;
 
 use crate::{
-    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
-    services::route::route_service::RouteService,
+    domain::{stop::Stop, vehicle::Vehicle},
+    services::{
+        distance::distance_service::DistanceMatrixInput, route::route_service::RouteService,
+    },
     solvers::solver::{Solution, Solver},
 };
 
@@ -14,7 +16,7 @@ pub struct GreedySolver {
 impl GreedySolver {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: DistanceMatrixInput,
         stops: Vec<Stop>,
     ) -> GreedySolver {
         GreedySolver {

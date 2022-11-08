@@ -1,15 +1,14 @@
 use rstest::rstest;
 
-use crate::domain::{
-    route::{DistanceMatrix, Route},
-    stop::Stop,
-    vehicle::Vehicle,
+use crate::{
+    domain::{route::Route, stop::Stop, vehicle::Vehicle},
+    services::distance::distance_service::DistanceMatrixInput,
 };
 
 use super::fixtures::{distances, full_stops, stops};
 
 #[rstest]
-fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
+fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrixInput) {
     let vehicle = Vehicle::new(0, 10);
 
     let mut route = Route::new(vehicle);
@@ -44,7 +43,7 @@ fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
 }
 
 #[rstest]
-fn route_cannot_overload_vehicle(full_stops: Vec<Stop>, distances: DistanceMatrix) {
+fn route_cannot_overload_vehicle(full_stops: Vec<Stop>, distances: DistanceMatrixInput) {
     let vehicle = Vehicle::new(0, 10);
 
     let mut route = Route::new(vehicle);

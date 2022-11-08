@@ -2,12 +2,15 @@ use rstest::fixture;
 
 use std::collections::HashMap;
 
-use crate::domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle};
+use crate::{
+    domain::{stop::Stop, vehicle::Vehicle},
+    services::distance::distance_service::DistanceMatrixInput,
+};
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
 
 #[fixture]
-pub fn distances() -> DistanceMatrix {
+pub fn distances() -> DistanceMatrixInput {
     HashMap::from([
         ((0, 1), 2.0),
         ((0, 2), 1.0),
