@@ -2,13 +2,13 @@ use rstest::rstest;
 
 use crate::{
     domain::{route::Route, stop::Stop, vehicle::Vehicle},
-    services::distance::distance_service::DistanceMatrix,
+    services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
-use super::fixtures::{distances, full_stops, stops};
+use super::fixtures::{distances, full_stops, stops, distance_service};
 
 #[rstest]
-fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
+fn route_distance_calculation(stops: Vec<Stop>, distance_service: DistanceService) {
     let vehicle = Vehicle::new(0, 10);
 
     let mut route = Route::new(vehicle);
@@ -17,25 +17,19 @@ fn route_distance_calculation(stops: Vec<Stop>, distances: DistanceMatrix) {
     route
         .add_stop(
             stops[1],
-            *distances
-                .get(&(stops[0].get_id(), stops[1].get_id()))
-                .unwrap(),
+            distance_service.get_distance(&stops[0], &stops[1]).unwrap(),
         )
         .unwrap();
     route
         .add_stop(
             stops[2],
-            *distances
-                .get(&(stops[1].get_id(), stops[2].get_id()))
-                .unwrap(),
+            distance_service.get_distance(&stops[1], &stops[2]).unwrap(),
         )
         .unwrap();
     route
         .add_stop(
             stops[3],
-            *distances
-                .get(&(stops[2].get_id(), stops[3].get_id()))
-                .unwrap(),
+            distance_service.get_distance(&stops[2], &stops[3]).unwrap(),
         )
         .unwrap();
 

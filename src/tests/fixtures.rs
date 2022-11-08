@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::distance::distance_service::DistanceMatrix,
+    services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
@@ -64,4 +64,12 @@ pub fn vehicle_factory() -> VehicleFactory {
     }
 
     wrapper
+}
+
+#[fixture]
+pub fn distance_service(
+    distances: DistanceMatrix,
+    stops: Vec<Stop>,
+) -> DistanceService {
+    DistanceService::new(stops, distances)
 }
