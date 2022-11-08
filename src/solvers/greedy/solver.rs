@@ -11,8 +11,8 @@ pub struct GreedySolver<'a> {
     route_service: RouteService<'a>,
 }
 
-impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
-    fn new(
+impl<'a> GreedySolver<'a> {
+    pub fn new(
         vehicles: &'a mut Vec<Vehicle>,
         distances: &'a DistanceMatrix,
         stops: &'a Vec<Stop>,
@@ -22,7 +22,9 @@ impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
             route_service: RouteService::new(vehicles, distances, stops),
         }
     }
+}
 
+impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
     fn construct_routes_in_parallel(route_service: &mut RouteService, vehicle_ids: &Vec<u32>) {
         for vehicle_id in vehicle_ids.iter() {
             let stop_id = match route_service.get_nearest_stop(*vehicle_id) {

@@ -1,19 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{
-    domain::{route::DistanceMatrix, stop::Stop, vehicle::Vehicle},
     services::route::route_service::RouteService,
 };
 
 pub type Solution = HashMap<u32, Vec<u32>>;
 
 pub trait Solver<'a, T> {
-    fn new(
-        vehicles: &'a mut Vec<Vehicle>,
-        distances: &'a DistanceMatrix,
-        stops: &'a Vec<Stop>,
-    ) -> T;
-
     fn solve(&mut self);
     fn get_solution(&self) -> &Solution;
     fn solution_total_distance(&self) -> f64;
