@@ -1,7 +1,5 @@
 use crate::{
-    services::{
-        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
-    },
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
     solvers::solver::Solver,
 };
 use rstest::rstest;
