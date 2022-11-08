@@ -6,12 +6,12 @@ use super::distance_matrix::DistanceMatrixEntry;
 
 pub type DistancesMatrixKey = (u32, u32);
 pub type DistanceMatrixInput = HashMap<DistancesMatrixKey, f64>;
-pub(crate) type DistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
+pub(crate) type MappedDistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
 
 pub type StopsMap = HashMap<u32, Stop>;
 
 pub struct DistanceService {
-    distances: DistanceMatrix,
+    distances: MappedDistanceMatrix,
 }
 
 impl<'a> DistanceService {
@@ -21,7 +21,7 @@ impl<'a> DistanceService {
         }
     }
 
-    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrixInput) -> DistanceMatrix {
+    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrixInput) -> MappedDistanceMatrix {
         let stops_map: StopsMap = stops.iter().map(|stop| (stop.get_id(), *stop)).collect();
 
         distances
