@@ -4,13 +4,13 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::distance::distance_service::DistanceMatrixInput,
+    services::distance::distance_service::DistanceMatrix,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
 
 #[fixture]
-pub fn distances() -> DistanceMatrixInput {
+pub fn distances() -> DistanceMatrix {
     HashMap::from([
         ((0, 1), 2.0),
         ((0, 2), 1.0),

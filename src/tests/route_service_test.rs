@@ -3,7 +3,7 @@ use rstest::rstest;
 use crate::{
     domain::stop::Stop,
     services::{
-        distance::distance_service::DistanceMatrixInput, route::route_service::RouteService,
+        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
     },
     tests::fixtures::VehicleFactory,
 };
@@ -14,7 +14,7 @@ use super::fixtures::{distances, stops, vehicle_factory};
 fn route_service_started(
     vehicle_factory: VehicleFactory,
     stops: Vec<Stop>,
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
 ) {
     let vehicles = vehicle_factory(2);
 
@@ -29,7 +29,7 @@ fn route_service_started(
 fn can_assign_stop_to_route(
     vehicle_factory: VehicleFactory,
     stops: Vec<Stop>,
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
 ) {
     let vehicles = vehicle_factory(1);
 
@@ -44,7 +44,7 @@ fn can_assign_stop_to_route(
 fn can_get_nearest_stop(
     vehicle_factory: VehicleFactory,
     stops: Vec<Stop>,
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
 ) {
     let vehicles = vehicle_factory(1);
 
@@ -58,7 +58,7 @@ fn can_get_nearest_stop(
 fn can_get_k_nearest_stops(
     vehicle_factory: VehicleFactory,
     stops: Vec<Stop>,
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
 ) {
     let vehicles = vehicle_factory(1);
 

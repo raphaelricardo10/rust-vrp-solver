@@ -5,7 +5,7 @@ use crate::domain::stop::Stop;
 use super::distance_matrix::DistanceMatrixEntry;
 
 pub type DistancesMatrixKey = (u32, u32);
-pub type DistanceMatrixInput = HashMap<DistancesMatrixKey, f64>;
+pub type DistanceMatrix = HashMap<DistancesMatrixKey, f64>;
 pub(crate) type MappedDistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
 
 pub type StopsMap = HashMap<u32, Stop>;
@@ -15,13 +15,13 @@ pub struct DistanceService {
 }
 
 impl<'a> DistanceService {
-    pub fn new(stops: Vec<Stop>, distances: DistanceMatrixInput) -> DistanceService {
+    pub fn new(stops: Vec<Stop>, distances: DistanceMatrix) -> DistanceService {
         DistanceService {
             distances: Self::map_distances(stops, distances),
         }
     }
 
-    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrixInput) -> MappedDistanceMatrix {
+    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrix) -> MappedDistanceMatrix {
         let stops_map: StopsMap = stops.iter().map(|stop| (stop.get_id(), *stop)).collect();
 
         distances

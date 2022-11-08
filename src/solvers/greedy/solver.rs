@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::{
-        distance::distance_service::DistanceMatrixInput, route::route_service::RouteService,
+        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
     },
     solvers::solver::{Solution, Solver},
 };
@@ -16,7 +16,7 @@ pub struct GreedySolver {
 impl GreedySolver {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrixInput,
+        distances: DistanceMatrix,
         stops: Vec<Stop>,
     ) -> GreedySolver {
         GreedySolver {

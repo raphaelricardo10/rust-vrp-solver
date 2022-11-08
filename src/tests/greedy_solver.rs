@@ -1,6 +1,6 @@
 use crate::{
     services::{
-        distance::distance_service::DistanceMatrixInput, route::route_service::RouteService,
+        distance::distance_service::DistanceMatrix, route::route_service::RouteService,
     },
     solvers::solver::Solver,
 };
@@ -14,7 +14,7 @@ use super::fixtures::{distances, stops, vehicle_factory};
 
 #[rstest]
 fn greedy_solution_is_correct_single_vehicle(
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
     stops: Vec<Stop>,
     vehicle_factory: VehicleFactory,
 ) {
@@ -33,7 +33,7 @@ fn greedy_solution_is_correct_single_vehicle(
 
 #[rstest]
 fn greedy_solution_is_correct_multiple_vehicles(
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
     stops: Vec<Stop>,
     vehicle_factory: VehicleFactory,
 ) {
@@ -55,7 +55,7 @@ fn greedy_solution_is_correct_multiple_vehicles(
 
 #[rstest]
 fn greedy_solution_total_distance_is_correct(
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
     stops: Vec<Stop>,
     vehicle_factory: VehicleFactory,
 ) {
@@ -70,7 +70,7 @@ fn greedy_solution_total_distance_is_correct(
 #[rstest]
 fn cannot_get_infeasible_near_stops(
     stops: Vec<Stop>,
-    distances: DistanceMatrixInput,
+    distances: DistanceMatrix,
     vehicle_factory: VehicleFactory,
 ) {
     let vehicles = vehicle_factory(1);

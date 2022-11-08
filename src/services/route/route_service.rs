@@ -3,7 +3,7 @@ use std::collections::{BTreeMap, HashMap};
 use crate::{
     domain::{route::Route, stop::Stop, vehicle::Vehicle},
     errors::vehicle::vehicle_overload::VehicleOverloadError,
-    services::distance::distance_service::{DistanceMatrixInput, DistanceService},
+    services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
 pub type StopMap = HashMap<u32, Stop>;
@@ -18,7 +18,7 @@ pub struct RouteService {
 impl RouteService {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrixInput,
+        distances: DistanceMatrix,
         stops: Vec<Stop>,
     ) -> RouteService {
         RouteService {
