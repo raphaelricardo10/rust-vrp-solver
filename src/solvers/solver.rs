@@ -8,10 +8,10 @@ pub type Solution = HashMap<u32, Vec<u32>>;
 
 pub trait Solver<'a, T> {
     fn solve(&mut self);
+    fn run_iteration(&mut self);
     fn stop_condition_met(&self) -> bool;
     fn get_solution(&self) -> &Solution;
     fn solution_total_distance(&self) -> f64;
-    fn construct_routes_in_parallel(&mut self);
 
     fn get_all_vehicle_ids(route_service: &RouteService) -> Vec<u32> {
         route_service
@@ -34,9 +34,9 @@ pub trait Solver<'a, T> {
             .collect()
     }
 
-    fn construct_all_routes(&mut self) {
+    fn run_all_iterations(&mut self) {
         while !self.stop_condition_met() {
-            self.construct_routes_in_parallel();
+            self.run_iteration();
         }
     }
 }

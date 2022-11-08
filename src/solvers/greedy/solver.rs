@@ -25,7 +25,7 @@ impl<'a> GreedySolver<'a> {
 }
 
 impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
-    fn construct_routes_in_parallel(&mut self) {
+    fn run_iteration(&mut self) {
         let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
 
         for vehicle_id in vehicle_ids {
@@ -42,7 +42,7 @@ impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
 
     fn solve(&mut self) {
         self.route_service.assign_starting_points();
-        self.construct_all_routes();
+        self.run_all_iterations();
         self.solution = Self::construct_solutions(&self.route_service);
     }
 
