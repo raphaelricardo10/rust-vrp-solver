@@ -14,17 +14,14 @@ pub struct DistanceService {
     distances: DistanceMatrix,
 }
 
-impl DistanceService {
+impl<'a> DistanceService {
     pub fn new(stops: Vec<Stop>, distances: DistanceMatrixInput) -> DistanceService {
         DistanceService {
             distances: Self::map_distances(stops, distances),
         }
     }
 
-    fn map_distances(
-        stops: Vec<Stop>,
-        distances: DistanceMatrixInput,
-    ) -> DistanceMatrix {
+    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrixInput) -> DistanceMatrix {
         let stops_map: StopsMap = stops.iter().map(|stop| (stop.get_id(), *stop)).collect();
 
         distances
@@ -32,10 +29,7 @@ impl DistanceService {
             .map(|x| {
                 (
                     (x.0 .0, x.0 .1),
-                    DistanceMatrixEntry::new(
-                        *stops_map.get(&x.0 .1).unwrap(),
-                        *x.1,
-                    ),
+                    DistanceMatrixEntry::new(*stops_map.get(&x.0 .1).unwrap(), *x.1),
                 )
             })
             .collect()
@@ -49,7 +43,7 @@ impl DistanceService {
         )
     }
 
-    pub(crate) fn get_distances_from<'a>(
+    pub(crate) fn get_distances_from(
         &'a self,
         stop: &'a Stop,
     ) -> impl Iterator<Item = &DistanceMatrixEntry> {
@@ -59,7 +53,7 @@ impl DistanceService {
             .map(|x| x.1)
     }
 
-    pub fn get_nearest_stop<'a>(
+    pub fn get_nearest_stop(
         &'a self,
         stop: &'a Stop,
         filter: impl Fn(&Stop) -> bool,
@@ -70,7 +64,7 @@ impl DistanceService {
             .map(|x| x.get_destination_stop())
     }
 
-    pub fn get_k_nearest_stops<'a>(
+    pub fn get_k_nearest_stops(
         &'a self,
         stop: &'a Stop,
         k: usize,
