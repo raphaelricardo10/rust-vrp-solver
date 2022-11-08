@@ -7,14 +7,14 @@ type DistanceMap = HashMap<u32, f64>;
 pub type DistanceMatrix = HashMap<(u32, u32), f64>;
 pub type DistanceMatrixLine<'a> = (&'a (u32, u32), &'a f64);
 
-pub struct Route<'a> {
-    stops: Vec<&'a Stop>,
+pub struct Route {
+    stops: Vec<Stop>,
     distances: DistanceMap,
-    vehicle: &'a mut Vehicle,
+    vehicle: Vehicle,
 }
 
-impl<'a> Route<'a> {
-    pub fn new(vehicle: &'a mut Vehicle) -> Route<'a> {
+impl Route {
+    pub fn new(vehicle: Vehicle) -> Route {
         Route {
             vehicle,
             stops: Vec::new(),
@@ -30,7 +30,7 @@ impl<'a> Route<'a> {
         self.vehicle.can_support_load(stop.usage)
     }
 
-    pub fn add_stop(&mut self, stop: &'a Stop, distance: f64) -> Result<(), VehicleOverloadError> {
+    pub fn add_stop(&mut self, stop: Stop, distance: f64) -> Result<(), VehicleOverloadError> {
         if let Err(e) = self.vehicle.load(stop.usage) {
             return Err(e);
         }
@@ -49,7 +49,7 @@ impl<'a> Route<'a> {
         &self.vehicle
     }
 
-    pub fn get_stops(&self) -> &Vec<&'a Stop> {
+    pub fn get_stops(&self) -> &Vec<Stop> {
         &self.stops
     }
 }

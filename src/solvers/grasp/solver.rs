@@ -3,24 +3,24 @@ use rand::thread_rng;
 use std::collections::HashMap;
 
 use crate::{
-    domain::stop::Stop,
+    domain::{stop::Stop, vehicle::Vehicle, route::DistanceMatrix},
     services::route::route_service::RouteService,
     solvers::solver::{Solution, Solver},
 };
 
-pub struct GraspSolver<'a> {
+pub struct GraspSolver {
     rcl_size: usize,
     solution: Solution,
-    route_service: RouteService<'a>,
+    route_service: RouteService,
 }
 
-impl<'a> GraspSolver<'a> {
+impl<'a> GraspSolver {
     pub fn new(
         rcl_size: usize,
-        vehicles: &'a mut Vec<crate::domain::vehicle::Vehicle>,
-        distances: &'a crate::domain::route::DistanceMatrix,
-        stops: &'a Vec<crate::domain::stop::Stop>,
-    ) -> GraspSolver<'a> {
+        vehicles: Vec<Vehicle>,
+        distances: DistanceMatrix,
+        stops: Vec<Stop>,
+    ) -> GraspSolver {
         GraspSolver {
             rcl_size,
             solution: HashMap::new(),
@@ -36,7 +36,7 @@ impl<'a> GraspSolver<'a> {
     }
 }
 
-impl<'a> Solver<'a, GraspSolver<'a>> for GraspSolver<'a> {
+impl<'a> Solver<'a, GraspSolver> for GraspSolver {
     fn solve(&mut self) {
         self.route_service.assign_starting_points();
         self.run_all_iterations();

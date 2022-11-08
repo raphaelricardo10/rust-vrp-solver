@@ -6,17 +6,17 @@ use crate::{
     solvers::solver::{Solution, Solver},
 };
 
-pub struct GreedySolver<'a> {
+pub struct GreedySolver {
     solution: Solution,
-    route_service: RouteService<'a>,
+    route_service: RouteService,
 }
 
-impl<'a> GreedySolver<'a> {
+impl<'a> GreedySolver {
     pub fn new(
-        vehicles: &'a mut Vec<Vehicle>,
-        distances: &'a DistanceMatrix,
-        stops: &'a Vec<Stop>,
-    ) -> GreedySolver<'a> {
+        vehicles: Vec<Vehicle>,
+        distances: DistanceMatrix,
+        stops: Vec<Stop>,
+    ) -> GreedySolver {
         GreedySolver {
             solution: HashMap::new(),
             route_service: RouteService::new(vehicles, distances, stops),
@@ -24,7 +24,7 @@ impl<'a> GreedySolver<'a> {
     }
 }
 
-impl<'a> Solver<'a, GreedySolver<'a>> for GreedySolver<'a> {
+impl<'a> Solver<'a, GreedySolver> for GreedySolver {
     fn run_iteration(&mut self) {
         let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
 

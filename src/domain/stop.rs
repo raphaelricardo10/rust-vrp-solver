@@ -1,3 +1,4 @@
+#[derive(Copy, Clone)]
 pub struct Stop {
     id: u32,
     pub usage: u32,

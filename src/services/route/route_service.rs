@@ -1,5 +1,4 @@
 use std::{
-    borrow::BorrowMut,
     collections::{BTreeMap, HashMap},
 };
 
@@ -13,49 +12,51 @@ use crate::{
     services::distance::distance_service::DistanceService,
 };
 
-pub type StopMap<'a> = HashMap<u32, &'a Stop>;
-pub type RouteMap<'a> = BTreeMap<u32, Route<'a>>;
+pub type StopMap = HashMap<u32, Stop>;
+pub type RouteMap = BTreeMap<u32, Route>;
 
-pub struct RouteService<'a> {
-    routes: RouteMap<'a>,
-    available_stops: StopMap<'a>,
-    distance_service: DistanceService<'a>,
+pub struct RouteService {
+    routes: RouteMap,
+    available_stops: StopMap,
+    distance_service: DistanceService,
 }
 
-impl<'a> RouteService<'a> {
+impl<'a> RouteService {
     pub fn new(
-        vehicles: &'a mut Vec<Vehicle>,
-        distances: &'a DistanceMatrix,
-        stops: &'a Vec<Stop>,
-    ) -> RouteService<'a> {
+        vehicles: Vec<Vehicle>,
+        distances: DistanceMatrix,
+        stops: Vec<Stop>,
+    ) -> RouteService {
         RouteService {
             routes: Self::map_routes(vehicles),
-            available_stops: Self::map_stops(stops),
+            available_stops: Self::map_stops(stops.clone()),
             distance_service: DistanceService::new(stops, distances),
         }
     }
 
-    pub fn map_routes(vehicles: &'a mut Vec<Vehicle>) -> RouteMap {
-        vehicles
-            .iter_mut()
-            .borrow_mut()
-            .map(|vehicle| (vehicle.get_id(), Route::new(vehicle)))
-            .collect()
+    pub fn map_routes(vehicles: Vec<Vehicle>) -> RouteMap {
+        let mut route_map = BTreeMap::new();
+
+        for vehicle in vehicles {
+            route_map.insert(vehicle.get_id(), Route::new(vehicle));
+        }
+
+        route_map
     }
 
-    fn map_stops(stops: &'a Vec<Stop>) -> StopMap {
-        stops.iter().map(|stop| (stop.get_id(), stop)).collect()
+    fn map_stops(stops: Vec<Stop>) -> StopMap {
+        stops.iter().map(|stop| (stop.get_id(), *stop)).collect()
     }
 
     pub fn get_available_stops(&self) -> &StopMap {
         &self.available_stops
     }
 
-    pub fn get_route(&self, vehicle_id: u32) -> Option<&'a Route> {
+    pub fn get_route(&self, vehicle_id: u32) -> Option<&Route> {
         Some(self.routes.get(&vehicle_id)?)
     }
 
-    pub fn get_all_routes(&self) -> &'a RouteMap {
+    pub fn get_all_routes(&self) -> &RouteMap {
         &self.routes
     }
 
@@ -97,7 +98,7 @@ impl<'a> RouteService<'a> {
         let new_stop = self.available_stops.remove(&stop_id).unwrap();
 
         let distance = match route.get_current_stop() {
-            Some(last_stop) => self.distance_service.get_distance(last_stop, new_stop).unwrap(),
+            Some(last_stop) => self.distance_service.get_distance(&last_stop, &new_stop).unwrap(),
             None => 0.0,
         };
 
