@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, cmp::min};
 
 use crate::domain::stop::Stop;
 
@@ -77,7 +77,9 @@ impl<'a> DistanceService {
 
         stops.sort_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap());
 
-        stops[0..k]
+        let number_of_stops = min(stops.len(), k);
+
+        stops[0..number_of_stops]
             .iter()
             .map(|x| x.get_destination_stop())
             .collect()
