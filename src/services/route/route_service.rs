@@ -112,6 +112,18 @@ impl RouteService {
         Some(())
     }
 
+    pub fn assign_stop_points(&mut self) -> Option<()> {
+        for (_, route) in &mut self.routes {
+            let first_stop = route.get_stops().first()?;
+            let last_stop = route.get_stops().last()?;
+            let distance = self.distance_service.get_distance(last_stop, first_stop)?;
+
+            route.add_stop(*first_stop, distance).ok();
+        }
+
+        Some(())
+    }
+
     fn is_stop_feasible(&self, stop: &Stop, route: &Route) -> bool {
         if !self.available_stops.contains_key(&stop.get_id()) {
             return false;

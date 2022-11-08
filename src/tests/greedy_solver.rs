@@ -62,7 +62,7 @@ fn greedy_solution_total_distance_is_correct(
     let mut solver = GreedySolver::new(vehicles, distances, stops);
     solver.solve();
 
-    assert_eq!(solver.solution_total_distance(), 5.0);
+    assert_eq!(solver.solution_total_distance(), 10.0);
 }
 
 #[rstest]

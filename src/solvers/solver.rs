@@ -40,6 +40,8 @@ pub trait Solver<T> {
             self.run_iteration();
         }
 
+        self.get_route_service().assign_stop_points();
+
         let solution = self.map_solutions();
         self.set_solution(solution);
     }
