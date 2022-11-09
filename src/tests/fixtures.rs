@@ -52,6 +52,17 @@ pub fn full_stops() -> Vec<Stop> {
 }
 
 #[fixture]
+pub fn stops_with_crossings() -> Vec<Stop> {
+    Vec::from([
+        Stop::new(0, 10),
+        Stop::new(3, 10),
+        Stop::new(1, 10),
+        Stop::new(2, 10),
+        Stop::new(0, 10),
+    ])
+}
+
+#[fixture]
 pub fn vehicle_factory() -> VehicleFactory {
     fn wrapper(number: u32) -> Vec<Vehicle> {
         let mut vehicles = Vec::new();
