@@ -31,34 +31,42 @@ pub fn calculate_stop_swap_cost(
     )
 }
 
-pub fn search(route: &mut Route, distance_service: &DistanceService) -> bool {
+pub fn calculate_minimum_swap_cost(
+    stops: &Vec<Stop>,
+    distance_service: &DistanceService,
+    current_stop_index: &usize,
+) -> Option<(usize, f64)> {
+    stops
+        .windows(2)
+        .enumerate()
+        .skip(current_stop_index + 2)
+        .map(|(next_stop_index, _)| {
+            (
+                next_stop_index,
+                calculate_stop_swap_cost(
+                    stops,
+                    distance_service,
+                    current_stop_index,
+                    &next_stop_index,
+                )
+                .unwrap(),
+            )
+        })
+        .min_by(|path1, path2| path1.1.partial_cmp(&path2.1).unwrap())
+}
+
+pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<bool> {
     for (current_stop_index, current_path) in route.get_stops().windows(2).enumerate().skip(1) {
         let current_insertion_cost =
             calculate_stop_insertion_cost(route.get_stops(), distance_service, &current_stop_index);
 
-        let (next_stop_index, min_swap_cost) = route
-            .get_stops()[..route.get_stops().len() - 2]
-            .windows(2)
-            .enumerate()
-            .skip(current_stop_index + 1)
-            .map(|(next_path_index, _)| {
-                (
-                    next_path_index,
-                    calculate_stop_swap_cost(
-                        route.get_stops(),
-                        distance_service,
-                        &current_stop_index,
-                        &next_path_index,
-                    )
-                    .unwrap(),
-                )
-            })
-            .min_by(|path1, path2| path1.1.partial_cmp(&path2.1).unwrap())
-            .unwrap();
+        let (next_stop_index, min_swap_cost) =
+            calculate_minimum_swap_cost(route.get_stops(), distance_service, &current_stop_index)?;
 
         if min_swap_cost > current_insertion_cost {
-            return true;
+            return Some(true);
         }
     }
-    return false;
+
+    return Some(false);
 }
