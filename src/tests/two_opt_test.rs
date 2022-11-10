@@ -52,38 +52,16 @@ fn can_optimize_route(distance_service: DistanceService, stops_with_crossings: V
     let mut route = Route::new(vehicle);
 
     route.add_stop(stops_with_crossings[0], 0.0).unwrap();
-    route
-        .add_stop(
-            stops_with_crossings[1],
-            distance_service
-                .get_distance(&stops_with_crossings[0], &stops_with_crossings[1])
-                .unwrap(),
-        )
-        .unwrap();
-    route
-        .add_stop(
-            stops_with_crossings[2],
-            distance_service
-                .get_distance(&stops_with_crossings[1], &stops_with_crossings[2])
-                .unwrap(),
-        )
-        .unwrap();
-    route
-        .add_stop(
-            stops_with_crossings[3],
-            distance_service
-                .get_distance(&stops_with_crossings[2], &stops_with_crossings[3])
-                .unwrap(),
-        )
-        .unwrap();
-    route
-        .add_stop(
-            stops_with_crossings[4],
-            distance_service
-                .get_distance(&stops_with_crossings[3], &stops_with_crossings[4])
-                .unwrap(),
-        )
-        .unwrap();
+    for (index, stop) in stops_with_crossings.iter().enumerate().skip(1) {
+        route
+            .add_stop(
+                *stop,
+                distance_service
+                    .get_distance(&stops_with_crossings[index-1], stop)
+                    .unwrap(),
+            )
+            .unwrap();
+    }
 
     let result = two_opt::search(&mut route, &distance_service).unwrap();
 
