@@ -19,21 +19,7 @@ pub fn calculate_stop_insertion_cost(
         .sum()
 }
 
-pub fn calculate_stop_swap_cost(
-    stops: &Vec<Stop>,
-    distance_service: &DistanceService,
-    path1_index: &usize,
-    path2_index: &usize,
-) -> Option<f64> {
-    Some(
-        distance_service.get_distance(&stops[path1_index - 1], &stops[*path2_index])?
-            + distance_service.get_distance(&stops[*path2_index], &stops[path1_index + 1])?
-            + distance_service.get_distance(&stops[path2_index - 1], &stops[*path1_index])?
-            + distance_service.get_distance(&stops[*path1_index], &stops[path2_index + 1])?,
-    )
-}
-
-fn calculate_swap_cost<'a>(path1: &Path, path2: &Path, distance_service: &DistanceService) -> f64 {
+pub(crate) fn calculate_swap_cost<'a>(path1: &Path, path2: &Path, distance_service: &DistanceService) -> f64 {
     let swapped_path_1 = Path::new(
         *path1.get_prev(),
         *path2.get_current(),

@@ -1,6 +1,6 @@
 use crate::{
     domain::{route::Route, vehicle::Vehicle},
-    local_search::{two_opt::{self, calculate_stop_insertion_cost, calculate_stop_swap_cost, calculate_minimum_swap_cost}, path::Path},
+    local_search::{two_opt::{self, calculate_stop_insertion_cost, calculate_minimum_swap_cost, calculate_swap_cost}, path::Path},
     services::distance::distance_service::DistanceService,
 };
 use rstest::rstest;
@@ -25,14 +25,12 @@ fn can_calculate_path_swap_cost(
     distance_service: DistanceService,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let insertion_cost_1 =
-        calculate_stop_insertion_cost(&stops_with_crossings, &distance_service, &1);
-    let insertion_cost_2 =
-        calculate_stop_insertion_cost(&stops_with_crossings, &distance_service, &3);
-    let swap_cost =
-        calculate_stop_swap_cost(&stops_with_crossings, &distance_service, &1, &3).unwrap();
+    let path1 = Path::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
+    let path2 = Path::from_stop_index(&stops_with_crossings, 3, &distance_service).unwrap();
 
-    assert_eq!(swap_cost - (insertion_cost_1 + insertion_cost_2), 0.0);
+    let swap_cost = calculate_swap_cost(&path1, &path2, &distance_service);
+
+    assert_eq!(swap_cost - (path1.get_cost() + path2.get_cost()), 0.0);
 }
 
 #[rstest]
