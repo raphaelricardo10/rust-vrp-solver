@@ -52,15 +52,21 @@ pub(crate) fn get_minimum_swap_cost<'a>(
         .min_by(|(_, cost1), (_, cost2)| cost1.partial_cmp(cost2).unwrap())
 }
 
+fn should_swap_stops(path1: &Path, path2: &Path, swap_cost: &f64) -> bool{
+    *swap_cost < path1.get_cost() + path2.get_cost()
+}
+
 pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<bool> {
-    for (prev_path_index, current_path_window) in route.get_stops().windows(3).enumerate() {
-        let current_path =
-            Path::from_window(current_path_window, prev_path_index, distance_service)?;
+    for (base_index, window) in route.get_stops().windows(3).enumerate() {
+        let path1 =
+            Path::from_window(window, base_index, distance_service)?;
 
-        let (min_swap_cost_index, swap_cost) =
-            get_minimum_swap_cost(route.get_stops(), distance_service, &current_path)?;
+        let (swap_candidate_index, swap_cost) =
+            get_minimum_swap_cost(route.get_stops(), distance_service, &path1)?;
 
-        if swap_cost > current_path.get_cost() {
+        let path2 = Path::from_stop_index(route.get_stops(), swap_candidate_index, distance_service)?;
+
+        if should_swap_stops(&path1, &path2, &swap_cost){
             return Some(true);
         }
     }
