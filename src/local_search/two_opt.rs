@@ -65,10 +65,10 @@ fn find_improvements(
 ) -> Option<usize> {
     let (swap_candidate_index, swap_cost) = get_minimum_swap_cost(stops, distance_service, &path)?;
 
-    let candidate_path = Path::from_stop_index(stops, swap_candidate_index, distance_service)?;
+    let swap_candidate = Path::from_stop_index(stops, swap_candidate_index, distance_service)?;
 
-    if should_swap_stops(&path, &candidate_path, &swap_cost) {
-        Some(candidate_path.get_current().get_index());
+    if should_swap_stops(&path, &swap_candidate, &swap_cost) {
+        Some(swap_candidate.get_current().get_index());
     }
 
     None
@@ -94,7 +94,7 @@ pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<b
     let mut paths = map_paths(route.get_stops(), distance_service);
 
     for path in paths.values() {
-        let candidate_index = match find_improvements(route.get_stops(), distance_service, path) {
+        let swap_candidate_index = match find_improvements(route.get_stops(), distance_service, path) {
             Some(candidate_index) => candidate_index,
             None => continue,
         };
