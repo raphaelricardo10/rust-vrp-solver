@@ -28,7 +28,7 @@ pub fn distances() -> DistanceMatrix {
         ((3, 1), 3.0),
         ((3, 2), 2.0),
         ((3, 4), 5.0),
-        ((4, 0), 1.0),
+        ((4, 0), 0.5),
         ((4, 1), 5.0),
         ((4, 2), 2.0),
         ((4, 3), 5.0),
@@ -56,6 +56,7 @@ pub fn stops_with_crossings() -> Vec<Stop> {
     Vec::from([
         Stop::new(0, 10),
         Stop::new(3, 10),
+        Stop::new(4, 10),
         Stop::new(1, 10),
         Stop::new(2, 10),
         Stop::new(0, 10),
