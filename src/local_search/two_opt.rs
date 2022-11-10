@@ -5,20 +5,6 @@ use crate::{
 
 use super::path::Path;
 
-pub fn calculate_stop_insertion_cost(
-    stops: &Vec<Stop>,
-    distance_service: &DistanceService,
-    path_index: &usize,
-) -> f64 {
-    let lower_limit = path_index - 1;
-    let upper_limit = path_index + 1;
-
-    stops[lower_limit..=upper_limit]
-        .windows(2)
-        .map(|w| distance_service.get_distance(&w[0], &w[1]).unwrap())
-        .sum()
-}
-
 pub(crate) fn calculate_swap_cost<'a>(
     path1: &Path,
     path2: &Path,
