@@ -29,7 +29,7 @@ pub(crate) fn calculate_swap_cost<'a>(
     swapped_path_1.get_cost() + swapped_path_2.get_cost()
 }
 
-pub(crate) fn calculate_minimum_swap_cost<'a>(
+pub(crate) fn get_minimum_swap_cost<'a>(
     stops: &'a Vec<Stop>,
     distance_service: &'a DistanceService,
     current_path: &'a Path<'a>,
@@ -58,7 +58,7 @@ pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<b
             Path::from_window(current_path_window, prev_path_index, distance_service)?;
 
         let (min_swap_cost_index, swap_cost) =
-            calculate_minimum_swap_cost(route.get_stops(), distance_service, &current_path)?;
+            get_minimum_swap_cost(route.get_stops(), distance_service, &current_path)?;
 
         if swap_cost > current_path.get_cost() {
             return Some(true);
