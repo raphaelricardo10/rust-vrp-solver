@@ -68,7 +68,7 @@ fn find_improvements(
     let swap_candidate = Path::from_stop_index(stops, swap_candidate_index, distance_service)?;
 
     if should_swap_stops(&path, &swap_candidate, &swap_cost) {
-        Some(swap_candidate.get_current().get_index());
+        return Some(swap_candidate.get_prev().get_index())
     }
 
     None
