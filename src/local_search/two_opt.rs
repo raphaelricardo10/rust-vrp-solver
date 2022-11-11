@@ -90,16 +90,31 @@ fn map_paths<'a>(
         .collect()
 }
 
+pub(crate) fn execute_swap(path_map: &mut BTreeMap<usize, Path>, index1: usize, index2: usize, distance_service: &DistanceService) {
+    let mut path1 = *path_map.get(&index1).unwrap();
+    let mut path2 = *path_map.get(&index2).unwrap();
+    let aux = *path1.get_current();
+
+    path1.set_current(*path2.get_current(), distance_service);
+    path2.set_current(aux, distance_service);
+
+    path_map.insert(path1.get_prev().get_index(), path1);
+    path_map.insert(path2.get_prev().get_index(), path2);
+}
+
 pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<bool> {
     let mut paths = map_paths(route.get_stops(), distance_service);
 
-    for path in paths.values() {
-        let swap_candidate_index = match find_improvements(route.get_stops(), distance_service, path) {
+    for stop_index in 0..paths.len() {
+        let path = paths.get(&stop_index)?;
+        
+        let swap_candidate_index = match find_improvements(route.get_stops(), distance_service, &path) {
             Some(candidate_index) => candidate_index,
             None => continue,
         };
-
-        //route.swap_stops(base_index, candidate_index)
+        
+        let base_index = path.get_prev().get_index();
+        execute_swap(&mut paths, base_index, swap_candidate_index, distance_service)
     }
 
     return Some(false);
