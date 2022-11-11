@@ -2,6 +2,7 @@ use crate::{domain::stop::Stop, services::distance::distance_service::DistanceSe
 
 use super::path_node::PathNode;
 
+#[derive(Copy, Clone)]
 pub(crate) struct Path<'a> {
     prev: PathNode<'a>,
     current: PathNode<'a>,
@@ -79,5 +80,10 @@ impl<'a> Path<'a> {
 
     pub(crate) fn get_cost(&self) -> f64 {
         self.cost
+    }
+
+    pub(crate) fn set_current(&mut self, path: PathNode<'a>,distance_service: &DistanceService) {
+        self.current = path;
+        self.cost = self.calculate_cost(distance_service).unwrap();
     }
 }
