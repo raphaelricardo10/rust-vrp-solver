@@ -5,7 +5,7 @@ use crate::{
     services::distance::distance_service::DistanceService,
 };
 
-use super::path::Path;
+use super::{path::Path, path_node::PathNode};
 
 pub(crate) fn calculate_swap_cost<'a>(
     path1: &Path,
@@ -36,16 +36,16 @@ pub(crate) fn get_minimum_swap_cost<'a>(
     distance_service: &'a DistanceService,
     path: &'a Path<'a>,
 ) -> Option<(usize, f64)> {
-    stops
-        .windows(3)
+    stops[.. stops.len() - 1]
+        .iter()
         .enumerate()
-        .skip(path.get_next().get_index())
-        .map(|(base_index, next_stop_window)| {
+        .skip(path.get_next().get_index() + 1)
+        .map(|(stop_index, _)| {
             (
-                base_index + 1,
+                stop_index,
                 calculate_swap_cost(
                     path,
-                    &Path::from_window(next_stop_window, base_index, distance_service)
+                    &Path::from_stop_index(stops, stop_index, distance_service)
                         .unwrap(),
                     distance_service,
                 ),
@@ -90,32 +90,18 @@ fn map_paths<'a>(
         .collect()
 }
 
-pub(crate) fn execute_swap(path_map: &mut BTreeMap<usize, Path>, index1: usize, index2: usize, distance_service: &DistanceService) {
-    let mut path1 = *path_map.get(&index1).unwrap();
-    let mut path2 = *path_map.get(&index2).unwrap();
-    let aux = *path1.get_current();
-
-    path1.set_current(*path2.get_current(), distance_service);
-    path2.set_current(aux, distance_service);
-
-    path_map.insert(path1.get_prev().get_index(), path1);
-    path_map.insert(path2.get_prev().get_index(), path2);
-}
-
-pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<bool> {
-    let mut paths = map_paths(route.get_stops(), distance_service);
-
-    for stop_index in 0..paths.len() {
-        let path = paths.get(&stop_index)?;
+pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<()> {
+    for stop_index in 1..route.get_stops().len() - 1  {
+        let path = Path::from_stop_index(route.get_stops(), stop_index, distance_service)?;
         
         let swap_candidate_index = match find_improvements(route.get_stops(), distance_service, &path) {
             Some(candidate_index) => candidate_index,
             None => continue,
         };
         
-        let base_index = path.get_prev().get_index();
-        execute_swap(&mut paths, base_index, swap_candidate_index, distance_service)
+        let base_index = path.get_current().get_index();
+        route.get_stops_mut().swap(base_index, swap_candidate_index);
     }
 
-    return Some(false);
+    Some(())
 }
