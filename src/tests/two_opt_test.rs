@@ -66,9 +66,9 @@ fn can_optimize_route(distance_service: DistanceService, stops_with_crossings: V
     two_opt::search(&mut route, &distance_service).unwrap();
 
     assert_eq!(route.get_stops().get(0).unwrap().get_id(), 0);
-    assert_eq!(route.get_stops().get(1).unwrap().get_id(), 1);
-    assert_eq!(route.get_stops().get(2).unwrap().get_id(), 4);
-    assert_eq!(route.get_stops().get(3).unwrap().get_id(), 3);
-    assert_eq!(route.get_stops().get(4).unwrap().get_id(), 2);
+    assert_eq!(route.get_stops().get(1).unwrap().get_id(), 2);
+    assert_eq!(route.get_stops().get(2).unwrap().get_id(), 3);
+    assert_eq!(route.get_stops().get(3).unwrap().get_id(), 1);
+    assert_eq!(route.get_stops().get(4).unwrap().get_id(), 4);
     assert_eq!(route.get_stops().get(5).unwrap().get_id(), 0);
 }
