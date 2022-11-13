@@ -1,11 +1,9 @@
-use std::collections::BTreeMap;
-
 use crate::{
     domain::{route::Route, stop::Stop},
     services::distance::distance_service::DistanceService,
 };
 
-use super::{path::Path, path_node::PathNode};
+use super::path::Path;
 
 pub(crate) fn calculate_swap_cost<'a>(
     path1: &Path,
