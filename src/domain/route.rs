@@ -51,6 +51,10 @@ impl Route {
         &self.stops
     }
 
+    pub fn get_stops_mut(&mut self) -> &mut Vec<Stop> {
+        &mut self.stops
+    }
+
     pub fn swap_stops(&mut self, index1: usize, index2: usize) {
         let aux = self.stops[index1];
 
