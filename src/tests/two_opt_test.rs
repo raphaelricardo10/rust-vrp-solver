@@ -16,7 +16,7 @@ fn can_calculate_insertion_cost(
 ) {
     let path = Path::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
 
-    assert_eq!(path.get_cost(), 6.0);
+    assert_eq!(path.get_cost(), 8.0);
 }
 
 #[rstest]
@@ -29,7 +29,7 @@ fn can_calculate_path_swap_cost(
 
     let swap_cost = calculate_swap_cost(&path1, &path2, &distance_service);
 
-    assert_eq!(swap_cost - (path1.get_cost() + path2.get_cost()), 0.0);
+    assert_eq!(swap_cost - (path1.get_cost() + path2.get_cost()), -4.0);
 }
 
 #[rstest]
@@ -42,7 +42,7 @@ fn can_get_the_minimum_swap_cost(
 
     let swap_cost = get_minimum_swap_cost(&stops_with_crossings, &distance_service, &path).unwrap();
         
-    assert_eq!(swap_cost.1, 12.0);
+    assert_eq!(swap_cost.1, 9.0);
 }
 
 #[rstest]
@@ -63,7 +63,12 @@ fn can_optimize_route(distance_service: DistanceService, stops_with_crossings: V
             .unwrap();
     }
 
-    let result = two_opt::search(&mut route, &distance_service).unwrap();
+    two_opt::search(&mut route, &distance_service).unwrap();
 
-    assert!(result);
+    assert_eq!(route.get_stops().get(0).unwrap().get_id(), 0);
+    assert_eq!(route.get_stops().get(1).unwrap().get_id(), 1);
+    assert_eq!(route.get_stops().get(2).unwrap().get_id(), 4);
+    assert_eq!(route.get_stops().get(3).unwrap().get_id(), 3);
+    assert_eq!(route.get_stops().get(4).unwrap().get_id(), 2);
+    assert_eq!(route.get_stops().get(5).unwrap().get_id(), 0);
 }
