@@ -1,13 +1,11 @@
-use std::collections::HashMap;
-
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::solver::{Solution, Solver},
+    solvers::{solution::Solution, solver::Solver},
 };
 
 pub struct GreedySolver {
-    solution: Solution,
+    pub solution: Solution,
     route_service: RouteService,
 }
 
@@ -18,7 +16,7 @@ impl GreedySolver {
         stops: Vec<Stop>,
     ) -> GreedySolver {
         GreedySolver {
-            solution: HashMap::new(),
+            solution: Solution::default(),
             route_service: RouteService::new(vehicles, distances, stops),
         }
     }
@@ -26,9 +24,7 @@ impl GreedySolver {
 
 impl Solver<GreedySolver> for GreedySolver {
     fn run_iteration(&mut self) {
-        let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
-
-        for vehicle_id in vehicle_ids {
+        for vehicle_id in Self::get_all_vehicle_ids(&self.route_service) {
             let stop_id = match self.route_service.get_nearest_stop(vehicle_id) {
                 None => break,
                 Some(stop) => stop.id,
@@ -40,20 +36,24 @@ impl Solver<GreedySolver> for GreedySolver {
         }
     }
 
-    fn get_solution(&self) -> &Solution {
-        &self.solution
+    fn solve(&mut self) {
+        self.route_service.assign_starting_points();
+
+        while !self.stop_condition_met() {
+            self.run_iteration();
+        }
+
+        self.route_service.assign_stop_points();
+
+        self.solution = Solution::new(self.route_service.get_all_routes(), self.route_service.total_distance());
     }
 
     fn solution_total_distance(&self) -> f64 {
-        self.route_service.total_distance()
+        self.solution.total_distance
     }
 
     fn stop_condition_met(&self) -> bool {
         !self.route_service.has_available_stop().unwrap()
-    }
-
-    fn set_solution(&mut self, solution: Solution) {
-        self.solution = solution
     }
 
     fn get_route_service(&mut self) -> &mut RouteService {

@@ -21,7 +21,7 @@ fn greedy_solution_is_correct_single_vehicle(
     let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
-    let solution = solver.get_solution().get(&0).unwrap();
+    let solution = solver.solution.result.get(&0).unwrap();
 
     assert_eq!(solution[0], 0);
     assert_eq!(solution[1], 2);
@@ -40,8 +40,8 @@ fn greedy_solution_is_correct_multiple_vehicles(
     let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
-    let solution_v1 = solver.get_solution().get(&0).unwrap();
-    let solution_v2 = solver.get_solution().get(&1).unwrap();
+    let solution_v1 = solver.solution.result.get(&0).unwrap();
+    let solution_v2 = solver.solution.result.get(&1).unwrap();
 
     assert_eq!(solution_v1[0], 0);
     assert_eq!(solution_v1[1], 2);
@@ -92,7 +92,7 @@ fn the_vehicle_returned_to_depot(
     let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
-    let solution = solver.get_solution().get(&0).unwrap();
+    let solution = solver.solution.result.get(&0).unwrap();
 
     let last_stop = *solution.last().unwrap();
 
