@@ -1,14 +1,11 @@
 use crate::errors::vehicle::vehicle_overload::VehicleOverloadError;
 
 use super::{stop::Stop, vehicle::Vehicle};
-use std::collections::HashMap;
-
-type DistanceMap = HashMap<u32, f64>;
 
 pub struct Route {
     pub stops: Vec<Stop>,
     pub vehicle: Vehicle,
-    distances: DistanceMap,
+    total_distance: f64,
 }
 
 impl Route {
@@ -16,7 +13,7 @@ impl Route {
         Route {
             vehicle,
             stops: Vec::new(),
-            distances: HashMap::new(),
+            total_distance: f64::default(),
         }
     }
 
@@ -34,13 +31,13 @@ impl Route {
         }
 
         self.stops.push(stop);
-        self.distances.insert(stop.id, distance);
+        self.total_distance += distance;
 
         Ok(())
     }
 
     pub fn total_distance(&self) -> f64 {
-        self.distances.values().sum()
+        self.total_distance
     }
 
     pub fn swap_stops(&mut self, index1: usize, index2: usize) {
