@@ -4,8 +4,8 @@ use crate::errors::vehicle::{
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Vehicle {
+    usage: u32,
     pub id: u32,
-    pub usage: u32,
     pub capacity: u32,
 }
 

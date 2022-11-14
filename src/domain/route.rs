@@ -7,8 +7,8 @@ type DistanceMap = HashMap<u32, f64>;
 
 pub struct Route {
     pub stops: Vec<Stop>,
-    pub distances: DistanceMap,
     pub vehicle: Vehicle,
+    distances: DistanceMap,
 }
 
 impl Route {
