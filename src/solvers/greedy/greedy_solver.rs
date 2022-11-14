@@ -24,7 +24,9 @@ impl GreedySolver {
 
 impl Solver<GreedySolver> for GreedySolver {
     fn run_iteration(&mut self) {
-        for vehicle_id in Self::get_all_vehicle_ids(&self.route_service) {
+        let vehicle_ids: Vec<u32> = self.route_service.get_all_routes().keys().cloned().collect();
+
+        for vehicle_id in vehicle_ids {
             let stop_id = match self.route_service.get_nearest_stop(vehicle_id) {
                 None => break,
                 Some(stop) => stop.id,

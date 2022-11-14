@@ -83,7 +83,8 @@ impl<'a> Solver<GraspSolver> for GraspSolver {
     }
 
     fn run_iteration(&mut self) {
-        let vehicle_ids = Self::get_all_vehicle_ids(&self.route_service);
+        let vehicle_ids: Vec<u32> = self.route_service.get_all_routes().keys().cloned().collect();
+
         self.generate_solution(&vehicle_ids);
         self.run_local_search(&vehicle_ids);
 
