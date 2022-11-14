@@ -41,24 +41,28 @@ impl<'a> GraspSolver {
         Some(chosen)
     }
 
+    fn run_iteration(&mut self, vehicle_ids: &Vec<u32>) {
+        for vehicle_id in vehicle_ids {
+            let stop_id = match self.get_random_near_stop(*vehicle_id) {
+                None => break,
+                Some(stop) => stop.id,
+            };
+
+            self.route_service
+                .assign_stop_to_route(*vehicle_id, stop_id)
+                .unwrap();
+
+            let route = self.route_service.get_route_mut(*vehicle_id).unwrap();
+            self.local_search.run(route);
+        }
+    }
+
     fn generate_solution(&mut self, vehicle_ids: &Vec<u32>) {
         self.route_service.reset();
         self.route_service.assign_starting_points();
 
         while self.route_service.has_available_stop().unwrap() {
-            for vehicle_id in vehicle_ids {
-                let stop_id = match self.get_random_near_stop(*vehicle_id) {
-                    None => break,
-                    Some(stop) => stop.id,
-                };
-
-                self.route_service
-                    .assign_stop_to_route(*vehicle_id, stop_id)
-                    .unwrap();
-
-                let route = self.route_service.get_route_mut(*vehicle_id).unwrap();
-                self.local_search.run(route);
-            }
+            self.run_iteration(vehicle_ids)
         }
 
         self.route_service.assign_stop_points();
@@ -76,7 +80,7 @@ impl<'a> GraspSolver {
         solution.is_better_than(&self.solution)
     }
 
-    fn run_iteration(&mut self) {
+    fn run_generation(&mut self) {
         let vehicle_ids: Vec<u32> = self
             .route_service
             .get_all_routes()
@@ -106,7 +110,7 @@ impl<'a> GraspSolver {
 
     pub fn solve(&mut self) {
         while !self.stop_condition_met() {
-            self.run_iteration();
+            self.run_generation();
         }
     }
 }
