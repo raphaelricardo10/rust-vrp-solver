@@ -5,7 +5,7 @@ use crate::{
 use rstest::rstest;
 
 use crate::{
-    domain::stop::Stop, solvers::greedy::solver::GreedySolver, tests::fixtures::VehicleFactory,
+    domain::stop::Stop, solvers::greedy::greedy_solver::GreedySolver, tests::fixtures::VehicleFactory,
 };
 
 use super::fixtures::{distances, stops, vehicle_factory};
