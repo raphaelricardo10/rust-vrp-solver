@@ -50,6 +50,10 @@ impl RouteService {
         Some(self.routes.get(&vehicle_id)?)
     }
 
+    pub fn get_route_mut(&mut self, vehicle_id: u32) -> Option<&mut Route> {
+        Some(self.routes.get_mut(&vehicle_id)?)
+    }
+
     pub fn get_all_routes(&self) -> &RouteMap {
         &self.routes
     }
