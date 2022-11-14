@@ -8,10 +8,10 @@ pub mod vehicle_test;
 pub mod route_service_test;
 
 #[cfg(test)]
-pub mod greedy_solver;
+pub mod greedy_solver_test;
 
 #[cfg(test)]
-pub mod grasp_solver;
+pub mod grasp_solver_test;
 
 mod fixtures;
 
