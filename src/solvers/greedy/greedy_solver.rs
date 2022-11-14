@@ -55,16 +55,8 @@ impl GreedySolver {
             self.route_service.total_distance(),
         );
     }
-    
-    fn solution_total_distance(&self) -> f64 {
-        self.solution.total_distance
-    }
-    
+
     fn stop_condition_met(&self) -> bool {
         !self.route_service.has_available_stop().unwrap()
-    }
-    
-    fn get_route_service(&mut self) -> &mut RouteService {
-        &mut self.route_service
     }
 }

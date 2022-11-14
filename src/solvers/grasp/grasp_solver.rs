@@ -76,10 +76,6 @@ impl<'a> GraspSolver {
         solution.is_better_than(&self.solution)
     }
 
-    fn solution_total_distance(&self) -> f64 {
-        self.solution.total_distance
-    }
-
     fn run_iteration(&mut self) {
         let vehicle_ids: Vec<u32> = self
             .route_service
@@ -106,10 +102,6 @@ impl<'a> GraspSolver {
 
     fn stop_condition_met(&self) -> bool {
         self.times_without_improvement >= 3
-    }
-
-    fn get_route_service(&mut self) -> &mut RouteService {
-        &mut self.route_service
     }
 
     pub fn solve(&mut self) {
