@@ -14,11 +14,11 @@ pub struct GraspSolver {
     route_service: RouteService,
 }
 
-impl GraspSolver {
+impl<'a> GraspSolver {
     pub fn new(
         rcl_size: usize,
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: &'a DistanceMatrix,
         stops: Vec<Stop>,
     ) -> GraspSolver {
         GraspSolver {
@@ -38,7 +38,7 @@ impl GraspSolver {
     }
 }
 
-impl Solver<GraspSolver> for GraspSolver {
+impl<'a> Solver<GraspSolver> for GraspSolver {
     fn get_solution(&self) -> &Solution {
         &self.solution
     }

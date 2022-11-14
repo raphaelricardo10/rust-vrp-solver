@@ -18,7 +18,7 @@ pub struct RouteService {
 impl RouteService {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: &DistanceMatrix,
         stops: Vec<Stop>,
     ) -> RouteService {
         RouteService {

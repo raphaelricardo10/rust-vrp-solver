@@ -15,13 +15,13 @@ pub struct DistanceService {
 }
 
 impl<'a> DistanceService {
-    pub fn new(stops: Vec<Stop>, distances: DistanceMatrix) -> DistanceService {
+    pub fn new(stops: Vec<Stop>, distances: &DistanceMatrix) -> DistanceService {
         DistanceService {
             distances: Self::map_distances(stops, distances),
         }
     }
 
-    fn map_distances(stops: Vec<Stop>, distances: DistanceMatrix) -> MappedDistanceMatrix {
+    fn map_distances(stops: Vec<Stop>, distances: &DistanceMatrix) -> MappedDistanceMatrix {
         let stops_map: StopsMap = stops.iter().map(|stop| (stop.id, *stop)).collect();
 
         distances

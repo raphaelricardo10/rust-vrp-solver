@@ -14,7 +14,7 @@ pub struct GreedySolver {
 impl GreedySolver {
     pub fn new(
         vehicles: Vec<Vehicle>,
-        distances: DistanceMatrix,
+        distances: &DistanceMatrix,
         stops: Vec<Stop>,
     ) -> GreedySolver {
         GreedySolver {

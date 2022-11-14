@@ -80,5 +80,5 @@ pub fn vehicle_factory() -> VehicleFactory {
 
 #[fixture]
 pub fn distance_service(distances: DistanceMatrix, stops: Vec<Stop>) -> DistanceService {
-    DistanceService::new(stops, distances)
+    DistanceService::new(stops, &distances)
 }
