@@ -15,7 +15,7 @@ fn grasp_solution_is_generated(
 ) {
     let vehicles = vehicle_factory(2);
 
-    let mut solver = GraspSolver::new(3, vehicles, &distances, stops);
+    let mut solver = GraspSolver::new(3, vehicles, &distances, 3,stops);
     solver.solve();
 
     let solution_v1 = solver.solution.result.get(&0).unwrap();

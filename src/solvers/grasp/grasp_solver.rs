@@ -13,6 +13,7 @@ pub struct GraspSolver {
     pub solution: Solution,
     local_search: TwoOptSearcher,
     route_service: RouteService,
+    max_improvement_times: u8,
     times_without_improvement: u8,
 }
 
@@ -21,10 +22,12 @@ impl<'a> GraspSolver {
         rcl_size: usize,
         vehicles: Vec<Vehicle>,
         distances: &'a DistanceMatrix,
+        max_improvement_times: u8,
         stops: Vec<Stop>,
     ) -> GraspSolver {
         GraspSolver {
             rcl_size,
+            max_improvement_times,
             solution: Solution::default(),
             times_without_improvement: Default::default(),
             local_search: TwoOptSearcher::new(stops.clone(), distances),
@@ -105,7 +108,7 @@ impl<'a> GraspSolver {
     }
 
     fn stop_condition_met(&self) -> bool {
-        self.times_without_improvement >= 3
+        self.times_without_improvement >= self.max_improvement_times
     }
 
     pub fn solve(&mut self) {
