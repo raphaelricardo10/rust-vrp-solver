@@ -4,9 +4,9 @@ use crate::errors::vehicle::{
 
 #[derive(PartialEq, Eq, Hash)]
 pub struct Vehicle {
-    id: u32,
-    usage: u32,
-    capacity: u32,
+    pub id: u32,
+    pub usage: u32,
+    pub capacity: u32,
 }
 
 impl Vehicle {
@@ -16,14 +16,6 @@ impl Vehicle {
             capacity,
             usage: 0,
         }
-    }
-
-    pub fn get_id(&self) -> u32 {
-        self.id
-    }
-
-    pub fn get_capacity(&self) -> u32 {
-        self.capacity
     }
 
     pub fn can_support_load(&self, quantity: u32) -> bool {

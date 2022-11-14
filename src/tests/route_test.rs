@@ -44,7 +44,7 @@ fn route_cannot_overload_vehicle(full_stops: Vec<Stop>, distances: DistanceMatri
 
     route.add_stop(full_stops[0], 0.0).unwrap();
     let distance = *distances
-        .get(&(full_stops[0].get_id(), full_stops[1].get_id()))
+        .get(&(full_stops[0].id, full_stops[1].id))
         .unwrap();
 
     match route.add_stop(full_stops[1], distance) {

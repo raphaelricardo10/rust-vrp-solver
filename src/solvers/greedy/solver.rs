@@ -31,7 +31,7 @@ impl Solver<GreedySolver> for GreedySolver {
         for vehicle_id in vehicle_ids {
             let stop_id = match self.route_service.get_nearest_stop(vehicle_id) {
                 None => break,
-                Some(stop) => stop.get_id(),
+                Some(stop) => stop.id,
             };
 
             self.route_service

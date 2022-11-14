@@ -78,7 +78,7 @@ fn cannot_get_infeasible_near_stops(
 
     let stop = route_service.get_nearest_stop(0).unwrap();
 
-    assert_ne!(stop.get_id(), 4)
+    assert_ne!(stop.id, 4)
 }
 
 #[rstest]

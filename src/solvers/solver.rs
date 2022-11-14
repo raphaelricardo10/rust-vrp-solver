@@ -16,7 +16,7 @@ pub trait Solver<T> {
         route_service
             .get_vehicles()
             .iter()
-            .map(|x| x.get_id())
+            .map(|x| x.id)
             .collect()
     }
 
@@ -27,7 +27,7 @@ pub trait Solver<T> {
             .map(|(vehicle_id, route)| -> (u32, Vec<u32>) {
                 (
                     *vehicle_id,
-                    route.get_stops().iter().map(|stop| stop.get_id()).collect(),
+                    route.stops.iter().map(|stop| stop.id).collect(),
                 )
             })
             .collect()

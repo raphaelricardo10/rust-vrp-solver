@@ -22,7 +22,7 @@ impl<'a> DistanceService {
     }
 
     fn map_distances(stops: Vec<Stop>, distances: DistanceMatrix) -> MappedDistanceMatrix {
-        let stops_map: StopsMap = stops.iter().map(|stop| (stop.get_id(), *stop)).collect();
+        let stops_map: StopsMap = stops.iter().map(|stop| (stop.id, *stop)).collect();
 
         distances
             .iter()
@@ -38,8 +38,8 @@ impl<'a> DistanceService {
     pub fn get_distance(&self, from: &Stop, to: &Stop) -> Option<f64> {
         Some(
             self.distances
-                .get(&(from.get_id(), to.get_id()))?
-                .get_distance(),
+                .get(&(from.id, to.id))?
+                .distance,
         )
     }
 
@@ -49,7 +49,7 @@ impl<'a> DistanceService {
     ) -> impl Iterator<Item = &DistanceMatrixEntry> {
         self.distances
             .iter()
-            .filter(|x| x.0 .0 == stop.get_id())
+            .filter(|x| x.0 .0 == stop.id)
             .map(|x| x.1)
     }
 
@@ -59,9 +59,9 @@ impl<'a> DistanceService {
         filter: impl Fn(&Stop) -> bool,
     ) -> Option<&Stop> {
         self.get_distances_from(stop)
-            .filter(|entry| filter(entry.get_destination_stop()))
+            .filter(|entry| filter(&entry.destination))
             .min_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap())
-            .map(|x| x.get_destination_stop())
+            .map(|x| &x.destination)
     }
 
     pub fn get_k_nearest_stops(
@@ -72,7 +72,7 @@ impl<'a> DistanceService {
     ) -> Vec<&Stop> {
         let mut stops = self
             .get_distances_from(stop)
-            .filter(|entry| filter(entry.get_destination_stop()))
+            .filter(|entry| filter(&entry.destination))
             .collect::<Vec<&DistanceMatrixEntry>>();
 
         stops.sort_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap());
@@ -81,7 +81,7 @@ impl<'a> DistanceService {
 
         stops[0..number_of_stops]
             .iter()
-            .map(|x| x.get_destination_stop())
+            .map(|x| &x.destination)
             .collect()
     }
 }

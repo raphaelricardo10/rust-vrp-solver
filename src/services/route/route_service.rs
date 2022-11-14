@@ -32,14 +32,14 @@ impl RouteService {
         let mut route_map = BTreeMap::new();
 
         for vehicle in vehicles {
-            route_map.insert(vehicle.get_id(), Route::new(vehicle));
+            route_map.insert(vehicle.id, Route::new(vehicle));
         }
 
         route_map
     }
 
     fn map_stops(stops: Vec<Stop>) -> StopMap {
-        stops.iter().map(|stop| (stop.get_id(), *stop)).collect()
+        stops.iter().map(|stop| (stop.id, *stop)).collect()
     }
 
     pub fn get_available_stops(&self) -> &StopMap {
@@ -55,7 +55,7 @@ impl RouteService {
     }
 
     pub fn get_vehicles(&self) -> Vec<&Vehicle> {
-        self.routes.values().map(|x| x.get_vehicle()).collect()
+        self.routes.values().map(|x| &x.vehicle).collect()
     }
 
     pub fn total_distance(&self) -> f64 {
@@ -114,8 +114,8 @@ impl RouteService {
 
     pub fn assign_stop_points(&mut self) -> Option<()> {
         for (_, route) in &mut self.routes {
-            let first_stop = route.get_stops().first()?;
-            let last_stop = route.get_stops().last()?;
+            let first_stop = route.stops.first()?;
+            let last_stop = route.stops.last()?;
             let distance = self.distance_service.get_distance(last_stop, first_stop)?;
 
             route.add_stop(*first_stop, distance).ok();
@@ -125,7 +125,7 @@ impl RouteService {
     }
 
     fn is_stop_feasible(&self, stop: &Stop, route: &Route) -> bool {
-        if !self.available_stops.contains_key(&stop.get_id()) {
+        if !self.available_stops.contains_key(&stop.id) {
             return false;
         }
 

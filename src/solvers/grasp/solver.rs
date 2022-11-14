@@ -53,7 +53,7 @@ impl Solver<GraspSolver> for GraspSolver {
         for vehicle_id in vehicle_ids {
             let stop_id = match self.get_random_near_stop(vehicle_id) {
                 None => break,
-                Some(stop) => stop.get_id(),
+                Some(stop) => stop.id,
             };
 
             self.route_service

@@ -35,7 +35,7 @@ fn can_assign_stop_to_route(
 
     route_service.assign_stop_to_route(0, 0).unwrap();
 
-    assert_eq!(route_service.get_route(0).unwrap().get_stops().len(), 1)
+    assert_eq!(route_service.get_route(0).unwrap().stops.len(), 1)
 }
 
 #[rstest]
@@ -49,7 +49,7 @@ fn can_get_nearest_stop(
     let mut route_service = RouteService::new(vehicles, distances, stops);
     route_service.assign_stop_to_route(0, 0).unwrap();
 
-    assert_eq!(route_service.get_nearest_stop(0).unwrap().get_id(), 2);
+    assert_eq!(route_service.get_nearest_stop(0).unwrap().id, 2);
 }
 
 #[rstest]
@@ -67,7 +67,7 @@ fn can_get_k_nearest_stops(
 
     assert_eq!(k_nearest.len(), 3);
 
-    assert_eq!(k_nearest[0].get_id(), 2);
-    assert_eq!(k_nearest[1].get_id(), 1);
-    assert_eq!(k_nearest[2].get_id(), 3);
+    assert_eq!(k_nearest[0].id, 2);
+    assert_eq!(k_nearest[1].id, 1);
+    assert_eq!(k_nearest[2].id, 3);
 }

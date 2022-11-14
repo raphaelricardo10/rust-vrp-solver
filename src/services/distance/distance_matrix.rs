@@ -3,8 +3,8 @@ use std::cmp::Ordering;
 use crate::domain::stop::Stop;
 
 pub(crate) struct DistanceMatrixEntry {
-    distance: f64,
-    destination: Stop,
+    pub(crate) distance: f64,
+    pub(crate) destination: Stop,
 }
 
 impl DistanceMatrixEntry {
@@ -14,25 +14,17 @@ impl DistanceMatrixEntry {
             destination,
         }
     }
-
-    pub(crate) fn get_distance(&self) -> f64 {
-        self.distance
-    }
-
-    pub(crate) fn get_destination_stop(&self) -> &Stop {
-        &self.destination
-    }
 }
 
 impl PartialOrd for DistanceMatrixEntry {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        self.get_distance().partial_cmp(&other.get_distance())
+        self.distance.partial_cmp(&other.distance)
     }
 }
 
 impl PartialEq for DistanceMatrixEntry {
     fn eq(&self, other: &Self) -> bool {
-        self.get_distance() == other.get_distance()
+        self.distance == other.distance
     }
 }
 
