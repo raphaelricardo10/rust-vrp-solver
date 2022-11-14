@@ -1,30 +1,32 @@
 use crate::{
     domain::{route::Route, stop::Stop},
-    services::distance::distance_service::DistanceService,
+    services::distance::distance_service::{DistanceService, DistanceMatrix},
 };
 
 use super::path::Path;
+
+pub struct TwoOptSearcher {
+    distance_service: DistanceService,
+}
+
+impl TwoOptSearcher {
+    pub fn new(stops: Vec<Stop>, distances: &DistanceMatrix) -> Self {
+        Self {
+            distance_service: DistanceService::new(stops, distances),
+        }
+    }
+}
 
 pub(crate) fn calculate_swap_cost<'a>(
     path1: &Path,
     path2: &Path,
     distance_service: &DistanceService,
 ) -> f64 {
-    let swapped_path_1 = Path::new(
-        path1.prev,
-        path2.current,
-        path1.next,
-        distance_service,
-    )
-    .unwrap();
+    let swapped_path_1 =
+        Path::new(path1.prev, path2.current, path1.next, distance_service).unwrap();
 
-    let swapped_path_2 = Path::new(
-        path2.prev,
-        path1.current,
-        path2.next,
-        distance_service,
-    )
-    .unwrap();
+    let swapped_path_2 =
+        Path::new(path2.prev, path1.current, path2.next, distance_service).unwrap();
 
     swapped_path_1.cost + swapped_path_2.cost
 }
@@ -75,11 +77,10 @@ pub fn search(route: &mut Route, distance_service: &DistanceService) -> Option<(
     for stop_index in 1..route.stops.len() - 1 {
         let path = Path::from_stop_index(&route.stops, stop_index, distance_service)?;
 
-        let swap_candidate_index =
-            match find_improvements(&route.stops, distance_service, &path) {
-                Some(candidate_index) => candidate_index,
-                None => continue,
-            };
+        let swap_candidate_index = match find_improvements(&route.stops, distance_service, &path) {
+            Some(candidate_index) => candidate_index,
+            None => continue,
+        };
 
         let base_index = path.current.index;
         route.stops.swap(base_index, swap_candidate_index);
