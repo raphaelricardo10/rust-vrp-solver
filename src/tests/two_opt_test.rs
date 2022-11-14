@@ -1,6 +1,6 @@
 use crate::{
     domain::{route::Route, vehicle::Vehicle},
-    local_search::{two_opt::{self, get_minimum_swap_cost, calculate_swap_cost}, path::Path},
+    local_search::{two_opt::{TwoOptSearcher}, path::Path},
     services::distance::distance_service::DistanceService,
 };
 use rstest::rstest;
@@ -27,7 +27,7 @@ fn can_calculate_path_swap_cost(
     let path1 = Path::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
     let path2 = Path::from_stop_index(&stops_with_crossings, 3, &distance_service).unwrap();
 
-    let swap_cost = calculate_swap_cost(&path1, &path2, &distance_service);
+    let swap_cost = TwoOptSearcher::calculate_swap_cost(&path1, &path2, &distance_service);
 
     assert_eq!(swap_cost - (path1.cost + path2.cost), -4.0);
 }
@@ -40,7 +40,7 @@ fn can_get_the_minimum_swap_cost(
     let stop_index = 1;
     let path = Path::from_stop_index(&stops_with_crossings, stop_index, &distance_service).unwrap();
 
-    let swap_cost = get_minimum_swap_cost(&stops_with_crossings, &distance_service, &path).unwrap();
+    let swap_cost = TwoOptSearcher::get_minimum_swap_cost(&path, &stops_with_crossings, &distance_service).unwrap();
         
     assert_eq!(swap_cost.1, 9.0);
 }
@@ -63,7 +63,7 @@ fn can_optimize_route(distance_service: DistanceService, stops_with_crossings: V
             .unwrap();
     }
 
-    two_opt::search(&mut route, &distance_service).unwrap();
+    TwoOptSearcher::search(&mut route, &distance_service).unwrap();
 
     assert_eq!(route.stops.get(0).unwrap().id, 0);
     assert_eq!(route.stops.get(1).unwrap().id, 2);
