@@ -29,23 +29,6 @@ impl<'a> Path<'a> {
         Some(path)
     }
 
-    pub(crate) fn from_window(
-        window: &'a [Stop],
-        base_index: usize,
-        distance_service: &DistanceService,
-    ) -> Option<Path<'a>> {
-        let mut path = Path {
-            prev: PathNode::new(base_index, &window[0]),
-            current: PathNode::new(base_index + 1, &window[1]),
-            next: PathNode::new(base_index + 2, &window[2]),
-            cost: 0.0,
-        };
-
-        path.cost = path.calculate_cost(distance_service)?;
-
-        Some(path)
-    }
-
     pub(crate) fn from_stop_index(
         stops: &'a Vec<Stop>,
         stop_index: usize,
