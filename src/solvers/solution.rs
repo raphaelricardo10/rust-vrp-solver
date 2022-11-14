@@ -13,7 +13,7 @@ impl Default for Solution {
     fn default() -> Self {
         Self {
             result: Default::default(),
-            total_distance: Default::default(),
+            total_distance: f64::MAX,
         }
     }
 }
