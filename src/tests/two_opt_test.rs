@@ -71,7 +71,7 @@ fn can_optimize_route(
             .unwrap();
     }
 
-    two_opt.search(&mut route).unwrap();
+    two_opt.run(&mut route).unwrap();
 
     assert_eq!(route.stops.get(0).unwrap().id, 0);
     assert_eq!(route.stops.get(1).unwrap().id, 2);

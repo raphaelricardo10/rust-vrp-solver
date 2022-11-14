@@ -74,7 +74,7 @@ impl TwoOptSearcher {
         None
     }
 
-    pub fn search(&self, route: &mut Route) -> Option<()> {
+    pub fn run(&self, route: &mut Route) -> Option<()> {
         for stop_index in 1..route.stops.len() - 1 {
             let path = Path::from_stop_index(&route.stops, stop_index, &self.distance_service)?;
 
