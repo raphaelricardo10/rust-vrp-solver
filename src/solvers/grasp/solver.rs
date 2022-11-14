@@ -5,12 +5,13 @@ use std::collections::HashMap;
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::solver::{Solution, Solver},
+    solvers::solver::{Solution, Solver}, local_search::two_opt::TwoOptSearcher,
 };
 
 pub struct GraspSolver {
     rcl_size: usize,
     solution: Solution,
+    local_search: TwoOptSearcher,
     route_service: RouteService,
 }
 
@@ -24,6 +25,7 @@ impl<'a> GraspSolver {
         GraspSolver {
             rcl_size,
             solution: HashMap::new(),
+            local_search: TwoOptSearcher::new(stops.clone(), distances),
             route_service: RouteService::new(vehicles, distances, stops),
         }
     }
