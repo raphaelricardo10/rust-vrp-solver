@@ -42,7 +42,10 @@ impl<'a> GraspSolver {
     }
 
     fn generate_solution(&mut self, vehicle_ids: &Vec<u32>) {
-        while !self.route_service.has_available_stop().unwrap() {
+        self.route_service.reset();
+        self.route_service.assign_starting_points();
+
+        while self.route_service.has_available_stop().unwrap() {
             for vehicle_id in vehicle_ids {
                 let stop_id = match self.get_random_near_stop(*vehicle_id) {
                     None => break,
@@ -57,6 +60,8 @@ impl<'a> GraspSolver {
                 self.local_search.run(route);
             }
         }
+
+        self.route_service.assign_stop_points();
     }
 
     fn run_local_search(&mut self, vehicle_ids: &Vec<u32>) {
