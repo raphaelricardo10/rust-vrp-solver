@@ -11,6 +11,7 @@ pub type RouteMap = BTreeMap<u32, Route>;
 
 pub struct RouteService {
     routes: RouteMap,
+    all_stops: Vec<Stop>,
     available_stops: StopMap,
     distance_service: DistanceService,
 }
@@ -22,10 +23,19 @@ impl RouteService {
         stops: Vec<Stop>,
     ) -> RouteService {
         RouteService {
+            all_stops: stops.clone(),
             routes: Self::map_routes(vehicles),
             available_stops: Self::map_stops(stops.clone()),
             distance_service: DistanceService::new(stops, distances),
         }
+    }
+
+    pub fn reset(&mut self) {
+        for route in self.routes.values_mut() {
+            route.reset();
+        }
+
+        self.available_stops = Self::map_stops(self.all_stops.clone());
     }
 
     pub fn map_routes(vehicles: Vec<Vehicle>) -> RouteMap {

@@ -17,6 +17,11 @@ impl Route {
         }
     }
 
+    pub fn reset(&mut self) {
+        self.stops.clear();
+        self.total_distance = Default::default()
+    }
+
     pub fn get_current_stop(&self) -> Option<&Stop> {
         Some(self.stops.last()?)
     }
