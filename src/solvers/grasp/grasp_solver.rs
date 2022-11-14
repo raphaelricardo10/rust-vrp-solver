@@ -5,7 +5,7 @@ use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     local_search::two_opt::TwoOptSearcher,
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::{solution::Solution, solver::Solver},
+    solvers::solution::Solution,
 };
 
 pub struct GraspSolver {
@@ -75,15 +75,18 @@ impl<'a> GraspSolver {
     fn should_update_solution(&self, solution: &Solution) -> bool {
         solution.is_better_than(&self.solution)
     }
-}
 
-impl<'a> Solver<GraspSolver> for GraspSolver {
     fn solution_total_distance(&self) -> f64 {
         self.solution.total_distance
     }
 
     fn run_iteration(&mut self) {
-        let vehicle_ids: Vec<u32> = self.route_service.get_all_routes().keys().cloned().collect();
+        let vehicle_ids: Vec<u32> = self
+            .route_service
+            .get_all_routes()
+            .keys()
+            .cloned()
+            .collect();
 
         self.generate_solution(&vehicle_ids);
         self.run_local_search(&vehicle_ids);
@@ -109,7 +112,7 @@ impl<'a> Solver<GraspSolver> for GraspSolver {
         &mut self.route_service
     }
 
-    fn solve(&mut self) {
+    pub fn solve(&mut self) {
         while !self.stop_condition_met() {
             self.run_iteration();
         }

@@ -1,11 +1,11 @@
-use crate::{
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::solver::Solver,
+use crate::services::{
+    distance::distance_service::DistanceMatrix, route::route_service::RouteService,
 };
 use rstest::rstest;
 
 use crate::{
-    domain::stop::Stop, solvers::greedy::greedy_solver::GreedySolver, tests::fixtures::VehicleFactory,
+    domain::stop::Stop, solvers::greedy::greedy_solver::GreedySolver,
+    tests::fixtures::VehicleFactory,
 };
 
 use super::fixtures::{distances, stops, vehicle_factory};
@@ -62,7 +62,7 @@ fn greedy_solution_total_distance_is_correct(
     let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
-    assert_eq!(solver.solution_total_distance(), 10.0);
+    assert_eq!(solver.solution.total_distance, 10.0);
 }
 
 #[rstest]

@@ -1,4 +1,4 @@
-use crate::{services::distance::distance_service::DistanceMatrix, solvers::solver::Solver};
+use crate::services::distance::distance_service::DistanceMatrix;
 use rstest::rstest;
 
 use crate::{
