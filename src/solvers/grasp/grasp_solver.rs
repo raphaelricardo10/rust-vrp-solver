@@ -26,7 +26,7 @@ impl<'a> GraspSolver {
         GraspSolver {
             rcl_size,
             solution: Solution::default(),
-            times_without_improvement: u8::default(),
+            times_without_improvement: Default::default(),
             local_search: TwoOptSearcher::new(stops.clone(), distances),
             route_service: RouteService::new(vehicles, distances, stops),
         }
