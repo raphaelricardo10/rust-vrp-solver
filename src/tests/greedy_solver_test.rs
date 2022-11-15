@@ -1,24 +1,17 @@
-use crate::services::{
-    distance::distance_service::DistanceMatrix, route::route_service::RouteService,
+use crate::{
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
+    tests::fixtures::GreedySolverFactory,
 };
 use rstest::rstest;
 
-use crate::{
-    domain::stop::Stop, solvers::greedy::greedy_solver::GreedySolver,
-    tests::fixtures::VehicleFactory,
-};
+use crate::{domain::stop::Stop, tests::fixtures::VehicleFactory};
 
-use super::fixtures::{distances, stops, vehicle_factory};
+use super::fixtures::{distances, greedy_solver_factory, stops, vehicle_factory};
 
 #[rstest]
-fn greedy_solution_is_correct_single_vehicle(
-    distances: DistanceMatrix,
-    stops: Vec<Stop>,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(1);
+fn greedy_solution_is_correct_single_vehicle(greedy_solver_factory: GreedySolverFactory) {
+    let mut solver = greedy_solver_factory(1);
 
-    let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
     let solution = solver.solution.result.get(&0).unwrap();
@@ -30,14 +23,9 @@ fn greedy_solution_is_correct_single_vehicle(
 }
 
 #[rstest]
-fn greedy_solution_is_correct_multiple_vehicles(
-    distances: DistanceMatrix,
-    stops: Vec<Stop>,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(2);
+fn greedy_solution_is_correct_multiple_vehicles(greedy_solver_factory: GreedySolverFactory) {
+    let mut solver = greedy_solver_factory(2);
 
-    let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
     let solution_v1 = solver.solution.result.get(&0).unwrap();
@@ -52,14 +40,9 @@ fn greedy_solution_is_correct_multiple_vehicles(
 }
 
 #[rstest]
-fn greedy_solution_total_distance_is_correct(
-    distances: DistanceMatrix,
-    stops: Vec<Stop>,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(2);
+fn greedy_solution_total_distance_is_correct(greedy_solver_factory: GreedySolverFactory) {
+    let mut solver = greedy_solver_factory(2);
 
-    let mut solver = GreedySolver::new(vehicles, &distances, stops);
     solver.solve();
 
     assert_eq!(solver.solution.total_distance, 10.0);
@@ -82,14 +65,9 @@ fn cannot_get_infeasible_near_stops(
 }
 
 #[rstest]
-fn the_vehicle_returned_to_depot(
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(2);
-
-    let mut solver = GreedySolver::new(vehicles, &distances, stops);
+fn the_vehicle_returned_to_depot(greedy_solver_factory: GreedySolverFactory) {
+    let mut solver = greedy_solver_factory(1);
+    
     solver.solve();
 
     let solution = solver.solution.result.get(&0).unwrap();
