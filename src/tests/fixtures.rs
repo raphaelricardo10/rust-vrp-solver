@@ -3,11 +3,12 @@ use rstest::fixture;
 use std::collections::HashMap;
 
 use crate::{
-    domain::{stop::Stop, vehicle::Vehicle},
+    domain::{stop::Stop, vehicle::Vehicle, route::Route},
     services::distance::distance_service::{DistanceMatrix, DistanceService}, local_search::two_opt::TwoOptSearcher,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
+pub type RouteFactory = Box<dyn Fn(Vec<Stop>) -> Route>;
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -86,4 +87,28 @@ pub fn distance_service(distances: DistanceMatrix, stops: Vec<Stop>) -> Distance
 #[fixture]
 pub fn two_opt(distances: DistanceMatrix, stops: Vec<Stop>) -> TwoOptSearcher {
     TwoOptSearcher::new(stops, &distances)
+}
+
+#[fixture]
+pub fn route_factory(distance_service: DistanceService) -> RouteFactory {
+    let wrapper = move |stops: Vec<Stop>| -> Route {
+        let vehicle = Vehicle::new(0, 100);
+        let mut route = Route::new(vehicle);
+    
+        route.add_stop(stops[0], Default::default()).unwrap();
+        for (index, stop) in stops.iter().enumerate().skip(1) {
+            route
+                .add_stop(
+                    *stop,
+                    distance_service
+                        .get_distance(&stops[index - 1], stop)
+                        .unwrap(),
+                )
+                .unwrap();
+        }    
+
+        route
+    };
+
+    Box::new(wrapper)
 }

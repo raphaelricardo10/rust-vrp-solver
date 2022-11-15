@@ -1,5 +1,4 @@
 use crate::{
-    domain::{route::Route, vehicle::Vehicle},
     local_search::{path::Path, two_opt::TwoOptSearcher},
     services::distance::distance_service::DistanceService,
 };
@@ -7,7 +6,8 @@ use rstest::rstest;
 
 use crate::domain::stop::Stop;
 
-use super::fixtures::{distance_service, stops_with_crossings, two_opt};
+use super::fixtures::RouteFactory;
+use super::fixtures::{distance_service, stops_with_crossings, two_opt, route_factory};
 
 #[rstest]
 fn can_calculate_insertion_cost(
@@ -52,24 +52,10 @@ fn can_get_the_minimum_swap_cost(
 #[rstest]
 fn can_optimize_route(
     two_opt: TwoOptSearcher,
-    distance_service: DistanceService,
+    route_factory: RouteFactory,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let vehicle = Vehicle::new(0, 100);
-
-    let mut route = Route::new(vehicle);
-
-    route.add_stop(stops_with_crossings[0], 0.0).unwrap();
-    for (index, stop) in stops_with_crossings.iter().enumerate().skip(1) {
-        route
-            .add_stop(
-                *stop,
-                distance_service
-                    .get_distance(&stops_with_crossings[index - 1], stop)
-                    .unwrap(),
-            )
-            .unwrap();
-    }
+    let mut route = route_factory(stops_with_crossings);
 
     two_opt.run(&mut route).unwrap();
 
