@@ -1,22 +1,12 @@
 use rstest::rstest;
 
-use crate::{
-    domain::stop::Stop,
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    tests::fixtures::VehicleFactory,
-};
+use crate::tests::fixtures::RouteServiceFactory;
 
-use super::fixtures::{distances, stops, vehicle_factory};
+use super::fixtures::route_service_factory;
 
 #[rstest]
-fn route_service_started(
-    vehicle_factory: VehicleFactory,
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-) {
-    let vehicles = vehicle_factory(2);
-
-    let route_service = RouteService::new(vehicles, &distances, stops);
+fn route_service_started(route_service_factory: RouteServiceFactory) {
+    let route_service = route_service_factory(2);
 
     assert_eq!(route_service.get_available_stops().len(), 5);
     assert_eq!(route_service.get_all_routes().len(), 2);
@@ -24,14 +14,8 @@ fn route_service_started(
 }
 
 #[rstest]
-fn can_assign_stop_to_route(
-    vehicle_factory: VehicleFactory,
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-) {
-    let vehicles = vehicle_factory(1);
-
-    let mut route_service = RouteService::new(vehicles, &distances, stops);
+fn can_assign_stop_to_route(route_service_factory: RouteServiceFactory) {
+    let mut route_service = route_service_factory(1);
 
     route_service.assign_stop_to_route(0, 0).unwrap();
 
@@ -39,28 +23,18 @@ fn can_assign_stop_to_route(
 }
 
 #[rstest]
-fn can_get_nearest_stop(
-    vehicle_factory: VehicleFactory,
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-) {
-    let vehicles = vehicle_factory(1);
+fn can_get_nearest_stop(route_service_factory: RouteServiceFactory) {
+    let mut route_service = route_service_factory(1);
 
-    let mut route_service = RouteService::new(vehicles, &distances, stops);
     route_service.assign_stop_to_route(0, 0).unwrap();
 
     assert_eq!(route_service.get_nearest_stop(0).unwrap().id, 2);
 }
 
 #[rstest]
-fn can_get_k_nearest_stops(
-    vehicle_factory: VehicleFactory,
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-) {
-    let vehicles = vehicle_factory(1);
+fn can_get_k_nearest_stops(route_service_factory: RouteServiceFactory) {
+    let mut route_service = route_service_factory(1);
 
-    let mut route_service = RouteService::new(vehicles, &distances, stops);
     route_service.assign_stop_to_route(0, 0).unwrap();
 
     let k_nearest = route_service.get_k_nearest_stops(0, 3).unwrap();
@@ -73,13 +47,8 @@ fn can_get_k_nearest_stops(
 }
 
 #[rstest]
-fn cannot_get_infeasible_near_stops(
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(1);
-    let mut route_service = RouteService::new(vehicles, &distances, stops);
+fn cannot_get_infeasible_near_stops(route_service_factory: RouteServiceFactory) {
+    let mut route_service = route_service_factory(1);
 
     route_service.assign_stop_to_route(0, 0).unwrap();
 

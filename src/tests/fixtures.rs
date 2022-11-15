@@ -4,12 +4,13 @@ use std::collections::HashMap;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle, route::Route},
-    services::distance::distance_service::{DistanceMatrix, DistanceService}, local_search::two_opt::TwoOptSearcher, solvers::greedy::greedy_solver::GreedySolver,
+    services::{distance::distance_service::{DistanceMatrix, DistanceService}, route::route_service::RouteService}, local_search::two_opt::TwoOptSearcher, solvers::greedy::greedy_solver::GreedySolver,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
 pub type RouteFactory = Box<dyn Fn(Vec<Stop>) -> Route>;
 pub type GreedySolverFactory = Box<dyn Fn(u32) -> GreedySolver>;
+pub type RouteServiceFactory = Box<dyn Fn(u32) -> RouteService>;
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -120,6 +121,17 @@ pub fn greedy_solver_factory(stops: Vec<Stop>, distances: DistanceMatrix, vehicl
         let vehicles = vehicle_factory(number_of_vehicles);
 
         GreedySolver::new(vehicles, &distances, stops.clone())
+    };
+
+    Box::new(wrapper)
+}
+
+#[fixture]
+pub fn route_service_factory(stops: Vec<Stop>, distances: DistanceMatrix, vehicle_factory: VehicleFactory) -> RouteServiceFactory {
+    let wrapper = move |number_of_vehicles| -> RouteService {
+        let vehicles = vehicle_factory(number_of_vehicles);
+
+        RouteService::new(vehicles, &distances, stops.clone())
     };
 
     Box::new(wrapper)
