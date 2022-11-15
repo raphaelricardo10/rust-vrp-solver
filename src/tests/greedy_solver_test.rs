@@ -1,12 +1,7 @@
-use crate::{
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    tests::fixtures::GreedySolverFactory,
-};
 use rstest::rstest;
+use crate::tests::fixtures::GreedySolverFactory;
 
-use crate::{domain::stop::Stop, tests::fixtures::VehicleFactory};
-
-use super::fixtures::{distances, greedy_solver_factory, stops, vehicle_factory};
+use super::fixtures::greedy_solver_factory;
 
 #[rstest]
 fn greedy_solution_is_correct_single_vehicle(greedy_solver_factory: GreedySolverFactory) {
@@ -49,25 +44,9 @@ fn greedy_solution_total_distance_is_correct(greedy_solver_factory: GreedySolver
 }
 
 #[rstest]
-fn cannot_get_infeasible_near_stops(
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-    vehicle_factory: VehicleFactory,
-) {
-    let vehicles = vehicle_factory(1);
-    let mut route_service = RouteService::new(vehicles, &distances, stops);
-
-    route_service.assign_stop_to_route(0, 0).unwrap();
-
-    let stop = route_service.get_nearest_stop(0).unwrap();
-
-    assert_ne!(stop.id, 4)
-}
-
-#[rstest]
 fn the_vehicle_returned_to_depot(greedy_solver_factory: GreedySolverFactory) {
     let mut solver = greedy_solver_factory(1);
-    
+
     solver.solve();
 
     let solution = solver.solution.result.get(&0).unwrap();
