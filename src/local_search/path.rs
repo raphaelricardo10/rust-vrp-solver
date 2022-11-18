@@ -30,7 +30,7 @@ impl<'a> Path<'a> {
     }
 
     pub(crate) fn from_stop_index(
-        stops: &'a Vec<Stop>,
+        stops: &'a [Stop],
         stop_index: usize,
         distance_service: &DistanceService,
     ) -> Option<Path<'a>> {

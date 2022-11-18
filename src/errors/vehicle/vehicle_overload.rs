@@ -5,6 +5,12 @@ pub struct VehicleOverloadError {
     description: &'static str,
 }
 
+impl Default for VehicleOverloadError {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl VehicleOverloadError {
     pub fn new() -> VehicleOverloadError {
         VehicleOverloadError {

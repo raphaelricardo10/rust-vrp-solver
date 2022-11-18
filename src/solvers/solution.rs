@@ -39,6 +39,6 @@ impl Solution {
     }
 
     pub fn is_better_than(&self, other: &Solution) -> bool {
-        return self.total_distance < other.total_distance
+        self.total_distance < other.total_distance
     }
 }

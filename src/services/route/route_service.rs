@@ -57,11 +57,11 @@ impl RouteService {
     }
 
     pub fn get_route(&self, vehicle_id: u32) -> Option<&Route> {
-        Some(self.routes.get(&vehicle_id)?)
+        self.routes.get(&vehicle_id)
     }
 
     pub fn get_route_mut(&mut self, vehicle_id: u32) -> Option<&mut Route> {
-        Some(self.routes.get_mut(&vehicle_id)?)
+        self.routes.get_mut(&vehicle_id)
     }
 
     pub fn get_all_routes(&self) -> &RouteMap {
@@ -85,7 +85,6 @@ impl RouteService {
                 .available_stops
                 .values()
                 .filter(|stop| self.is_stop_feasible(stop, route))
-                .map(|stop| *stop)
                 .count();
 
             if feasible_stops_number > 0 {
@@ -108,7 +107,7 @@ impl RouteService {
         let distance = match route.get_current_stop() {
             Some(last_stop) => self
                 .distance_service
-                .get_distance(&last_stop, &new_stop)
+                .get_distance(last_stop, &new_stop)
                 .unwrap(),
             None => 0.0,
         };
@@ -119,7 +118,7 @@ impl RouteService {
     pub fn assign_starting_points(&mut self) -> Option<()> {
         let starting_stop = self.available_stops.remove(&0)?;
 
-        for (_, route) in &mut self.routes {
+        for route in &mut self.routes.values_mut() {
             route.add_stop(starting_stop, 0.0).ok();
         }
 
@@ -127,7 +126,7 @@ impl RouteService {
     }
 
     pub fn assign_stop_points(&mut self) -> Option<()> {
-        for (_, route) in &mut self.routes {
+        for route in &mut self.routes.values_mut() {
             let first_stop = route.stops.first()?;
             let last_stop = route.stops.last()?;
             let distance = self.distance_service.get_distance(last_stop, first_stop)?;

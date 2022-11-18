@@ -23,7 +23,7 @@ impl Route {
     }
 
     pub fn get_current_stop(&self) -> Option<&Stop> {
-        Some(self.stops.last()?)
+        self.stops.last()
     }
 
     pub fn can_add_stop(&self, stop: &Stop) -> bool {
@@ -31,9 +31,7 @@ impl Route {
     }
 
     pub fn add_stop(&mut self, stop: Stop, distance: f64) -> Result<(), VehicleOverloadError> {
-        if let Err(e) = self.vehicle.load(stop.usage) {
-            return Err(e);
-        }
+        self.vehicle.load(stop.usage)?;
 
         self.stops.push(stop);
         self.total_distance += distance;
@@ -46,9 +44,6 @@ impl Route {
     }
 
     pub fn swap_stops(&mut self, index1: usize, index2: usize) {
-        let aux = self.stops[index1];
-
-        self.stops[index1] = self.stops[index2];
-        self.stops[index2] = aux;
+        self.stops.swap(index1, index2);
     }
 }

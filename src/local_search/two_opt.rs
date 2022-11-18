@@ -67,7 +67,7 @@ impl TwoOptSearcher {
         let swap_candidate =
             Path::from_stop_index(stops, swap_candidate_index, &self.distance_service)?;
 
-        if Self::should_swap_stops(&path, &swap_candidate, &swap_cost) {
+        if Self::should_swap_stops(path, &swap_candidate, &swap_cost) {
             return Some(swap_candidate.current.index);
         }
 

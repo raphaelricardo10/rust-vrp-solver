@@ -5,6 +5,12 @@ pub struct NegativeVehicleCapacityError {
     description: &'static str,
 }
 
+impl Default for NegativeVehicleCapacityError {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl NegativeVehicleCapacityError {
     pub fn new() -> NegativeVehicleCapacityError {
         NegativeVehicleCapacityError {
