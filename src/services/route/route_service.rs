@@ -1,4 +1,5 @@
 use std::collections::{BTreeMap, HashMap};
+use rand::{thread_rng, seq::IteratorRandom};
 
 use crate::{
     domain::{route::Route, stop::Stop, vehicle::Vehicle},
@@ -48,6 +49,10 @@ impl RouteService {
         route_map
     }
 
+    fn get_feasible_stops<'a>(&'a self, route: &'a Route) -> impl Iterator<Item = &'a Stop> {
+        self.available_stops.values().filter(|stop| route.can_add_stop(stop))
+    }
+
     fn map_stops(stops: Vec<Stop>) -> StopMap {
         stops.iter().map(|stop| (stop.id, *stop)).collect()
     }
@@ -74,17 +79,15 @@ impl RouteService {
 
     pub fn total_distance(&self) -> f64 {
         self.routes
-            .iter()
-            .map(|(_, route)| route.total_distance())
+            .values()
+            .map(|route| route.total_distance())
             .sum()
     }
 
     pub fn has_available_stop(&self) -> Option<bool> {
         for route in self.routes.values() {
             let feasible_stops_number = self
-                .available_stops
-                .values()
-                .filter(|stop| self.is_stop_feasible(stop, route))
+                .get_feasible_stops(route)
                 .count();
 
             if feasible_stops_number > 0 {
@@ -165,5 +168,11 @@ impl RouteService {
             self.distance_service
                 .get_k_nearest_stops(current_stop, k, |stop| self.is_stop_feasible(stop, route)),
         )
+    }
+
+    pub fn get_random_stop(&self, vehicle_id: u32) -> Option<&Stop> {
+        let route = self.routes.get(&vehicle_id)?;
+
+        self.get_feasible_stops(route).choose(&mut thread_rng())
     }
 }
