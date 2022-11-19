@@ -1,6 +1,6 @@
-use crate::{services::route::route_service::RouteService, domain::route::Route};
+use crate::{domain::route::Route, services::route::route_service::RouteService};
 
-use super::{population::Population, individual::Individual};
+use super::{individual::Individual, population::Population};
 
 pub struct GeneticSolver {
     population_size: u32,
@@ -11,7 +11,10 @@ impl GeneticSolver {
     pub fn new(population_size: u32, mut route_service: RouteService) -> Self {
         let population = Self::generate_random_population(population_size, &mut route_service);
 
-        Self { population_size, population }
+        Self {
+            population_size,
+            population,
+        }
     }
 
     pub(crate) fn generate_random_individual(route_service: &mut RouteService) -> Individual {
@@ -25,7 +28,9 @@ impl GeneticSolver {
             for vehicle_id in vehicle_ids.iter() {
                 let stop = route_service.get_random_stop(*vehicle_id).unwrap();
 
-                route_service.assign_stop_to_route(*vehicle_id, stop.id).unwrap();
+                route_service
+                    .assign_stop_to_route(*vehicle_id, stop.id)
+                    .unwrap();
             }
         }
 
@@ -34,7 +39,10 @@ impl GeneticSolver {
         Individual::new(routes)
     }
 
-    pub(crate) fn generate_random_population(population_size: u32, route_service: &mut RouteService) -> Population {
+    pub(crate) fn generate_random_population(
+        population_size: u32,
+        route_service: &mut RouteService,
+    ) -> Population {
         let mut population = Population::default();
 
         for _ in 0..population_size {
