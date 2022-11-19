@@ -14,7 +14,7 @@ impl GeneticSolver {
         Self { population_size, population }
     }
 
-    fn generate_random_individual(route_service: &mut RouteService) -> Individual {
+    pub(crate) fn generate_random_individual(route_service: &mut RouteService) -> Individual {
         let vehicle_ids: Vec<u32> = route_service
             .get_vehicles()
             .iter()
@@ -34,7 +34,7 @@ impl GeneticSolver {
         Individual::new(routes)
     }
 
-    fn generate_random_population(population_size: u32, route_service: &mut RouteService) -> Population {
+    pub(crate) fn generate_random_population(population_size: u32, route_service: &mut RouteService) -> Population {
         let mut population = Population::default();
 
         for _ in 0..population_size {

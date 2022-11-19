@@ -3,9 +3,9 @@ use crate::domain::{route::Route, stop::Stop};
 type Gene = Stop;
 type Chromosome = Route;
 
-pub(super) struct Individual {
-    fitness: f64,
-    chromosomes: Vec<Chromosome>,
+pub(crate) struct Individual {
+    pub(crate) fitness: f64,
+    pub(crate) chromosomes: Vec<Chromosome>,
 }
 
 impl Individual {

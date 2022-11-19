@@ -3,8 +3,8 @@ use crate::services::route::route_service::RouteService;
 use super::individual::Individual;
 
 #[derive(Default)]
-pub(super) struct Population {
-    pub(super) individuals: Vec<Individual>,
+pub(crate) struct Population {
+    pub(crate) individuals: Vec<Individual>,
 }
 
 impl Population {
