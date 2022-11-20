@@ -1,3 +1,5 @@
+use rand::{seq::SliceRandom, thread_rng};
+
 use crate::{domain::route::Route, services::route::route_service::RouteService};
 
 use super::{individual::Individual, population::Population};
@@ -53,5 +55,14 @@ impl GeneticSolver {
         }
 
         population
+    }
+
+    pub(crate) fn selection(&self) -> Vec<Individual> {
+        self.population
+            .get_k_bests(2)
+            .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
+            .unwrap()
+            .cloned()
+            .collect()
     }
 }
