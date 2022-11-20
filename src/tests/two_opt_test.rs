@@ -30,7 +30,7 @@ fn can_calculate_path_swap_cost(
 
     let swap_cost = two_opt.calculate_swap_cost(&path1, &path2);
 
-    assert_eq!(swap_cost - (path1.cost + path2.cost), -4.0);
+    assert_eq!(swap_cost, -4.0);
 }
 
 #[rstest]
@@ -46,7 +46,7 @@ fn can_get_the_minimum_swap_cost(
         .get_minimum_swap_cost(&path, &stops_with_crossings)
         .unwrap();
 
-    assert_eq!(swap_cost.1, 9.0);
+    assert_eq!(swap_cost.1, -5.0);
 }
 
 #[rstest]

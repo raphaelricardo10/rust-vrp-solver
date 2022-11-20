@@ -33,7 +33,7 @@ impl TwoOptSearcher {
         )
         .unwrap();
 
-        swapped_path_1.cost + swapped_path_2.cost
+        (swapped_path_1.cost + swapped_path_2.cost) - (path1.cost + path2.cost)
     }
 
     pub(crate) fn get_minimum_swap_cost(
@@ -57,8 +57,8 @@ impl TwoOptSearcher {
             .min_by(|(_, cost1), (_, cost2)| cost1.partial_cmp(cost2).unwrap())
     }
 
-    fn should_swap_stops(path1: &Path, path2: &Path, swap_cost: f64) -> bool {
-        swap_cost < path1.cost + path2.cost
+    fn should_swap_stops(swap_cost: f64) -> bool {
+        swap_cost < 0.0
     }
 
     fn find_improvements(&self, stops: &Vec<Stop>, path: &Path) -> Option<(usize, f64)> {
@@ -67,9 +67,8 @@ impl TwoOptSearcher {
         let swap_candidate =
             Path::from_stop_index(stops, swap_candidate_index, &self.distance_service)?;
 
-        if Self::should_swap_stops(path, &swap_candidate, swap_cost) {
-            let cost_change = swap_cost - (path.cost + swap_candidate.cost);
-            return Some((swap_candidate.current.index, cost_change));
+        if Self::should_swap_stops(swap_cost) {
+            return Some((swap_candidate.current.index, swap_cost));
         }
 
         None
@@ -79,13 +78,13 @@ impl TwoOptSearcher {
         for stop_index in 1..route.stops.len() - 1 {
             let path = Path::from_stop_index(&route.stops, stop_index, &self.distance_service)?;
 
-            let (swap_candidate_index, cost_change) = match self.find_improvements(&route.stops, &path) {
+            let (swap_candidate_index, swap_cost) = match self.find_improvements(&route.stops, &path) {
                 Some(candidate_index) => candidate_index,
                 None => continue,
             };
 
             let base_index = path.current.index;
-            route.swap_stops(base_index, swap_candidate_index, cost_change);
+            route.swap_stops(base_index, swap_candidate_index, swap_cost);
         }
 
         Some(())
