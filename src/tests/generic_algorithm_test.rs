@@ -33,3 +33,19 @@ fn test_fitness_is_correct(stops: Vec<Stop>, route_factory: RouteFactory) {
 
     assert_eq!(individual.fitness, 4.0);
 }
+
+#[rstest]
+fn test_gene_swap(stops: Vec<Stop>, route_factory: RouteFactory) {
+    let route = route_factory(stops[..4].to_vec());
+
+    let mut individual = Individual::new(vec![route]);
+
+    let address1 = (0, 1);
+    let address2 = (0, 2);
+
+    individual.swap_genes(address1, address2, -2.0);
+
+    assert_eq!(individual.get_gene(address1).unwrap().id, stops[2].id);
+    assert_eq!(individual.get_gene(address2).unwrap().id, stops[1].id);
+    assert_eq!(individual.fitness, 7.0);
+}
