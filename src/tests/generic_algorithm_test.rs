@@ -1,8 +1,13 @@
 use rstest::rstest;
 
-use crate::{solvers::genetic::{genetic_solver::GeneticSolver, individual::Individual}, domain::stop::Stop};
+use crate::{
+    domain::stop::Stop,
+    solvers::genetic::{genetic_solver::GeneticSolver, individual::Individual},
+};
 
-use super::fixtures::{route_service_factory, RouteServiceFactory, route_factory, RouteFactory, stops};
+use super::fixtures::{
+    route_factory, route_service_factory, stops, RouteFactory, RouteServiceFactory,
+};
 
 #[rstest]
 fn test_generate_random_individual(route_service_factory: RouteServiceFactory) {
@@ -45,7 +50,7 @@ fn test_gene_swap(stops: Vec<Stop>, route_factory: RouteFactory) {
 
     individual.swap_genes(address1, address2, -2.0);
 
+    assert_eq!(individual.fitness, 7.0);
     assert_eq!(individual.get_gene(address1).unwrap().id, stops[2].id);
     assert_eq!(individual.get_gene(address2).unwrap().id, stops[1].id);
-    assert_eq!(individual.fitness, 7.0);
 }
