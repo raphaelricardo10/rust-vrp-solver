@@ -65,4 +65,6 @@ fn can_optimize_route(
     assert_eq!(route.stops.get(3).unwrap().id, 1);
     assert_eq!(route.stops.get(4).unwrap().id, 4);
     assert_eq!(route.stops.get(5).unwrap().id, 0);
+
+    assert_eq!(route.total_distance(), 11.5);
 }
