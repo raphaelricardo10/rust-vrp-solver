@@ -44,7 +44,8 @@ impl Route {
         self.total_distance
     }
 
-    pub fn swap_stops(&mut self, index1: usize, index2: usize) {
+    pub fn swap_stops(&mut self, index1: usize, index2: usize, distance_change: f64) {
         self.stops.swap(index1, index2);
+        self.total_distance += distance_change;
     }
 }
