@@ -1,21 +1,47 @@
-use rand::{seq::SliceRandom, thread_rng};
+use rand::{
+    seq::{IteratorRandom, SliceRandom},
+    thread_rng, Rng,
+};
 
-use crate::{domain::route::Route, services::route::route_service::RouteService};
+use crate::{
+    domain::{route::Route, stop::Stop},
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
+};
 
-use super::{individual::Individual, population::Population};
+use super::{
+    individual::{GeneAddress, Individual},
+    population::Population,
+};
 
 pub struct GeneticSolver {
+    elite_size: usize,
+    mutation_rate: f64,
     population_size: u32,
     population: Population,
+    distance_service: DistanceService,
 }
 
 impl GeneticSolver {
-    pub fn new(population_size: u32, mut route_service: RouteService) -> Self {
+    pub fn new(
+        stops: Vec<Stop>,
+        distances: &DistanceMatrix,
+        population_size: u32,
+        elite_size: usize,
+        mutation_rate: f64,
+        mut route_service: RouteService,
+    ) -> Self {
+        let distance_service = DistanceService::new(stops, distances);
         let population = Self::generate_random_population(population_size, &mut route_service);
 
         Self {
-            population_size,
+            elite_size,
             population,
+            mutation_rate,
+            population_size,
+            distance_service,
         }
     }
 
@@ -59,10 +85,49 @@ impl GeneticSolver {
 
     pub(crate) fn selection(&self) -> Vec<Individual> {
         self.population
-            .get_k_bests(2)
+            .get_k_bests(self.elite_size)
             .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
             .unwrap()
             .cloned()
             .collect()
+    }
+
+    pub(crate) fn choose_random_genes(
+        individual: &Individual,
+    ) -> Option<(GeneAddress, GeneAddress)> {
+        let mut rng = thread_rng();
+
+        let (chromossome_index, chromossome) =
+            individual.chromosomes.iter().enumerate().choose(&mut rng)?;
+
+        let addresses: Vec<GeneAddress> = chromossome
+            .stops
+            .iter()
+            .enumerate()
+            .skip(1)
+            .choose_multiple(&mut rng, 2)
+            .iter()
+            .map(|(gene_index, gene)| (chromossome_index, *gene_index))
+            .collect();
+
+        Some((addresses[0], addresses[1]))
+    }
+
+    pub(crate) fn swap_random_genes(&self, individual: &mut Individual) -> Option<()> {
+        let addresses: (GeneAddress, GeneAddress) = Self::choose_random_genes(individual)?;
+
+        Some(())
+    }
+
+    pub(crate) fn mutation(&mut self) {
+        let mut rng = thread_rng();
+
+        self.population
+            .individuals
+            .iter_mut()
+            .filter(|_| rng.gen_bool(self.mutation_rate))
+            .for_each(|_| todo!());
+
+        todo!()
     }
 }
