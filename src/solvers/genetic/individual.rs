@@ -4,6 +4,7 @@ type Gene = Stop;
 type Chromosome = Route;
 type GeneAddress = (usize, usize);
 
+#[derive(Clone)]
 pub(crate) struct Individual {
     pub(crate) fitness: f64,
     pub(crate) chromosomes: Vec<Chromosome>,
