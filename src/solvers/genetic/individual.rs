@@ -1,8 +1,8 @@
 use crate::domain::{route::Route, stop::Stop};
 
-type Gene = Stop;
-type Chromosome = Route;
-type GeneAddress = (usize, usize);
+pub(super) type Gene = Stop;
+pub(super) type Chromosome = Route;
+pub(super) type GeneAddress = (usize, usize);
 
 #[derive(Clone)]
 pub(crate) struct Individual {
