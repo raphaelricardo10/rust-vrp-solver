@@ -9,7 +9,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    stop_swapper::StopSwapper,
+    stop_swapper::{path::Path, StopSwapper},
 };
 
 use super::{
@@ -114,8 +114,28 @@ impl GeneticSolver {
         Some((addresses[0], addresses[1]))
     }
 
-    pub(crate) fn swap_random_genes(&self, individual: &mut Individual) -> Option<()> {
-        let addresses: (GeneAddress, GeneAddress) = Self::choose_random_genes(individual)?;
+    pub(crate) fn swap_random_genes(
+        individual: &mut Individual,
+        stop_swapper: &StopSwapper,
+    ) -> Option<()> {
+        let (address1, address2): (GeneAddress, GeneAddress) =
+            Self::choose_random_genes(individual)?;
+
+        let path1 = Path::from_stop_index(
+            &individual.chromosomes.get(address1.0)?.stops,
+            address1.1,
+            &stop_swapper.distance_service,
+        )?;
+
+        let path2 = Path::from_stop_index(
+            &individual.chromosomes.get(address2.0)?.stops,
+            address2.1,
+            &stop_swapper.distance_service,
+        )?;
+
+        let swap_cost = stop_swapper.calculate_swap_cost(&path1, &path2);
+
+        individual.swap_genes(address1, address2, swap_cost);
 
         Some(())
     }
@@ -123,12 +143,14 @@ impl GeneticSolver {
     pub(crate) fn mutation(&mut self) {
         let mut rng = thread_rng();
 
+        let stop_swapper = &self.stop_swapper;
+
         self.population
             .individuals
             .iter_mut()
             .filter(|_| rng.gen_bool(self.mutation_rate))
-            .for_each(|_| todo!());
-
-        todo!()
+            .for_each(|individual| {
+                Self::swap_random_genes(individual, stop_swapper);
+            });
     }
 }
