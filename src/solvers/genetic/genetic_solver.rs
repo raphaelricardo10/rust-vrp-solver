@@ -9,6 +9,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
+    stop_swapper::StopSwapper,
 };
 
 use super::{
@@ -21,7 +22,7 @@ pub struct GeneticSolver {
     mutation_rate: f64,
     population_size: u32,
     population: Population,
-    distance_service: DistanceService,
+    stop_swapper: StopSwapper,
 }
 
 impl GeneticSolver {
@@ -33,15 +34,15 @@ impl GeneticSolver {
         mutation_rate: f64,
         mut route_service: RouteService,
     ) -> Self {
-        let distance_service = DistanceService::new(stops, distances);
+        let stop_swapper = StopSwapper::new(stops, distances);
         let population = Self::generate_random_population(population_size, &mut route_service);
 
         Self {
             elite_size,
             population,
+            stop_swapper,
             mutation_rate,
             population_size,
-            distance_service,
         }
     }
 
