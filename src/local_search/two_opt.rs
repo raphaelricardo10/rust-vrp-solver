@@ -1,6 +1,6 @@
 use crate::{
     domain::{route::Route, stop::Stop},
-    services::distance::distance_service::{DistanceMatrix, DistanceService},
+    services::distance::distance_service::DistanceMatrix,
     stop_swapper::{path::Path, StopSwapper},
 };
 
@@ -20,10 +20,14 @@ impl TwoOptSearcher {
     }
 
     fn find_improvements(&self, stops: &Vec<Stop>, path: &Path) -> Option<(usize, f64)> {
-        let (swap_candidate_index, swap_cost) = self.stop_swapper.get_minimum_swap_cost(path, stops)?;
+        let (swap_candidate_index, swap_cost) =
+            self.stop_swapper.get_minimum_swap_cost(path, stops)?;
 
-        let swap_candidate =
-            Path::from_stop_index(stops, swap_candidate_index, &self.stop_swapper.distance_service)?;
+        let swap_candidate = Path::from_stop_index(
+            stops,
+            swap_candidate_index,
+            &self.stop_swapper.distance_service,
+        )?;
 
         if Self::should_swap_stops(swap_cost) {
             return Some((swap_candidate.current.index, swap_cost));
@@ -34,7 +38,11 @@ impl TwoOptSearcher {
 
     pub fn run(&self, route: &mut Route) -> Option<()> {
         for stop_index in 1..route.stops.len() - 1 {
-            let path = Path::from_stop_index(&route.stops, stop_index, &self.stop_swapper.distance_service)?;
+            let path = Path::from_stop_index(
+                &route.stops,
+                stop_index,
+                &self.stop_swapper.distance_service,
+            )?;
 
             let (swap_candidate_index, swap_cost) =
                 match self.find_improvements(&route.stops, &path) {
