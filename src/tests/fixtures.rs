@@ -10,7 +10,7 @@ use crate::{
         route::route_service::RouteService,
     },
     solvers::greedy::greedy_solver::GreedySolver,
-    stop_swapper::stop_swapper::StopSwapper,
+    stop_swapper::StopSwapper,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;

@@ -3,7 +3,7 @@ use rstest::rstest;
 use crate::{
     domain::stop::Stop,
     services::distance::distance_service::DistanceService,
-    stop_swapper::{path::Path, stop_swapper::StopSwapper},
+    stop_swapper::{path::Path, StopSwapper},
 };
 
 use super::fixtures::{distance_service, stop_swapper, stops_with_crossings};
