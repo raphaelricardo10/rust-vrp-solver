@@ -20,3 +20,6 @@ pub mod two_opt_test;
 
 #[cfg(test)]
 pub mod generic_algorithm_test;
+
+#[cfg(test)]
+pub mod stop_swapper;

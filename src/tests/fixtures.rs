@@ -3,8 +3,14 @@ use rstest::fixture;
 use std::collections::HashMap;
 
 use crate::{
-    domain::{stop::Stop, vehicle::Vehicle, route::Route},
-    services::{distance::distance_service::{DistanceMatrix, DistanceService}, route::route_service::RouteService}, local_search::two_opt::TwoOptSearcher, solvers::greedy::greedy_solver::GreedySolver,
+    domain::{route::Route, stop::Stop, vehicle::Vehicle},
+    local_search::two_opt::TwoOptSearcher,
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
+    solvers::greedy::greedy_solver::GreedySolver,
+    stop_swapper::stop_swapper::StopSwapper,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
@@ -92,11 +98,16 @@ pub fn two_opt(distances: DistanceMatrix, stops: Vec<Stop>) -> TwoOptSearcher {
 }
 
 #[fixture]
+pub(crate) fn stop_swapper(distances: DistanceMatrix, stops: Vec<Stop>) -> StopSwapper {
+    StopSwapper::new(stops, &distances)
+}
+
+#[fixture]
 pub fn route_factory(distance_service: DistanceService) -> RouteFactory {
     let wrapper = move |stops: Vec<Stop>| -> Route {
         let vehicle = Vehicle::new(0, 100);
         let mut route = Route::new(vehicle);
-    
+
         route.add_stop(stops[0], Default::default()).unwrap();
         for (index, stop) in stops.iter().enumerate().skip(1) {
             route
@@ -107,7 +118,7 @@ pub fn route_factory(distance_service: DistanceService) -> RouteFactory {
                         .unwrap(),
                 )
                 .unwrap();
-        }    
+        }
 
         route
     };
@@ -116,7 +127,11 @@ pub fn route_factory(distance_service: DistanceService) -> RouteFactory {
 }
 
 #[fixture]
-pub fn greedy_solver_factory(stops: Vec<Stop>, distances: DistanceMatrix, vehicle_factory: VehicleFactory) -> GreedySolverFactory{
+pub fn greedy_solver_factory(
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,
+    vehicle_factory: VehicleFactory,
+) -> GreedySolverFactory {
     let wrapper = move |number_of_vehicles: u32| -> GreedySolver {
         let vehicles = vehicle_factory(number_of_vehicles);
 
@@ -127,7 +142,11 @@ pub fn greedy_solver_factory(stops: Vec<Stop>, distances: DistanceMatrix, vehicl
 }
 
 #[fixture]
-pub fn route_service_factory(stops: Vec<Stop>, distances: DistanceMatrix, vehicle_factory: VehicleFactory) -> RouteServiceFactory {
+pub fn route_service_factory(
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,
+    vehicle_factory: VehicleFactory,
+) -> RouteServiceFactory {
     let wrapper = move |number_of_vehicles| -> RouteService {
         let vehicles = vehicle_factory(number_of_vehicles);
 
