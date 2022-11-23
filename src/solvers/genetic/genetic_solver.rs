@@ -1,4 +1,7 @@
+use std::cmp;
+
 use rand::{
+    rngs::ThreadRng,
     seq::{IteratorRandom, SliceRandom},
     thread_rng, Rng,
 };
@@ -13,7 +16,7 @@ use crate::{
 };
 
 use super::{
-    individual::{GeneAddress, Individual},
+    individual::{Gene, GeneAddress, Individual},
     population::Population,
 };
 
@@ -93,22 +96,29 @@ impl GeneticSolver {
             .collect()
     }
 
+    pub(crate) fn choose_random_chromosome<'a>(
+        individual: &'a Individual,
+    ) -> Option<(usize, &'a Route)> {
+        let mut rng = thread_rng();
+
+        individual.chromosomes.iter().enumerate().choose(&mut rng)
+    }
+
     pub(crate) fn choose_random_genes(
         individual: &Individual,
     ) -> Option<(GeneAddress, GeneAddress)> {
         let mut rng = thread_rng();
 
-        let (chromossome_index, chromossome) =
-            individual.chromosomes.iter().enumerate().choose(&mut rng)?;
+        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
 
-        let addresses: Vec<GeneAddress> = chromossome
+        let addresses: Vec<GeneAddress> = chromosome
             .stops
             .iter()
             .enumerate()
             .skip(1)
             .choose_multiple(&mut rng, 2)
             .iter()
-            .map(|(gene_index, gene)| (chromossome_index, *gene_index))
+            .map(|(gene_index, gene)| (chromosome_index, *gene_index))
             .collect();
 
         Some((addresses[0], addresses[1]))
@@ -152,5 +162,53 @@ impl GeneticSolver {
             .for_each(|individual| {
                 Self::swap_random_genes(individual, stop_swapper);
             });
+    }
+
+    fn generate_range(min: usize, max: usize, rng: &mut ThreadRng) -> (usize, usize) {
+        let a = rng.gen_range(min..=max);
+        let mut b = rng.gen_range(min..=max);
+
+        while a == b {
+            b = rng.gen_range(min..=max);
+        }
+
+        (cmp::min(a, b), cmp::max(a, b))
+    }
+
+    fn slice_individual_randomly(
+        individual: &Individual,
+        rng: &mut ThreadRng,
+    ) -> Option<(GeneAddress, Vec<Gene>)> {
+        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
+
+        let max_size = chromosome.stops.len();
+
+        let (lower_bound, upper_bound) =
+            Self::generate_range(1, cmp::min(chromosome_index, max_size), rng);
+
+        let slice_address: GeneAddress = (chromosome_index, lower_bound);
+
+        Some((
+            slice_address,
+            chromosome.stops[lower_bound..=upper_bound].to_vec(),
+        ))
+    }
+
+    pub(crate) fn make_offspring(parent1: &Individual, parent2: &Individual, rng: &mut ThreadRng) -> Option<Individual> {
+        let (slice_address, parent_slice): (GeneAddress, Vec<Gene>) =
+            Self::slice_individual_randomly(&parent1, rng)?;
+
+        todo!()
+    }
+
+    pub(crate) fn crossover(&mut self) -> Option<()> {
+        let mut parents = self.selection();
+
+        let mut rng = thread_rng();
+
+        let offspring1 = Self::make_offspring(&parents[0], &parents[1], &mut rng)?;
+        let offspring2 = Self::make_offspring(&parents[1], &parents[0], &mut rng)?;
+
+        Some(())
     }
 }
