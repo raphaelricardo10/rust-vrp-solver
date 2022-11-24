@@ -41,6 +41,21 @@ impl Route {
         Ok(())
     }
 
+    pub fn remove_stop(&mut self, stop_index: usize, distance_reduction: f64) {
+        self.stops.remove(stop_index);
+        self.total_distance -= distance_reduction;
+    }
+
+    pub fn add_stop_at(&mut self, stop: Stop, index: usize, distance_change: f64) {
+        self.stops.insert(index, stop);
+        self.total_distance += distance_change;
+    }
+
+    pub fn add_multiple_stops_at(&mut self, stops: Vec<Stop>, index: usize, distance_change: f64) {
+        self.stops.splice(index..index, stops);
+        self.total_distance += distance_change;
+    }
+
     pub fn total_distance(&self) -> f64 {
         self.total_distance
     }
