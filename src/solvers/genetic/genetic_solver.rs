@@ -8,7 +8,10 @@ use rand::{
 
 use crate::{
     domain::{route::Route, stop::Stop},
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
     stop_swapper::{path::Path, StopSwapper},
 };
 
@@ -208,10 +211,10 @@ impl GeneticSolver {
     }
 
     pub(crate) fn make_offspring(
-        &self,
         parent1: Individual,
         parent2: Individual,
         rng: &mut ThreadRng,
+        distance_service: &DistanceService,
     ) -> Option<Individual> {
         let (slice_address, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
@@ -220,13 +223,9 @@ impl GeneticSolver {
             .iter()
             .enumerate()
             .map(|(gene_index, _)| {
-                Path::from_stop_index(
-                    &parent_slice,
-                    gene_index,
-                    &self.stop_swapper.distance_service,
-                )
-                .unwrap()
-                .cost
+                Path::from_stop_index(&parent_slice, gene_index, distance_service)
+                    .unwrap()
+                    .cost
             })
             .sum();
 
@@ -250,8 +249,7 @@ impl GeneticSolver {
                 .enumerate()
                 .filter(|(_, gene)| genes_set.contains(gene))
                 .map(|(gene_index, _)| {
-                    Path::from_stop_index(&stops, gene_index, &self.stop_swapper.distance_service)
-                        .unwrap()
+                    Path::from_stop_index(&stops, gene_index, distance_service).unwrap()
                 })
                 .for_each(|path| offspring_chromosome.remove_stop(path.current.index, path.cost));
 
@@ -272,8 +270,19 @@ impl GeneticSolver {
 
         let mut rng = thread_rng();
 
-        let offspring1 = self.make_offspring(parents[0].clone(), parents[1].clone(), &mut rng)?;
-        let offspring2 = self.make_offspring(parents[1].clone(), parents[0].clone(), &mut rng)?;
+        let offspring1 = Self::make_offspring(
+            parents[0].clone(),
+            parents[1].clone(),
+            &mut rng,
+            &self.stop_swapper.distance_service,
+        )?;
+
+        let offspring2 = Self::make_offspring(
+            parents[1].clone(),
+            parents[0].clone(),
+            &mut rng,
+            &self.stop_swapper.distance_service,
+        )?;
 
         Some(())
     }
