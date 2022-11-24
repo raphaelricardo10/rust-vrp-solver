@@ -227,6 +227,32 @@ impl GeneticSolver {
             .flat_map(|chromosome| chromosome.stops.clone())
             .collect();
 
+        let mut offspring = Individual::new(Vec::default());
+
+        for chromosome in parent2.chromosomes {
+            let mut offspring_chromosome = Chromosome::new(chromosome.vehicle);
+            offspring_chromosome.reset();
+
+            chromosome
+                .stops
+                .iter()
+                .enumerate()
+                .filter(|(_, gene)| genes_set.contains(gene))
+                .map(|(gene_index, _)| {
+                    Path::from_stop_index(
+                        &chromosome.stops,
+                        gene_index,
+                        &self.stop_swapper.distance_service,
+                    )
+                    .unwrap()
+                })
+                .for_each(|path| {
+                    offspring_chromosome
+                        .add_stop(*path.current.stop, path.cost)
+                        .unwrap()
+                });
+        }
+
         todo!()
     }
 
