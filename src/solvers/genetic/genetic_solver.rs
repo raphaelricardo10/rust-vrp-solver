@@ -1,4 +1,4 @@
-use std::cmp;
+use std::{cmp, collections::HashSet};
 
 use rand::{
     rngs::ThreadRng,
@@ -16,7 +16,7 @@ use crate::{
 };
 
 use super::{
-    individual::{Gene, GeneAddress, Individual},
+    individual::{Chromosome, Gene, GeneAddress, Individual},
     population::Population,
 };
 
@@ -98,10 +98,26 @@ impl GeneticSolver {
 
     pub(crate) fn choose_random_chromosome<'a>(
         individual: &'a Individual,
-    ) -> Option<(usize, &'a Route)> {
+    ) -> Option<(usize, &'a Chromosome)> {
         let mut rng = thread_rng();
 
         individual.chromosomes.iter().enumerate().choose(&mut rng)
+    }
+
+    pub(crate) fn choose_gene(individual: &Individual, rng: &mut ThreadRng) -> Option<GeneAddress> {
+        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
+
+        let address: Vec<GeneAddress> = chromosome
+            .stops
+            .iter()
+            .enumerate()
+            .skip(1)
+            .choose(rng)
+            .iter()
+            .map(|(gene_index, _)| (chromosome_index, *gene_index))
+            .collect();
+
+        Some(address[0])
     }
 
     pub(crate) fn choose_random_genes(
@@ -194,20 +210,33 @@ impl GeneticSolver {
         ))
     }
 
-    pub(crate) fn make_offspring(parent1: &Individual, parent2: &Individual, rng: &mut ThreadRng) -> Option<Individual> {
+    pub(crate) fn make_offspring(
+        &self,
+        parent1: Individual,
+        parent2: Individual,
+        rng: &mut ThreadRng,
+    ) -> Option<Individual> {
         let (slice_address, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
+
+        let insertion_point = Self::choose_gene(&parent2, rng)?;
+
+        let genes_set: HashSet<Gene> = parent2
+            .chromosomes
+            .iter()
+            .flat_map(|chromosome| chromosome.stops.clone())
+            .collect();
 
         todo!()
     }
 
     pub(crate) fn crossover(&mut self) -> Option<()> {
-        let mut parents = self.selection();
+        let parents = self.selection();
 
         let mut rng = thread_rng();
 
-        let offspring1 = Self::make_offspring(&parents[0], &parents[1], &mut rng)?;
-        let offspring2 = Self::make_offspring(&parents[1], &parents[0], &mut rng)?;
+        let offspring1 = self.make_offspring(parents[0].clone(), parents[1].clone(), &mut rng)?;
+        let offspring2 = self.make_offspring(parents[1].clone(), parents[0].clone(), &mut rng)?;
 
         Some(())
     }
