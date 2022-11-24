@@ -8,10 +8,7 @@ use rand::{
 
 use crate::{
     domain::{route::Route, stop::Stop},
-    services::{
-        distance::distance_service::{DistanceMatrix, DistanceService},
-        route::route_service::RouteService,
-    },
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
     stop_swapper::{path::Path, StopSwapper},
 };
 
@@ -219,7 +216,21 @@ impl GeneticSolver {
         let (slice_address, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
 
-        let insertion_point = Self::choose_gene(&parent2, rng)?;
+        let parent_slice_cost: f64 = parent_slice
+            .iter()
+            .enumerate()
+            .map(|(gene_index, _)| {
+                Path::from_stop_index(
+                    &parent_slice,
+                    gene_index,
+                    &self.stop_swapper.distance_service,
+                )
+                .unwrap()
+                .cost
+            })
+            .sum();
+
+        let insertion_point: GeneAddress = Self::choose_gene(&parent2, rng)?;
 
         let genes_set: HashSet<Gene> = parent2
             .chromosomes
@@ -227,11 +238,11 @@ impl GeneticSolver {
             .flat_map(|chromosome| chromosome.stops.clone())
             .collect();
 
-        let mut offspring = Individual::new(Vec::default());
+        let mut offspring_chromosomes: Vec<Chromosome> = Vec::new();
 
         for chromosome in parent2.chromosomes {
-            let mut offspring_chromosome = Chromosome::new(chromosome.vehicle);
-            offspring_chromosome.reset();
+            let stops = chromosome.stops.clone();
+            let mut offspring_chromosome: Chromosome = chromosome.clone();
 
             chromosome
                 .stops
@@ -239,21 +250,21 @@ impl GeneticSolver {
                 .enumerate()
                 .filter(|(_, gene)| genes_set.contains(gene))
                 .map(|(gene_index, _)| {
-                    Path::from_stop_index(
-                        &chromosome.stops,
-                        gene_index,
-                        &self.stop_swapper.distance_service,
-                    )
-                    .unwrap()
-                })
-                .for_each(|path| {
-                    offspring_chromosome
-                        .add_stop(*path.current.stop, path.cost)
+                    Path::from_stop_index(&stops, gene_index, &self.stop_swapper.distance_service)
                         .unwrap()
-                });
+                })
+                .for_each(|path| offspring_chromosome.remove_stop(path.current.index, path.cost));
+
+            offspring_chromosomes.push(offspring_chromosome);
         }
 
-        todo!()
+        offspring_chromosomes[insertion_point.0].add_multiple_stops_at(
+            parent_slice,
+            insertion_point.1,
+            parent_slice_cost,
+        );
+
+        Some(Individual::new(offspring_chromosomes))
     }
 
     pub(crate) fn crossover(&mut self) -> Option<()> {
