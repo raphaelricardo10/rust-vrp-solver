@@ -107,17 +107,18 @@ impl GeneticSolver {
     pub(crate) fn choose_gene(individual: &Individual, rng: &mut ThreadRng) -> Option<GeneAddress> {
         let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
 
-        let address: Vec<GeneAddress> = chromosome
+        let address: GeneAddress = chromosome
             .stops
             .iter()
             .enumerate()
             .skip(1)
+            .take(chromosome.stops.len() - 1)
             .choose(rng)
             .iter()
             .map(|(gene_index, _)| (chromosome_index, *gene_index))
-            .collect();
+            .last()?;
 
-        Some(address[0])
+        Some(address)
     }
 
     pub(crate) fn choose_random_genes(
@@ -200,13 +201,13 @@ impl GeneticSolver {
         let max_size = chromosome.stops.len();
 
         let (lower_bound, upper_bound) =
-            Self::generate_range(1, cmp::min(chromosome_index, max_size), rng);
+            Self::generate_range(1, max_size, rng);
 
         let slice_address: GeneAddress = (chromosome_index, lower_bound);
 
         Some((
             slice_address,
-            chromosome.stops[lower_bound..=upper_bound].to_vec(),
+            chromosome.stops[lower_bound..upper_bound].to_vec(),
         ))
     }
 
@@ -216,20 +217,19 @@ impl GeneticSolver {
         rng: &mut ThreadRng,
         distance_service: &DistanceService,
     ) -> Option<Individual> {
-        let (slice_address, parent_slice): (GeneAddress, Vec<Gene>) =
+        let (_, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
 
-        let parent_slice_cost: f64 = parent_slice
+        let parent_slice_cost: f64 = parent_slice[..parent_slice.len() - 1]
             .iter()
             .enumerate()
+            .skip(1)
             .map(|(gene_index, _)| {
                 Path::from_stop_index(&parent_slice, gene_index, distance_service)
                     .unwrap()
                     .cost
             })
             .sum();
-
-        let insertion_point: GeneAddress = Self::choose_gene(&parent2, rng)?;
 
         let genes_set: HashSet<Gene> = parent2
             .chromosomes
@@ -244,9 +244,10 @@ impl GeneticSolver {
             let mut offspring_chromosome: Chromosome = chromosome.clone();
 
             chromosome
-                .stops
+                .stops[..chromosome.stops.len() - 1]
                 .iter()
                 .enumerate()
+                .skip(1)
                 .filter(|(_, gene)| genes_set.contains(gene))
                 .map(|(gene_index, _)| {
                     Path::from_stop_index(&stops, gene_index, distance_service).unwrap()
@@ -256,13 +257,17 @@ impl GeneticSolver {
             offspring_chromosomes.push(offspring_chromosome);
         }
 
-        offspring_chromosomes[insertion_point.0].add_multiple_stops_at(
+        let mut offspring = Individual::new(offspring_chromosomes);
+
+        let insertion_point: GeneAddress = Self::choose_gene(&offspring, rng)?;
+
+        offspring.chromosomes[insertion_point.0].add_multiple_stops_at(
             parent_slice,
             insertion_point.1,
             parent_slice_cost,
         );
 
-        Some(Individual::new(offspring_chromosomes))
+        Some(offspring)
     }
 
     pub(crate) fn crossover(&mut self) -> Option<()> {
