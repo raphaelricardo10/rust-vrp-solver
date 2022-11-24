@@ -20,6 +20,7 @@ impl Route {
 
     pub fn reset(&mut self) {
         self.stops.clear();
+        self.vehicle.reset();
         self.total_distance = Default::default()
     }
 

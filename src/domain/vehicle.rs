@@ -15,8 +15,12 @@ impl Vehicle {
         Vehicle {
             id,
             capacity,
-            usage: 0,
+            usage: Default::default(),
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.usage = Default::default();
     }
 
     pub fn can_support_load(&self, quantity: u32) -> bool {
