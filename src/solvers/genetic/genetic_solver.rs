@@ -200,8 +200,7 @@ impl GeneticSolver {
 
         let max_size = chromosome.stops.len();
 
-        let (lower_bound, upper_bound) =
-            Self::generate_range(1, max_size, rng);
+        let (lower_bound, upper_bound) = Self::generate_range(1, max_size, rng);
 
         let slice_address: GeneAddress = (chromosome_index, lower_bound);
 
@@ -243,11 +242,11 @@ impl GeneticSolver {
             let stops = chromosome.stops.clone();
             let mut offspring_chromosome: Chromosome = chromosome.clone();
 
-            chromosome
-                .stops[..chromosome.stops.len() - 1]
+            chromosome.stops
                 .iter()
                 .enumerate()
                 .skip(1)
+                .take(chromosome.stops.len() - 1)
                 .filter(|(_, gene)| genes_set.contains(gene))
                 .map(|(gene_index, _)| {
                     Path::from_stop_index(&stops, gene_index, distance_service).unwrap()
@@ -261,10 +260,20 @@ impl GeneticSolver {
 
         let insertion_point: GeneAddress = Self::choose_gene(&offspring, rng)?;
 
+        let distance_before = distance_service.get_distance(
+            &offspring.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
+            parent_slice.first()?,
+        )?;
+
+        let distance_after = distance_service.get_distance(
+            parent_slice.last()?,
+            &offspring.chromosomes[insertion_point.0].stops[insertion_point.1],
+        )?;
+
         offspring.chromosomes[insertion_point.0].add_multiple_stops_at(
             parent_slice,
             insertion_point.1,
-            parent_slice_cost,
+            parent_slice_cost + distance_before + distance_after,
         );
 
         Some(offspring)
