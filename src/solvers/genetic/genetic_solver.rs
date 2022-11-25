@@ -26,6 +26,8 @@ pub struct GeneticSolver {
     population_size: u32,
     population: Population,
     stop_swapper: StopSwapper,
+    max_generations: u8,
+    max_crossover_tries: u8,
 }
 
 impl GeneticSolver {
@@ -35,6 +37,8 @@ impl GeneticSolver {
         population_size: u32,
         elite_size: usize,
         mutation_rate: f64,
+        max_crossover_tries: u8,
+        max_generations: u8,
         mut route_service: RouteService,
     ) -> Self {
         let stop_swapper = StopSwapper::new(stops, distances);
@@ -46,6 +50,8 @@ impl GeneticSolver {
             stop_swapper,
             mutation_rate,
             population_size,
+            max_generations,
+            max_crossover_tries
         }
     }
 
@@ -94,12 +100,13 @@ impl GeneticSolver {
         population
     }
 
-    pub(crate) fn selection(&self) -> Vec<Individual> {
+    pub(crate) fn selection(&self) -> Vec<(usize, Individual)> {
         self.population
             .get_k_bests(self.elite_size)
             .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
             .unwrap()
             .cloned()
+            .enumerate()
             .collect()
     }
 
@@ -347,24 +354,62 @@ impl GeneticSolver {
         Some(offspring)
     }
 
+    fn is_offspring_better_than_parents(offspring: &Individual, parent1: &Individual, parent2: &Individual) -> bool{
+        if offspring.fitness > parent1.fitness {
+            return false;
+        }
+
+        if offspring.fitness > parent2.fitness {
+            return false;
+        }
+
+        return true;
+    }
+
+    pub(crate) fn make_better_offspring(
+        parent1: Individual,
+        parent2: Individual,
+        rng: &mut ThreadRng,
+        number_of_tries: u8,
+        distance_service: &DistanceService,
+    ) -> Option<Individual> {
+        for _ in 0..number_of_tries {
+            let offspring = Self::make_offspring(parent1.clone(), parent2.clone(), rng, distance_service)?;
+
+            if Self::is_offspring_better_than_parents(&offspring, &parent1, &parent2) {
+                return Some(offspring);
+            }
+        }
+
+        None
+    }
+
     pub(crate) fn crossover(&mut self) -> Option<()> {
         let parents = self.selection();
 
+        let (parent1_index, parent1) = &parents[0];
+        let (parent2_index, parent2) = &parents[1];
+
         let mut rng = thread_rng();
 
-        let offspring1 = Self::make_offspring(
-            parents[0].clone(),
-            parents[1].clone(),
+        let offspring1 = Self::make_better_offspring(
+            parent1.clone(),
+            parent2.clone(),
             &mut rng,
+            10,
             &self.stop_swapper.distance_service,
         )?;
 
-        let offspring2 = Self::make_offspring(
-            parents[1].clone(),
-            parents[0].clone(),
+        let offspring2 = Self::make_better_offspring(
+            parent1.clone(),
+            parent2.clone(),
             &mut rng,
+            10,
             &self.stop_swapper.distance_service,
         )?;
+
+        self.population.individuals[*parent1_index] = offspring1;
+        self.population.individuals[*parent2_index] = offspring2;
 
         Some(())
     }
