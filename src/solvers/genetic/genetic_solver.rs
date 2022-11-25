@@ -114,6 +114,10 @@ impl GeneticSolver {
     pub(crate) fn choose_gene(individual: &Individual, rng: &mut ThreadRng) -> Option<GeneAddress> {
         let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
 
+        if chromosome.stops.len() == 1 {
+            return Some((chromosome_index, 0));
+        }
+
         let (gene_index, _) = chromosome
             .stops
             .iter()
@@ -203,7 +207,7 @@ impl GeneticSolver {
     ) -> Option<(GeneAddress, Vec<Gene>)> {
         let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
 
-        let max_size = chromosome.stops.len();
+        let max_size = chromosome.stops.len() - 1;
 
         let (lower_bound, upper_bound) = Self::generate_range(1, max_size, rng);
 
@@ -251,6 +255,10 @@ impl GeneticSolver {
         let unrepeated_genes: Vec<&Gene> =
             Self::drop_gene_duplicates(&parent2_chromosome, parent1_slice);
 
+        if unrepeated_genes.len() == 2 {
+            return offspring_chromosome;
+        }
+
         unrepeated_genes
             .windows(2)
             .map(|window| {
@@ -266,6 +274,40 @@ impl GeneticSolver {
             });
 
         offspring_chromosome
+    }
+
+    pub(crate) fn insert_parent_slice_in_offspring(
+        offspring: &mut Individual,
+        insertion_point: GeneAddress,
+        parent_slice: Vec<Gene>,
+        parent_slice_cost: f64,
+        distance_service: &DistanceService,
+    ) -> Option<()> {
+        let distance_before;
+
+        if offspring.chromosomes[insertion_point.0].stops.len() == 1 {
+            distance_before = 0.0;
+        } else {
+            distance_before = distance_service.get_distance(
+                &offspring.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
+                parent_slice.first()?,
+            )?;
+        }
+
+        let distance_after = distance_service.get_distance(
+            parent_slice.last()?,
+            &offspring.chromosomes[insertion_point.0].stops[insertion_point.1],
+        )?;
+
+        offspring.chromosomes[insertion_point.0].add_multiple_stops_at(
+            parent_slice,
+            insertion_point.1,
+            parent_slice_cost + distance_before + distance_after,
+        );
+
+        offspring.update_fitness();
+
+        Some(())
     }
 
     pub(crate) fn make_offspring(
@@ -292,24 +334,15 @@ impl GeneticSolver {
         }
 
         let mut offspring = Individual::new(offspring_chromosomes);
+        let insertion_point: GeneAddress = Self::choose_gene(&offspring, rng).unwrap();
 
-        let insertion_point: GeneAddress = Self::choose_gene(&offspring, rng)?;
-
-        let distance_before = distance_service.get_distance(
-            &offspring.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
-            parent_slice.first()?,
-        )?;
-
-        let distance_after = distance_service.get_distance(
-            parent_slice.last()?,
-            &offspring.chromosomes[insertion_point.0].stops[insertion_point.1],
-        )?;
-
-        offspring.chromosomes[insertion_point.0].add_multiple_stops_at(
+        Self::insert_parent_slice_in_offspring(
+            &mut offspring,
+            insertion_point,
             parent_slice,
-            insertion_point.1,
-            parent_slice_cost + distance_before + distance_after,
-        );
+            parent_slice_cost,
+            distance_service,
+        )?;
 
         Some(offspring)
     }
