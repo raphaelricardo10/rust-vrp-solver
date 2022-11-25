@@ -53,6 +53,11 @@ impl Route {
 
     pub fn add_multiple_stops_at(&mut self, stops: Vec<Stop>, index: usize, distance_change: f64) {
         self.stops.splice(index..index, stops);
+
+        if index == 0 {
+            self.stops.insert(0, *self.stops.last().unwrap());
+        }
+
         self.total_distance += distance_change;
     }
 
