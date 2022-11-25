@@ -10,8 +10,9 @@ use crate::{
     domain::{route::Route, stop::Stop},
     services::{
         distance::distance_service::{DistanceMatrix, DistanceService},
-        route::route_service::RouteService,
+        route::route_service::{RouteMap, RouteService},
     },
+    solvers::solution::Solution,
     stop_swapper::{path::Path, StopSwapper},
 };
 
@@ -27,6 +28,9 @@ pub struct GeneticSolver {
     population: Population,
     stop_swapper: StopSwapper,
     max_generations: u8,
+    current_generation: u8,
+    pub solution: Solution,
+    best: Individual,
     max_crossover_tries: u8,
 }
 
@@ -51,7 +55,10 @@ impl GeneticSolver {
             mutation_rate,
             population_size,
             max_generations,
-            max_crossover_tries
+            max_crossover_tries,
+            best: Default::default(),
+            solution: Default::default(),
+            current_generation: Default::default(),
         }
     }
 
@@ -354,7 +361,11 @@ impl GeneticSolver {
         Some(offspring)
     }
 
-    fn is_offspring_better_than_parents(offspring: &Individual, parent1: &Individual, parent2: &Individual) -> bool{
+    fn is_offspring_better_than_parents(
+        offspring: &Individual,
+        parent1: &Individual,
+        parent2: &Individual,
+    ) -> bool {
         if offspring.fitness > parent1.fitness {
             return false;
         }
@@ -374,7 +385,8 @@ impl GeneticSolver {
         distance_service: &DistanceService,
     ) -> Option<Individual> {
         for _ in 0..number_of_tries {
-            let offspring = Self::make_offspring(parent1.clone(), parent2.clone(), rng, distance_service)?;
+            let offspring =
+                Self::make_offspring(parent1.clone(), parent2.clone(), rng, distance_service)?;
 
             if Self::is_offspring_better_than_parents(&offspring, &parent1, &parent2) {
                 return Some(offspring);
@@ -384,19 +396,18 @@ impl GeneticSolver {
         None
     }
 
-    pub(crate) fn crossover(&mut self) -> Option<()> {
-        let parents = self.selection();
-
-        let (parent1_index, parent1) = &parents[0];
-        let (parent2_index, parent2) = &parents[1];
-
+    pub(crate) fn crossover(
+        &mut self,
+        parent1: &Individual,
+        parent2: &Individual,
+    ) -> Option<(Individual, Individual)> {
         let mut rng = thread_rng();
 
         let offspring1 = Self::make_better_offspring(
             parent1.clone(),
             parent2.clone(),
             &mut rng,
-            10,
+            self.max_crossover_tries,
             &self.stop_swapper.distance_service,
         )?;
 
@@ -404,13 +415,60 @@ impl GeneticSolver {
             parent1.clone(),
             parent2.clone(),
             &mut rng,
-            10,
+            self.max_crossover_tries,
             &self.stop_swapper.distance_service,
         )?;
 
-        self.population.individuals[*parent1_index] = offspring1;
-        self.population.individuals[*parent2_index] = offspring2;
+        Some((offspring1, offspring2))
+    }
 
-        Some(())
+    fn stop_condition_met(&self) -> bool {
+        return self.current_generation >= self.max_generations;
+    }
+
+    fn should_update_best(&self, individual: &Individual) -> bool {
+        return individual.fitness < self.best.fitness;
+    }
+
+    pub fn solve(&mut self) {
+        while !self.stop_condition_met() {
+            loop {
+                let parents = self.selection();
+
+                let (parent1_index, parent1) = &parents[0];
+                let (parent2_index, parent2) = &parents[1];
+
+                let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
+                    Some(offsprings) => offsprings,
+                    None => break,
+                };
+
+                if self.should_update_best(&offspring1) {
+                    self.best = offspring1.clone();
+                }
+
+                if self.should_update_best(&offspring2) {
+                    self.best = offspring2.clone();
+                }
+
+                self.population.individuals[*parent1_index] = offspring1;
+                self.population.individuals[*parent2_index] = offspring2;
+
+            }
+
+            self.mutation();
+
+            self.current_generation += 1;
+        }
+
+        let route_map: RouteMap = self
+            .best
+            .chromosomes
+            .iter()
+            .cloned()
+            .map(|chromosome| (chromosome.vehicle.id, chromosome))
+            .collect();
+
+        self.solution = Solution::new(&route_map, self.best.fitness);
     }
 }
