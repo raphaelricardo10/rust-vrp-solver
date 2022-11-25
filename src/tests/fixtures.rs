@@ -150,7 +150,7 @@ pub fn route_service_factory(
     let wrapper = move |number_of_vehicles| -> RouteService {
         let vehicles = vehicle_factory(number_of_vehicles);
 
-        RouteService::new(vehicles, &distances, stops.clone())
+        RouteService::new(vehicles, &distances, stops[..stops.len()].to_vec())
     };
 
     Box::new(wrapper)
