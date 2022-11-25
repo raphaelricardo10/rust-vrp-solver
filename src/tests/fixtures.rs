@@ -1,6 +1,6 @@
 use rstest::fixture;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::{
     domain::{route::Route, stop::Stop, vehicle::Vehicle},
@@ -9,14 +9,22 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::greedy::greedy_solver::GreedySolver,
+    solvers::{
+        genetic::{genetic_solver::GeneticSolver, individual::Individual, population::Population},
+        greedy::greedy_solver::GreedySolver,
+    },
     stop_swapper::StopSwapper,
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
 pub type RouteFactory = Box<dyn Fn(Vec<Stop>) -> Route>;
+
 pub type GreedySolverFactory = Box<dyn Fn(u32) -> GreedySolver>;
 pub type RouteServiceFactory = Box<dyn Fn(u32) -> RouteService>;
+
+pub(crate) type IndividualFactory = Box<dyn Fn(u32) -> Individual>;
+pub(crate) type PopulationFactory = Box<dyn Fn(u32, u32) -> Population>;
+pub(crate) type ParentSliceFactory = Box<dyn Fn(usize) -> (Individual, HashSet<Stop>)>;
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -151,6 +159,47 @@ pub fn route_service_factory(
         let vehicles = vehicle_factory(number_of_vehicles);
 
         RouteService::new(vehicles, &distances, stops[..stops.len()].to_vec())
+    };
+
+    Box::new(wrapper)
+}
+
+#[fixture]
+pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> IndividualFactory {
+    let wrapper = move |number_of_chromosomes| -> Individual {
+        let mut route_service = route_service_factory(number_of_chromosomes);
+
+        GeneticSolver::generate_random_individual(&mut route_service)
+    };
+
+    Box::new(wrapper)
+}
+
+#[fixture]
+pub(crate) fn population_factory(route_service_factory: RouteServiceFactory) -> PopulationFactory {
+    let wrapper = move |number_of_individuals, number_of_chromosomes| -> Population {
+        let mut route_service = route_service_factory(number_of_chromosomes);
+
+        GeneticSolver::generate_random_population(number_of_individuals, &mut route_service)
+    };
+
+    Box::new(wrapper)
+}
+
+#[fixture]
+pub(crate) fn parent_slice_factory(individual_factory: IndividualFactory) -> ParentSliceFactory {
+    let wrapper = move |number_of_genes| -> (Individual, HashSet<Stop>) {
+        let parent = individual_factory(1);
+        let slice = HashSet::from_iter(
+            parent.chromosomes[0]
+                .stops
+                .iter()
+                .skip(1)
+                .take(number_of_genes)
+                .cloned(),
+        );
+
+        (parent, slice)
     };
 
     Box::new(wrapper)
