@@ -26,8 +26,8 @@ pub struct GeneticSolver {
     mutation_rate: f64,
     population: Population,
     stop_swapper: StopSwapper,
-    max_generations: u8,
-    current_generation: u8,
+    max_generations: u32,
+    current_generation: u32,
     pub solution: Solution,
     best: Individual,
     max_crossover_tries: u8,
@@ -42,7 +42,7 @@ impl GeneticSolver {
         elite_size: usize,
         mutation_rate: f64,
         max_crossover_tries: u8,
-        max_generations: u8,
+        max_generations: u32,
         mut route_service: RouteService,
     ) -> Self {
         let stop_swapper = StopSwapper::new(stops, distances);
