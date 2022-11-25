@@ -4,6 +4,12 @@ pub(super) type Gene = Stop;
 pub(super) type Chromosome = Route;
 pub(super) type GeneAddress = (usize, usize);
 
+impl Default for Individual {
+    fn default() -> Self {
+        Self { fitness: f64::MAX, chromosomes: Default::default() }
+    }
+}
+
 #[derive(Clone)]
 pub(crate) struct Individual {
     pub(crate) fitness: f64,
