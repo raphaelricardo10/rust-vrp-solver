@@ -107,18 +107,15 @@ impl GeneticSolver {
     pub(crate) fn choose_gene(individual: &Individual, rng: &mut ThreadRng) -> Option<GeneAddress> {
         let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
 
-        let address: GeneAddress = chromosome
+        let (gene_index, _) = chromosome
             .stops
             .iter()
             .enumerate()
             .skip(1)
             .take(chromosome.stops.len() - 1)
-            .choose(rng)
-            .iter()
-            .map(|(gene_index, _)| (chromosome_index, *gene_index))
-            .last()?;
+            .choose(rng)?;
 
-        Some(address)
+        Some((chromosome_index, gene_index))
     }
 
     pub(crate) fn choose_random_genes(
@@ -210,6 +207,60 @@ impl GeneticSolver {
         ))
     }
 
+    pub(crate) fn calculate_slice_cost(slice: &[Gene], distance_service: &DistanceService) -> f64 {
+        slice
+            .windows(2)
+            .map(|window| {
+                distance_service
+                    .get_distance(&window[0], &window[1])
+                    .unwrap()
+            })
+            .sum()
+    }
+
+    pub(crate) fn drop_gene_duplicates<'a>(
+        chromosome: &'a Chromosome,
+        compare_set: &'a HashSet<Gene>,
+    ) -> Vec<&'a Gene> {
+        chromosome
+            .stops
+            .iter()
+            .skip(1)
+            .filter(|gene| !compare_set.contains(gene))
+            .collect()
+    }
+
+    pub(crate) fn make_offspring_chromosome(
+        parent1_slice: &HashSet<Gene>,
+        parent2_chromosome: Chromosome,
+        distance_service: &DistanceService,
+    ) -> Chromosome {
+        let mut offspring_chromosome = Chromosome::new(parent2_chromosome.vehicle);
+
+        offspring_chromosome
+            .add_stop(parent2_chromosome.stops[0], 0.0)
+            .unwrap();
+
+        let unrepeated_genes: Vec<&Gene> =
+            Self::drop_gene_duplicates(&parent2_chromosome, parent1_slice);
+
+        unrepeated_genes
+            .windows(2)
+            .map(|window| {
+                (
+                    window[0],
+                    distance_service
+                        .get_distance(&window[0], &window[1])
+                        .unwrap(),
+                )
+            })
+            .for_each(|(gene, distance)| {
+                offspring_chromosome.add_stop(*gene, distance).unwrap();
+            });
+
+        offspring_chromosome
+    }
+
     pub(crate) fn make_offspring(
         parent1: Individual,
         parent2: Individual,
@@ -219,41 +270,18 @@ impl GeneticSolver {
         let (_, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
 
-        let parent_slice_cost: f64 = parent_slice[..parent_slice.len() - 1]
-            .iter()
-            .enumerate()
-            .skip(1)
-            .map(|(gene_index, _)| {
-                Path::from_stop_index(&parent_slice, gene_index, distance_service)
-                    .unwrap()
-                    .cost
-            })
-            .sum();
+        let parent_slice_cost = Self::calculate_slice_cost(&parent_slice, distance_service);
 
-        let genes_set: HashSet<Gene> = parent2
-            .chromosomes
-            .iter()
-            .flat_map(|chromosome| chromosome.stops.clone())
-            .collect();
+        let genes_set: HashSet<Gene> = HashSet::from_iter(parent_slice.iter().cloned());
 
         let mut offspring_chromosomes: Vec<Chromosome> = Vec::new();
 
         for chromosome in parent2.chromosomes {
-            let stops = chromosome.stops.clone();
-            let mut offspring_chromosome: Chromosome = chromosome.clone();
-
-            chromosome.stops
-                .iter()
-                .enumerate()
-                .skip(1)
-                .take(chromosome.stops.len() - 1)
-                .filter(|(_, gene)| genes_set.contains(gene))
-                .map(|(gene_index, _)| {
-                    Path::from_stop_index(&stops, gene_index, distance_service).unwrap()
-                })
-                .for_each(|path| offspring_chromosome.remove_stop(path.current.index, path.cost));
-
-            offspring_chromosomes.push(offspring_chromosome);
+            offspring_chromosomes.push(Self::make_offspring_chromosome(
+                &genes_set,
+                chromosome,
+                &distance_service,
+            ));
         }
 
         let mut offspring = Individual::new(offspring_chromosomes);
