@@ -181,3 +181,25 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     assert_ne!(offspring.fitness, 0.0);
 }
+
+#[rstest]
+fn test_can_generate_offspring_better_than_parents(
+    individual_factory: IndividualFactory,
+    distance_service: DistanceService,
+) {
+    let parent1 = individual_factory(1);
+    let parent2 = individual_factory(1);
+
+    let mut rng = thread_rng();
+
+    let offspring = GeneticSolver::make_better_offspring(
+        parent1.clone(),
+        parent2.clone(),
+        &mut rng,
+        100,
+        &distance_service,
+    ).unwrap();
+
+    assert!(offspring.fitness < parent1.fitness);
+    assert!(offspring.fitness < parent2.fitness);
+}
