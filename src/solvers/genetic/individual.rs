@@ -27,6 +27,10 @@ impl Individual {
             .sum()
     }
 
+    pub(crate) fn update_fitness(&mut self) {
+        self.fitness = Self::calculate_fitness(&self.chromosomes);
+    }
+
     pub(crate) fn get_gene(&self, address: GeneAddress) -> Option<Gene> {
         self.chromosomes
             .get(address.0)?
