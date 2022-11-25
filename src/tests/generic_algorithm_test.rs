@@ -3,16 +3,16 @@ use rstest::rstest;
 
 use crate::{
     domain::stop::Stop,
-    services::distance::distance_service::DistanceService,
+    services::distance::distance_service::{DistanceMatrix, DistanceService},
     solvers::genetic::{genetic_solver::GeneticSolver, individual::Individual},
     tests::fixtures::{IndividualFactory, ParentSliceFactory},
 };
 
 use super::fixtures::{
-    distance_service, individual_factory, parent_slice_factory, population_factory, route_factory,
-    stops,
+    distance_service, distances, individual_factory, parent_slice_factory, population_factory,
+    route_factory, route_service_factory, stops,
 };
-use super::fixtures::{PopulationFactory, RouteFactory};
+use super::fixtures::{PopulationFactory, RouteFactory, RouteServiceFactory};
 
 #[rstest]
 fn test_generate_random_individual(individual_factory: IndividualFactory) {
@@ -84,8 +84,8 @@ fn test_can_generate_a_offspring(
     let parent2 = individual_factory(1);
 
     let offspring = GeneticSolver::make_offspring(
-        parent1.clone(),
-        parent2.clone(),
+        parent1,
+        parent2,
         &mut rng,
         &distance_service,
     )
@@ -168,7 +168,7 @@ fn test_can_insert_parent_slice_in_empty_offspring(
     let mut offspring = Individual::new(vec![chromosome]);
 
     let slice = &stops[1..=3];
-    let slice_cost = GeneticSolver::calculate_slice_cost(&slice, &distance_service);
+    let slice_cost = GeneticSolver::calculate_slice_cost(slice, &distance_service);
 
     GeneticSolver::insert_parent_slice_in_offspring(
         &mut offspring,
@@ -196,10 +196,28 @@ fn test_can_generate_offspring_better_than_parents(
         parent1.clone(),
         parent2.clone(),
         &mut rng,
-        100,
+        255,
         &distance_service,
-    ).unwrap();
+    )
+    .unwrap();
 
     assert!(offspring.fitness < parent1.fitness);
     assert!(offspring.fitness < parent2.fitness);
+}
+
+#[rstest]
+fn test_genetic_algorithm_can_optimize_route(
+    distances: DistanceMatrix,
+    stops: Vec<Stop>,
+    route_service_factory: RouteServiceFactory,
+) {
+    let route_service = route_service_factory(2);
+    let mut solver = GeneticSolver::new(stops, &distances, 10, 3, 0.05, 10, 100, route_service);
+    solver.solve();
+
+    let solution_v1 = solver.solution.result.get(&0).unwrap();
+    let solution_v2 = solver.solution.result.get(&1).unwrap();
+
+    assert_ne!(solution_v1.len(), 0);
+    assert_ne!(solution_v2.len(), 0);
 }

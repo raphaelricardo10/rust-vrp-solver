@@ -24,7 +24,6 @@ use super::{
 pub struct GeneticSolver {
     elite_size: usize,
     mutation_rate: f64,
-    population_size: u32,
     population: Population,
     stop_swapper: StopSwapper,
     max_generations: u8,
@@ -35,6 +34,7 @@ pub struct GeneticSolver {
 }
 
 impl GeneticSolver {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
@@ -53,7 +53,6 @@ impl GeneticSolver {
             population,
             stop_swapper,
             mutation_rate,
-            population_size,
             max_generations,
             max_crossover_tries,
             best: Default::default(),
@@ -117,9 +116,9 @@ impl GeneticSolver {
             .collect()
     }
 
-    pub(crate) fn choose_random_chromosome<'a>(
-        individual: &'a Individual,
-    ) -> Option<(usize, &'a Chromosome)> {
+    pub(crate) fn choose_random_chromosome(
+        individual: &Individual,
+    ) -> Option<(usize, &Chromosome)> {
         let mut rng = thread_rng();
 
         individual.chromosomes.iter().enumerate().choose(&mut rng)
@@ -148,14 +147,19 @@ impl GeneticSolver {
     ) -> Option<(GeneAddress, GeneAddress)> {
         let mut rng = thread_rng();
 
-        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
+        let (chromosome_index, chromosome) = individual
+            .chromosomes
+            .iter()
+            .enumerate()
+            .filter(|(_, chromosome)| chromosome.stops.len() > 3)
+            .choose(&mut rng)?;
 
         let addresses: Vec<GeneAddress> = chromosome
             .stops
             .iter()
             .enumerate()
             .skip(1)
-            .take(chromosome.stops.len() - 1)
+            .take(chromosome.stops.len() - 2)
             .choose_multiple(&mut rng, 2)
             .iter()
             .map(|(gene_index, _)| (chromosome_index, *gene_index))
@@ -279,7 +283,7 @@ impl GeneticSolver {
                 (
                     window[1],
                     distance_service
-                        .get_distance(&window[0], &window[1])
+                        .get_distance(window[0], window[1])
                         .unwrap(),
                 )
             })
@@ -297,16 +301,13 @@ impl GeneticSolver {
         parent_slice_cost: f64,
         distance_service: &DistanceService,
     ) -> Option<()> {
-        let distance_before;
-
-        if offspring.chromosomes[insertion_point.0].stops.len() == 1 {
-            distance_before = 0.0;
-        } else {
-            distance_before = distance_service.get_distance(
+        let distance_before = match offspring.chromosomes[insertion_point.0].stops.len() == 1 {
+            true => 0.0,
+            false => distance_service.get_distance(
                 &offspring.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
                 parent_slice.first()?,
-            )?;
-        }
+            )?,
+        };
 
         let distance_after = distance_service.get_distance(
             parent_slice.last()?,
@@ -343,7 +344,7 @@ impl GeneticSolver {
             offspring_chromosomes.push(Self::make_offspring_chromosome(
                 &genes_set,
                 chromosome,
-                &distance_service,
+                distance_service,
             ));
         }
 
@@ -374,7 +375,7 @@ impl GeneticSolver {
             return false;
         }
 
-        return true;
+        true
     }
 
     pub(crate) fn make_better_offspring(
@@ -423,11 +424,11 @@ impl GeneticSolver {
     }
 
     fn stop_condition_met(&self) -> bool {
-        return self.current_generation >= self.max_generations;
+        self.current_generation >= self.max_generations
     }
 
     fn should_update_best(&self, individual: &Individual) -> bool {
-        return individual.fitness < self.best.fitness;
+        individual.fitness < self.best.fitness
     }
 
     pub fn solve(&mut self) {
@@ -453,7 +454,6 @@ impl GeneticSolver {
 
                 self.population.individuals[*parent1_index] = offspring1;
                 self.population.individuals[*parent2_index] = offspring2;
-
             }
 
             self.mutation();

@@ -16,24 +16,48 @@ impl StopSwapper {
         }
     }
 
+    fn are_paths_consecutive(path1: &Path, path2: &Path) -> bool {
+        path1.next.index == path2.current.index
+    }
+
+    fn swap_non_consecutive_paths<'a>(
+        path1: &'a Path<'a>,
+        path2: &'a Path<'a>,
+        distance_service: &'a DistanceService,
+    ) -> (Path<'a>, Path<'a>) {
+        let swapped_path_1 =
+            Path::new(path1.prev, path2.current, path1.next, distance_service).unwrap();
+
+        let swapped_path_2 =
+            Path::new(path2.prev, path1.current, path2.next, distance_service).unwrap();
+
+        (swapped_path_1, swapped_path_2)
+    }
+
+    fn swap_consecutive_paths<'a>(
+        path1: &'a Path<'a>,
+        path2: &'a Path<'a>,
+        distance_service: &'a DistanceService,
+    ) -> (Path<'a>, Path<'a>) {
+        let swapped_path_1 =
+            Path::new(path1.prev, path2.current, path1.current, distance_service).unwrap();
+
+        let swapped_path_2 =
+            Path::new(path2.current, path1.current, path2.next, distance_service).unwrap();
+
+        (swapped_path_1, swapped_path_2)
+    }
+
     pub(crate) fn calculate_swap_cost(&self, path1: &Path, path2: &Path) -> f64 {
-        let swapped_path_1 = Path::new(
-            path1.prev,
-            path2.current,
-            path1.next,
-            &self.distance_service,
-        )
-        .unwrap();
+        let (swapped_path1, swapped_path2);
 
-        let swapped_path_2 = Path::new(
-            path2.prev,
-            path1.current,
-            path2.next,
-            &self.distance_service,
-        )
-        .unwrap();
+        if Self::are_paths_consecutive(path1, path2) {
+            (swapped_path1, swapped_path2) = Self::swap_consecutive_paths(path1, path2, &self.distance_service);
+        } else {
+            (swapped_path1, swapped_path2) = Self::swap_non_consecutive_paths(path1, path2, &self.distance_service);
+        }
 
-        (swapped_path_1.cost + swapped_path_2.cost) - (path1.cost + path2.cost)
+        (swapped_path1.cost + swapped_path2.cost) - (path1.cost + path2.cost)
     }
 
     pub(crate) fn get_minimum_swap_cost(
