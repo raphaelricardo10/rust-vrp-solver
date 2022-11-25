@@ -119,7 +119,7 @@ impl GeneticSolver {
             .iter()
             .enumerate()
             .skip(1)
-            .take(chromosome.stops.len() - 1)
+            .take(chromosome.stops.len() - 2)
             .choose(rng)?;
 
         Some((chromosome_index, gene_index))
@@ -137,9 +137,10 @@ impl GeneticSolver {
             .iter()
             .enumerate()
             .skip(1)
+            .take(chromosome.stops.len() - 1)
             .choose_multiple(&mut rng, 2)
             .iter()
-            .map(|(gene_index, gene)| (chromosome_index, *gene_index))
+            .map(|(gene_index, _)| (chromosome_index, *gene_index))
             .collect();
 
         Some((addresses[0], addresses[1]))
@@ -232,7 +233,6 @@ impl GeneticSolver {
         chromosome
             .stops
             .iter()
-            .skip(1)
             .filter(|gene| !compare_set.contains(gene))
             .collect()
     }
@@ -255,7 +255,7 @@ impl GeneticSolver {
             .windows(2)
             .map(|window| {
                 (
-                    window[0],
+                    window[1],
                     distance_service
                         .get_distance(&window[0], &window[1])
                         .unwrap(),
