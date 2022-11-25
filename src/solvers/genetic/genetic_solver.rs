@@ -56,15 +56,22 @@ impl GeneticSolver {
             .map(|vehicle| vehicle.id)
             .collect();
 
+        route_service.assign_starting_points();
+
         while route_service.has_available_stop().unwrap() {
             for vehicle_id in vehicle_ids.iter() {
-                let stop = route_service.get_random_stop(*vehicle_id).unwrap();
+                let stop = match route_service.get_random_stop(*vehicle_id) {
+                    Some(stop) => stop,
+                    None => continue,
+                };
 
                 route_service
                     .assign_stop_to_route(*vehicle_id, stop.id)
                     .unwrap();
             }
         }
+
+        route_service.assign_stop_points();
 
         let routes: Vec<Route> = route_service.get_all_routes().values().cloned().collect();
 
