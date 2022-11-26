@@ -15,7 +15,7 @@ use crate::{
         genetic::{genetic_solver::GeneticSolver, individual::Individual, population::Population},
         greedy::greedy_solver::GreedySolver,
     },
-    stop_swapper::StopSwapper,
+    stop_swapper::{path::Path, StopSwapper},
 };
 
 pub type VehicleFactory = fn(number: u32) -> Vec<Vehicle>;
@@ -27,6 +27,25 @@ pub type RouteServiceFactory = Box<dyn Fn(u32) -> RouteService>;
 pub(crate) type IndividualFactory = Box<dyn FnMut(u32) -> Individual>;
 pub(crate) type PopulationFactory = Box<dyn Fn(u32, u32) -> Population>;
 pub(crate) type ParentSliceFactory = Box<dyn FnMut(usize) -> (Individual, HashSet<Stop>)>;
+
+pub struct PathFactory {
+    pub stops: Vec<Stop>,
+    pub distance_service: DistanceService,
+}
+
+impl<'a> PathFactory {
+    fn new(stops: Vec<Stop>, distance_service: DistanceService) -> Self {
+        Self {
+            stops,
+            distance_service,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub(crate) fn make_path(&'a self, stop_index: usize) -> Option<Path<'a>> {
+        Path::from_stop_index(&self.stops, stop_index, &self.distance_service)
+    }
+}
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -164,6 +183,14 @@ pub fn route_service_factory(
     };
 
     Box::new(wrapper)
+}
+
+#[fixture]
+pub(super) fn path_factory(
+    stops_with_crossings: Vec<Stop>,
+    distance_service: DistanceService,
+) -> PathFactory {
+    PathFactory::new(stops_with_crossings, distance_service)
 }
 
 #[fixture]
