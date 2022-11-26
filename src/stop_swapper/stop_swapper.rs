@@ -17,7 +17,15 @@ impl StopSwapper {
     }
 
     fn are_paths_consecutive(path1: &Path, path2: &Path) -> bool {
-        path1.next.index == path2.current.index
+        if path1.next.index == path2.current.index {
+            return true;
+        }
+
+        if path1.prev.index == path2.current.index {
+            return true;
+        }
+
+        false
     }
 
     fn swap_non_consecutive_paths<'a>(
@@ -35,10 +43,14 @@ impl StopSwapper {
     }
 
     fn swap_consecutive_paths<'a>(
-        path1: &'a Path<'a>,
-        path2: &'a Path<'a>,
+        mut path1: &'a Path<'a>,
+        mut path2: &'a Path<'a>,
         distance_service: &'a DistanceService,
     ) -> (Path<'a>, Path<'a>) {
+        if path1.prev.stop.id == path2.current.stop.id {
+            std::mem::swap(&mut path1, &mut path2);
+        }
+
         let swapped_path_1 =
             Path::new(path1.prev, path2.current, path1.current, distance_service).unwrap();
 
@@ -52,9 +64,11 @@ impl StopSwapper {
         let (swapped_path1, swapped_path2);
 
         if Self::are_paths_consecutive(path1, path2) {
-            (swapped_path1, swapped_path2) = Self::swap_consecutive_paths(path1, path2, &self.distance_service);
+            (swapped_path1, swapped_path2) =
+                Self::swap_consecutive_paths(path1, path2, &self.distance_service);
         } else {
-            (swapped_path1, swapped_path2) = Self::swap_non_consecutive_paths(path1, path2, &self.distance_service);
+            (swapped_path1, swapped_path2) =
+                Self::swap_non_consecutive_paths(path1, path2, &self.distance_service);
         }
 
         (swapped_path1.cost + swapped_path2.cost) - (path1.cost + path2.cost)
