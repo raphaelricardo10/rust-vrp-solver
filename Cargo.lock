@@ -269,6 +269,7 @@ name = "vrp-solver"
 version = "0.1.0"
 dependencies = [
  "rand",
+ "rand_chacha",
  "rstest",
 ]
 

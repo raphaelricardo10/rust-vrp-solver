@@ -1,7 +1,6 @@
 use std::{cmp, collections::HashSet};
 
 use rand::{
-    rngs::ThreadRng,
     seq::{IteratorRandom, SliceRandom},
     thread_rng, Rng,
 };
@@ -35,7 +34,7 @@ pub struct GeneticSolver {
 
 impl GeneticSolver {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
+    pub fn new<R>(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
         population_size: u32,
@@ -44,9 +43,13 @@ impl GeneticSolver {
         max_crossover_tries: u8,
         max_generations: u32,
         mut route_service: RouteService,
-    ) -> Self {
+        rng: &mut R,
+    ) -> Self
+    where
+        R: Rng + ?Sized,
+    {
         let stop_swapper = StopSwapper::new(stops, distances);
-        let population = Self::generate_random_population(population_size, &mut route_service);
+        let population = Self::generate_random_population(population_size, &mut route_service, rng);
 
         Self {
             elite_size,
@@ -61,7 +64,13 @@ impl GeneticSolver {
         }
     }
 
-    pub(crate) fn generate_random_individual(route_service: &mut RouteService) -> Individual {
+    pub(crate) fn generate_random_individual<R>(
+        route_service: &mut RouteService,
+        rng: &mut R,
+    ) -> Individual
+    where
+        R: Rng + ?Sized,
+    {
         let vehicle_ids: Vec<u32> = route_service
             .get_vehicles()
             .iter()
@@ -72,7 +81,7 @@ impl GeneticSolver {
 
         while route_service.has_available_stop().unwrap() {
             for vehicle_id in vehicle_ids.iter() {
-                let stop = match route_service.get_random_stop(*vehicle_id) {
+                let stop = match route_service.get_random_stop(*vehicle_id, rng) {
                     Some(stop) => stop,
                     None => continue,
                 };
@@ -90,14 +99,18 @@ impl GeneticSolver {
         Individual::new(routes)
     }
 
-    pub(crate) fn generate_random_population(
+    pub(crate) fn generate_random_population<R>(
         population_size: u32,
         route_service: &mut RouteService,
-    ) -> Population {
+        rng: &mut R,
+    ) -> Population
+    where
+        R: Rng + ?Sized,
+    {
         let mut population = Population::default();
 
         for _ in 0..population_size {
-            let individual = Self::generate_random_individual(route_service);
+            let individual = Self::generate_random_individual(route_service, rng);
             population.individuals.push(individual);
 
             route_service.reset();
@@ -116,16 +129,21 @@ impl GeneticSolver {
             .collect()
     }
 
-    pub(crate) fn choose_random_chromosome(
-        individual: &Individual,
-    ) -> Option<(usize, &Chromosome)> {
-        let mut rng = thread_rng();
-
-        individual.chromosomes.iter().enumerate().choose(&mut rng)
+    pub(crate) fn choose_random_chromosome<'a, R>(
+        individual: &'a Individual,
+        rng: &mut R,
+    ) -> Option<(usize, &'a Chromosome)>
+    where
+        R: Rng + ?Sized,
+    {
+        individual.chromosomes.iter().enumerate().choose(rng)
     }
 
-    pub(crate) fn choose_gene(individual: &Individual, rng: &mut ThreadRng) -> Option<GeneAddress> {
-        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
+    pub(crate) fn choose_gene<R>(individual: &Individual, rng: &mut R) -> Option<GeneAddress>
+    where
+        R: Rng + ?Sized,
+    {
+        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual, rng)?;
 
         if chromosome.stops.len() == 1 {
             return Some((chromosome_index, 0));
@@ -142,17 +160,19 @@ impl GeneticSolver {
         Some((chromosome_index, gene_index))
     }
 
-    pub(crate) fn choose_random_genes(
+    pub(crate) fn choose_random_genes<R>(
         individual: &Individual,
-    ) -> Option<(GeneAddress, GeneAddress)> {
-        let mut rng = thread_rng();
-
+        rng: &mut R,
+    ) -> Option<(GeneAddress, GeneAddress)>
+    where
+        R: Rng + ?Sized,
+    {
         let (chromosome_index, chromosome) = individual
             .chromosomes
             .iter()
             .enumerate()
             .filter(|(_, chromosome)| chromosome.stops.len() > 3)
-            .choose(&mut rng)?;
+            .choose(rng)?;
 
         let addresses: Vec<GeneAddress> = chromosome
             .stops
@@ -160,7 +180,7 @@ impl GeneticSolver {
             .enumerate()
             .skip(1)
             .take(chromosome.stops.len() - 2)
-            .choose_multiple(&mut rng, 2)
+            .choose_multiple(rng, 2)
             .iter()
             .map(|(gene_index, _)| (chromosome_index, *gene_index))
             .collect();
@@ -168,12 +188,16 @@ impl GeneticSolver {
         Some((addresses[0], addresses[1]))
     }
 
-    pub(crate) fn swap_random_genes(
+    pub(crate) fn swap_random_genes<R>(
         individual: &mut Individual,
         stop_swapper: &StopSwapper,
-    ) -> Option<()> {
+        rng: &mut R,
+    ) -> Option<()>
+    where
+        R: Rng + ?Sized,
+    {
         let (address1, address2): (GeneAddress, GeneAddress) =
-            Self::choose_random_genes(individual)?;
+            Self::choose_random_genes(individual, rng)?;
 
         let path1 = Path::from_stop_index(
             &individual.chromosomes.get(address1.0)?.stops,
@@ -204,11 +228,14 @@ impl GeneticSolver {
             .iter_mut()
             .filter(|_| rng.gen_bool(self.mutation_rate))
             .for_each(|individual| {
-                Self::swap_random_genes(individual, stop_swapper);
+                Self::swap_random_genes(individual, stop_swapper, &mut thread_rng());
             });
     }
 
-    fn generate_range(min: usize, max: usize, rng: &mut ThreadRng) -> (usize, usize) {
+    fn generate_range<R>(min: usize, max: usize, rng: &mut R) -> (usize, usize)
+    where
+        R: Rng + ?Sized,
+    {
         let a = rng.gen_range(min..=max);
         let mut b = rng.gen_range(min..=max);
 
@@ -219,11 +246,14 @@ impl GeneticSolver {
         (cmp::min(a, b), cmp::max(a, b))
     }
 
-    fn slice_individual_randomly(
+    fn slice_individual_randomly<R>(
         individual: &Individual,
-        rng: &mut ThreadRng,
-    ) -> Option<(GeneAddress, Vec<Gene>)> {
-        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual)?;
+        rng: &mut R,
+    ) -> Option<(GeneAddress, Vec<Gene>)>
+    where
+        R: Rng + ?Sized,
+    {
+        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual, rng)?;
 
         let max_size = chromosome.stops.len() - 1;
 
@@ -282,9 +312,7 @@ impl GeneticSolver {
             .map(|window| {
                 (
                     window[1],
-                    distance_service
-                        .get_distance(window[0], window[1])
-                        .unwrap(),
+                    distance_service.get_distance(window[0], window[1]).unwrap(),
                 )
             })
             .for_each(|(gene, distance)| {
@@ -325,12 +353,15 @@ impl GeneticSolver {
         Some(())
     }
 
-    pub(crate) fn make_offspring(
+    pub(crate) fn make_offspring<R>(
         parent1: Individual,
         parent2: Individual,
-        rng: &mut ThreadRng,
+        rng: &mut R,
         distance_service: &DistanceService,
-    ) -> Option<Individual> {
+    ) -> Option<Individual>
+    where
+        R: Rng + ?Sized,
+    {
         let (_, parent_slice): (GeneAddress, Vec<Gene>) =
             Self::slice_individual_randomly(&parent1, rng)?;
 
@@ -378,13 +409,16 @@ impl GeneticSolver {
         true
     }
 
-    pub(crate) fn make_better_offspring(
+    pub(crate) fn make_better_offspring<R>(
         parent1: Individual,
         parent2: Individual,
-        rng: &mut ThreadRng,
+        rng: &mut R,
         number_of_tries: u8,
         distance_service: &DistanceService,
-    ) -> Option<Individual> {
+    ) -> Option<Individual>
+    where
+        R: Rng + ?Sized,
+    {
         for _ in 0..number_of_tries {
             let offspring =
                 Self::make_offspring(parent1.clone(), parent2.clone(), rng, distance_service)?;
@@ -397,17 +431,19 @@ impl GeneticSolver {
         None
     }
 
-    pub(crate) fn crossover(
+    pub(crate) fn crossover<R>(
         &mut self,
         parent1: &Individual,
         parent2: &Individual,
-    ) -> Option<(Individual, Individual)> {
-        let mut rng = thread_rng();
-
+        rng: &mut R,
+    ) -> Option<(Individual, Individual)>
+    where
+        R: Rng + ?Sized,
+    {
         let offspring1 = Self::make_better_offspring(
             parent1.clone(),
             parent2.clone(),
-            &mut rng,
+            rng,
             self.max_crossover_tries,
             &self.stop_swapper.distance_service,
         )?;
@@ -415,7 +451,7 @@ impl GeneticSolver {
         let offspring2 = Self::make_better_offspring(
             parent1.clone(),
             parent2.clone(),
-            &mut rng,
+            rng,
             self.max_crossover_tries,
             &self.stop_swapper.distance_service,
         )?;
@@ -431,7 +467,10 @@ impl GeneticSolver {
         individual.fitness < self.best.fitness
     }
 
-    pub fn solve(&mut self) {
+    pub fn solve<R>(&mut self, rng: &mut R)
+    where
+        R: Rng + ?Sized,
+    {
         while !self.stop_condition_met() {
             loop {
                 let parents = self.selection();
@@ -439,7 +478,7 @@ impl GeneticSolver {
                 let (parent1_index, parent1) = &parents[0];
                 let (parent2_index, parent2) = &parents[1];
 
-                let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
+                let (offspring1, offspring2) = match self.crossover(parent1, parent2, rng) {
                     Some(offsprings) => offsprings,
                     None => break,
                 };
