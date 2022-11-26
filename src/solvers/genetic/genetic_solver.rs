@@ -246,6 +246,13 @@ impl GeneticSolver {
         (cmp::min(a, b), cmp::max(a, b))
     }
 
+    fn choose_parent_slice_chromosome<'a, R>(parent: &'a Individual, rng: &mut R) -> Option<(usize, &'a Chromosome)>
+    where
+        R: Rng + ?Sized,
+    {
+        parent.chromosomes.iter().enumerate().filter(|(_, chromosome)| chromosome.stops.len() > 3).choose(rng)
+    }
+
     fn slice_individual_randomly<R>(
         individual: &Individual,
         rng: &mut R,
@@ -253,7 +260,7 @@ impl GeneticSolver {
     where
         R: Rng + ?Sized,
     {
-        let (chromosome_index, chromosome) = Self::choose_random_chromosome(individual, rng)?;
+        let (chromosome_index, chromosome) = Self::choose_parent_slice_chromosome(individual, rng)?;
 
         let max_size = chromosome.stops.len() - 1;
 
