@@ -1,4 +1,5 @@
-use rand::{thread_rng, Rng};
+use rand::{thread_rng, SeedableRng};
+use rand_chacha::ChaCha8Rng;
 use rstest::fixture;
 
 use std::collections::{HashMap, HashSet};
@@ -23,9 +24,9 @@ pub type RouteFactory = Box<dyn Fn(Vec<Stop>) -> Route>;
 pub type GreedySolverFactory = Box<dyn Fn(u32) -> GreedySolver>;
 pub type RouteServiceFactory = Box<dyn Fn(u32) -> RouteService>;
 
-pub(crate) type IndividualFactory<R> = Box<dyn Fn(u32, &mut R) -> Individual>;
+pub(crate) type IndividualFactory = Box<dyn FnMut(u32) -> Individual>;
 pub(crate) type PopulationFactory = Box<dyn Fn(u32, u32) -> Population>;
-pub(crate) type ParentSliceFactory<R> = Box<dyn Fn(usize, &mut R) -> (Individual, HashSet<Stop>)>;
+pub(crate) type ParentSliceFactory = Box<dyn FnMut(usize) -> (Individual, HashSet<Stop>)>;
 
 #[fixture]
 pub fn distances() -> DistanceMatrix {
@@ -166,16 +167,13 @@ pub fn route_service_factory(
 }
 
 #[fixture]
-pub(crate) fn individual_factory<R>(
-    route_service_factory: RouteServiceFactory,
-) -> IndividualFactory<R>
-where
-    R: Rng + ?Sized,
-{
-    let wrapper = move |number_of_chromosomes, rng: &mut R| -> Individual {
+pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> IndividualFactory {
+    let mut rng = ChaCha8Rng::seed_from_u64(0);
+
+    let wrapper = move |number_of_chromosomes| -> Individual {
         let mut route_service = route_service_factory(number_of_chromosomes);
 
-        GeneticSolver::generate_random_individual(&mut route_service, rng)
+        GeneticSolver::generate_random_individual(&mut route_service, &mut rng)
     };
 
     Box::new(wrapper)
@@ -197,14 +195,11 @@ pub(crate) fn population_factory(route_service_factory: RouteServiceFactory) -> 
 }
 
 #[fixture]
-pub(crate) fn parent_slice_factory<R>(
-    individual_factory: IndividualFactory<R>,
-) -> ParentSliceFactory<R>
-where
-    R: Rng + ?Sized + 'static,
-{
-    let wrapper = move |number_of_genes, rng: &mut R| -> (Individual, HashSet<Stop>) {
-        let parent = individual_factory(1, rng);
+pub(crate) fn parent_slice_factory(
+    mut individual_factory: IndividualFactory,
+) -> ParentSliceFactory {
+    let wrapper = move |number_of_genes| -> (Individual, HashSet<Stop>) {
+        let parent = individual_factory(1);
         let slice = HashSet::from_iter(
             parent.chromosomes[0]
                 .stops

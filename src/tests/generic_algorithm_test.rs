@@ -1,4 +1,4 @@
-use rand::{rngs::mock::StepRng, thread_rng, SeedableRng};
+use rand::{thread_rng, SeedableRng};
 use rand_chacha::ChaCha8Rng;
 use rstest::rstest;
 
@@ -16,10 +16,8 @@ use super::fixtures::{
 use super::fixtures::{PopulationFactory, RouteFactory, RouteServiceFactory};
 
 #[rstest]
-fn test_generate_random_individual(individual_factory: IndividualFactory<StepRng>) {
-    let mut rng = StepRng::new(2, 1);
-
-    let individual = individual_factory(2, &mut rng);
+fn test_generate_random_individual(mut individual_factory: IndividualFactory) {
+    let individual = individual_factory(2);
 
     for chromosome in individual.chromosomes.iter() {
         assert_eq!(chromosome.stops.first().unwrap().id, 0);
@@ -67,11 +65,9 @@ fn test_gene_swap(stops: Vec<Stop>, route_factory: RouteFactory) {
 #[rstest]
 fn test_slice_cost_is_correct(
     distance_service: DistanceService,
-    individual_factory: IndividualFactory<ChaCha8Rng>,
+    mut individual_factory: IndividualFactory,
 ) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let individual = individual_factory(1, &mut rng);
+    let individual = individual_factory(1);
     let route = &individual.chromosomes[0];
     let slice_cost = GeneticSolver::calculate_slice_cost(&route.stops, &distance_service);
 
@@ -81,12 +77,12 @@ fn test_slice_cost_is_correct(
 #[rstest]
 fn test_can_generate_a_offspring(
     distance_service: DistanceService,
-    individual_factory: IndividualFactory<ChaCha8Rng>,
+    mut individual_factory: IndividualFactory,
 ) {
     let mut rng = ChaCha8Rng::seed_from_u64(0);
 
-    let parent1 = individual_factory(1, &mut rng);
-    let parent2 = individual_factory(1, &mut rng);
+    let parent1 = individual_factory(1);
+    let parent2 = individual_factory(1);
 
     let offspring =
         GeneticSolver::make_offspring(parent1, parent2, &mut rng, &distance_service).unwrap();
@@ -95,10 +91,8 @@ fn test_can_generate_a_offspring(
 }
 
 #[rstest]
-fn test_can_drop_gene_duplicates(parent_slice_factory: ParentSliceFactory<ChaCha8Rng>) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let (parent, slice) = parent_slice_factory(2, &mut rng);
+fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
+    let (parent, slice) = parent_slice_factory(2);
 
     let chromosome_without_duplicates =
         GeneticSolver::drop_gene_duplicates(&parent.chromosomes[0], &slice);
@@ -111,10 +105,8 @@ fn test_can_drop_gene_duplicates(parent_slice_factory: ParentSliceFactory<ChaCha
 }
 
 #[rstest]
-fn test_can_drop_all_genes_from_duplicates(parent_slice_factory: ParentSliceFactory<ChaCha8Rng>) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let (parent, slice) = parent_slice_factory(3, &mut rng);
+fn test_can_drop_all_genes_from_duplicates(mut parent_slice_factory: ParentSliceFactory) {
+    let (parent, slice) = parent_slice_factory(3);
 
     let chromosome_without_duplicates =
         GeneticSolver::drop_gene_duplicates(&parent.chromosomes[0], &slice);
@@ -127,13 +119,11 @@ fn test_can_drop_all_genes_from_duplicates(parent_slice_factory: ParentSliceFact
 #[rstest]
 fn test_can_generate_offspring_chromosome(
     distance_service: DistanceService,
-    individual_factory: IndividualFactory<ChaCha8Rng>,
-    parent_slice_factory: ParentSliceFactory<ChaCha8Rng>,
+    mut individual_factory: IndividualFactory,
+    mut parent_slice_factory: ParentSliceFactory,
 ) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let (_, parent1_slice) = parent_slice_factory(2, &mut rng);
-    let parent2 = individual_factory(1, &mut rng);
+    let (_, parent1_slice) = parent_slice_factory(2);
+    let parent2 = individual_factory(1);
 
     let chromosome = GeneticSolver::make_offspring_chromosome(
         &parent1_slice,
@@ -147,13 +137,11 @@ fn test_can_generate_offspring_chromosome(
 #[rstest]
 fn test_can_generate_offspring_chromosome_dropping_a_whole_chromosome(
     distance_service: DistanceService,
-    individual_factory: IndividualFactory<ChaCha8Rng>,
-    parent_slice_factory: ParentSliceFactory<ChaCha8Rng>,
+    mut individual_factory: IndividualFactory,
+    mut parent_slice_factory: ParentSliceFactory,
 ) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let (_, parent1_slice) = parent_slice_factory(3, &mut rng);
-    let parent2 = individual_factory(1, &mut rng);
+    let (_, parent1_slice) = parent_slice_factory(3);
+    let parent2 = individual_factory(1);
 
     let chromosome = GeneticSolver::make_offspring_chromosome(
         &parent1_slice,
@@ -192,19 +180,16 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
 #[rstest]
 fn test_can_generate_offspring_better_than_parents(
-    individual_factory: IndividualFactory<ChaCha8Rng>,
+    mut individual_factory: IndividualFactory,
     distance_service: DistanceService,
 ) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
-
-    let parent1 = individual_factory(1, &mut rng);
-    let parent2 = individual_factory(1, &mut rng);
-
+    let parent1 = individual_factory(1);
+    let parent2 = individual_factory(1);
 
     let offspring = match GeneticSolver::make_better_offspring(
         parent1.clone(),
         parent2.clone(),
-        &mut rng,
+        &mut thread_rng(),
         255,
         &distance_service,
     ) {
