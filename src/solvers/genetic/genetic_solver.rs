@@ -84,23 +84,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             individual.swap_random_genes(stop_swapper, self.rng);
         }
     }
-
-    fn is_offspring_better_than_parents(
-        offspring: &Individual,
-        parent1: &Individual,
-        parent2: &Individual,
-    ) -> bool {
-        if offspring.fitness > parent1.fitness {
-            return false;
-        }
-
-        if offspring.fitness > parent2.fitness {
-            return false;
-        }
-
-        true
-    }
-
+    
     pub(crate) fn crossover(
         &mut self,
         parent1: &Individual,
