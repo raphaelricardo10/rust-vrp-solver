@@ -7,7 +7,7 @@ use crate::{
     solvers::genetic::individual::{Chromosome, Gene, GeneAddress, Individual},
 };
 
-use super::{crossover_operator::CrossoverOperator, offspring::Offspring};
+use super::crossover_operator::CrossoverOperator;
 
 #[derive(Clone)]
 pub(crate) struct OrderCrossover {
