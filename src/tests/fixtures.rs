@@ -1,4 +1,4 @@
-use rand::{thread_rng, SeedableRng};
+use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::fixture;
 
