@@ -6,7 +6,8 @@ use crate::{
     domain::stop::Stop,
     services::distance::distance_service::{DistanceMatrix, DistanceService},
     solvers::genetic::{
-        crossover::order_crossover::OrderCrossover, genetic_solver::GeneticSolver,
+        crossover::{offspring::Offspring, order_crossover::OrderCrossover},
+        genetic_solver::GeneticSolver,
         individual::Individual,
     },
     tests::fixtures::{IndividualFactory, ParentSliceFactory},
@@ -183,36 +184,20 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
 #[rstest]
 fn test_can_generate_offspring_better_than_parents(
-    stops: Vec<Stop>,
-    distances: DistanceMatrix,
-    route_service_factory: RouteServiceFactory,
+    distance_service: DistanceService,
     mut individual_factory: IndividualFactory,
 ) {
     let parent1 = individual_factory(1);
     let parent2 = individual_factory(1);
 
     let mut rng = ChaCha8Rng::seed_from_u64(0);
+    let crossover_op = OrderCrossover::new(100);
 
-    let route_service = route_service_factory(2);
-    let mut solver = GeneticSolver::new(
-        stops,
-        &distances,
-        10,
-        3,
-        0.05,
-        10,
-        100,
-        route_service,
-        &mut rng,
-    );
+    let mut offspring = Offspring::new(parent1.clone(), parent2.clone(), crossover_op);
+    offspring.try_to_evolve(&mut rng, &distance_service).unwrap();
 
-    let offspring = match solver.make_better_offspring(parent1.clone(), parent2.clone()) {
-        Some(offspring) => offspring,
-        None => panic!("Could not generate better offspring"),
-    };
-
-    assert!(offspring.fitness < parent1.fitness);
-    assert!(offspring.fitness < parent2.fitness);
+    assert!(offspring.individual.fitness < parent1.fitness);
+    assert!(offspring.individual.fitness < parent2.fitness);
 }
 
 #[rstest]

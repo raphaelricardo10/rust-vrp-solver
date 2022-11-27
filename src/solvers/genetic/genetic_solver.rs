@@ -3,7 +3,7 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 use crate::{
     domain::stop::Stop,
     services::{
-        distance::distance_service::{DistanceMatrix},
+        distance::distance_service::DistanceMatrix,
         route::route_service::{RouteMap, RouteService},
     },
     solvers::solution::Solution,
@@ -11,7 +11,9 @@ use crate::{
 };
 
 use super::{
-    crossover::order_crossover::OrderCrossover, individual::Individual, population::Population,
+    crossover::{offspring::Offspring, order_crossover::OrderCrossover},
+    individual::Individual,
+    population::Population,
 };
 
 pub struct GeneticSolver<'a, R: Rng + ?Sized> {
@@ -23,7 +25,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     current_generation: u32,
     pub solution: Solution,
     best: Individual,
-    max_crossover_tries: u8,
+    crossover_op: OrderCrossover,
     rng: &'a mut R,
 }
 
@@ -41,16 +43,17 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         rng: &'a mut R,
     ) -> Self {
         let stop_swapper = StopSwapper::new(stops, distances);
+        let crossover_op = OrderCrossover::new(max_crossover_tries);
         let population = Population::from_random(population_size, rng, &mut route_service);
 
         Self {
             rng,
             elite_size,
             population,
+            crossover_op,
             stop_swapper,
             mutation_rate,
             max_generations,
-            max_crossover_tries,
             best: Default::default(),
             solution: Default::default(),
             current_generation: Default::default(),
@@ -98,36 +101,18 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         true
     }
 
-    pub(crate) fn make_better_offspring(
-        &mut self,
-        parent1: Individual,
-        parent2: Individual,
-    ) -> Option<Individual> {
-        for _ in 0..self.max_crossover_tries {
-            let offspring = OrderCrossover::make_offspring(
-                parent1.clone(),
-                parent2.clone(),
-                self.rng,
-                &self.stop_swapper.distance_service,
-            )?;
-
-            if Self::is_offspring_better_than_parents(&offspring, &parent1, &parent2) {
-                return Some(offspring);
-            }
-        }
-
-        None
-    }
-
     pub(crate) fn crossover(
         &mut self,
         parent1: &Individual,
         parent2: &Individual,
     ) -> Option<(Individual, Individual)> {
-        let offspring1 = self.make_better_offspring(parent1.clone(), parent2.clone())?;
-        let offspring2 = self.make_better_offspring(parent2.clone(), parent1.clone())?;
+        let mut offspring1 = Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op.clone());
+        let mut offspring2 = Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op.clone());
 
-        Some((offspring1, offspring2))
+        offspring1.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
+        offspring2.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
+
+        Some((offspring1.individual, offspring2.individual))
     }
 
     fn stop_condition_met(&self) -> bool {

@@ -7,8 +7,30 @@ use crate::{
     solvers::genetic::individual::{Chromosome, Gene, GeneAddress, Individual},
 };
 
+use super::{crossover_operator::CrossoverOperator, offspring::Offspring};
+
+#[derive(Clone)]
 pub(crate) struct OrderCrossover {
     max_of_tries: u8,
+}
+
+impl CrossoverOperator<OrderCrossover> for OrderCrossover {
+    fn run<R>(
+        &self,
+        parent1: Individual,
+        parent2: Individual,
+        rng: &mut R,
+        distance_service: &DistanceService,
+    ) -> Option<Individual>
+    where
+        R: Rng + ?Sized,
+    {
+        Self::make_offspring(parent1, parent2, rng, distance_service)
+    }
+
+    fn max_of_tries(&self) -> u8 {
+        self.max_of_tries
+    }
 }
 
 impl OrderCrossover {
