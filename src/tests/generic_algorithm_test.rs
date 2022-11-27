@@ -5,7 +5,10 @@ use rstest::rstest;
 use crate::{
     domain::stop::Stop,
     services::distance::distance_service::{DistanceMatrix, DistanceService},
-    solvers::genetic::{genetic_solver::GeneticSolver, individual::Individual},
+    solvers::genetic::{
+        crossover::order_crossover::OrderCrossover, genetic_solver::GeneticSolver,
+        individual::Individual,
+    },
     tests::fixtures::{IndividualFactory, ParentSliceFactory},
 };
 
@@ -29,7 +32,7 @@ fn test_generate_random_individual(mut individual_factory: IndividualFactory) {
 }
 
 #[rstest]
-fn test_generate_random_population(population_factory: PopulationFactory) {
+fn test_generate_random_population(mut population_factory: PopulationFactory) {
     let population = population_factory(2, 2);
 
     assert_ne!(population.individuals[0].chromosomes[0].stops.len(), 0);
@@ -69,7 +72,7 @@ fn test_slice_cost_is_correct(
 ) {
     let individual = individual_factory(1);
     let route = &individual.chromosomes[0];
-    let slice_cost = GeneticSolver::calculate_slice_cost(&route.stops, &distance_service);
+    let slice_cost = OrderCrossover::calculate_slice_cost(&route.stops, &distance_service);
 
     assert_eq!(slice_cost, route.total_distance());
 }
@@ -85,7 +88,7 @@ fn test_can_generate_a_offspring(
     let parent2 = individual_factory(1);
 
     let offspring =
-        GeneticSolver::make_offspring(parent1, parent2, &mut rng, &distance_service).unwrap();
+        OrderCrossover::make_offspring(parent1, parent2, &mut rng, &distance_service).unwrap();
 
     assert_ne!(offspring.fitness, 0.0);
 }
@@ -95,12 +98,12 @@ fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
     let (parent, slice) = parent_slice_factory(2);
 
     let chromosome_without_duplicates =
-        GeneticSolver::drop_gene_duplicates(&parent.chromosomes[0], &slice);
+        OrderCrossover::drop_gene_duplicates(&parent.chromosomes[0], &slice);
 
     assert_eq!(chromosome_without_duplicates.len(), 3);
 
     for gene in chromosome_without_duplicates {
-        assert!(!slice.contains(gene));
+        assert!(!slice.contains(&gene));
     }
 }
 
@@ -109,7 +112,7 @@ fn test_can_drop_all_genes_from_duplicates(mut parent_slice_factory: ParentSlice
     let (parent, slice) = parent_slice_factory(3);
 
     let chromosome_without_duplicates =
-        GeneticSolver::drop_gene_duplicates(&parent.chromosomes[0], &slice);
+        OrderCrossover::drop_gene_duplicates(&parent.chromosomes[0], &slice);
 
     assert_eq!(chromosome_without_duplicates.len(), 2);
     assert_eq!(chromosome_without_duplicates[0].id, 0);
@@ -125,7 +128,7 @@ fn test_can_generate_offspring_chromosome(
     let (_, parent1_slice) = parent_slice_factory(2);
     let parent2 = individual_factory(1);
 
-    let chromosome = GeneticSolver::make_offspring_chromosome(
+    let chromosome = OrderCrossover::make_offspring_chromosome(
         &parent1_slice,
         parent2.chromosomes[0].clone(),
         &distance_service,
@@ -143,7 +146,7 @@ fn test_can_generate_offspring_chromosome_dropping_a_whole_chromosome(
     let (_, parent1_slice) = parent_slice_factory(3);
     let parent2 = individual_factory(1);
 
-    let chromosome = GeneticSolver::make_offspring_chromosome(
+    let chromosome = OrderCrossover::make_offspring_chromosome(
         &parent1_slice,
         parent2.chromosomes[0].clone(),
         &distance_service,
@@ -164,9 +167,9 @@ fn test_can_insert_parent_slice_in_empty_offspring(
     let mut offspring = Individual::new(vec![chromosome]);
 
     let slice = &stops[1..=3];
-    let slice_cost = GeneticSolver::calculate_slice_cost(slice, &distance_service);
+    let slice_cost = OrderCrossover::calculate_slice_cost(slice, &distance_service);
 
-    GeneticSolver::insert_parent_slice_in_offspring(
+    OrderCrossover::insert_parent_slice_in_offspring(
         &mut offspring,
         insertion_point,
         slice.to_vec(),
@@ -180,19 +183,30 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
 #[rstest]
 fn test_can_generate_offspring_better_than_parents(
+    stops: Vec<Stop>,
+    distances: DistanceMatrix,
+    route_service_factory: RouteServiceFactory,
     mut individual_factory: IndividualFactory,
-    distance_service: DistanceService,
 ) {
     let parent1 = individual_factory(1);
     let parent2 = individual_factory(1);
 
-    let offspring = match GeneticSolver::make_better_offspring(
-        parent1.clone(),
-        parent2.clone(),
-        &mut thread_rng(),
-        255,
-        &distance_service,
-    ) {
+    let mut rng = ChaCha8Rng::seed_from_u64(0);
+
+    let route_service = route_service_factory(2);
+    let mut solver = GeneticSolver::new(
+        stops,
+        &distances,
+        10,
+        3,
+        0.05,
+        10,
+        100,
+        route_service,
+        &mut rng,
+    );
+
+    let offspring = match solver.make_better_offspring(parent1.clone(), parent2.clone()) {
         Some(offspring) => offspring,
         None => panic!("Could not generate better offspring"),
     };
@@ -207,6 +221,8 @@ fn test_genetic_algorithm_can_optimize_route(
     stops: Vec<Stop>,
     route_service_factory: RouteServiceFactory,
 ) {
+    let mut rng = ChaCha8Rng::seed_from_u64(0);
+
     let route_service = route_service_factory(2);
     let mut solver = GeneticSolver::new(
         stops,
@@ -217,9 +233,9 @@ fn test_genetic_algorithm_can_optimize_route(
         10,
         100,
         route_service,
-        &mut thread_rng(),
+        &mut rng,
     );
-    solver.solve(&mut thread_rng());
+    solver.solve();
 
     let solution_v1 = solver.solution.result.get(&0).unwrap();
     let solution_v2 = solver.solution.result.get(&1).unwrap();

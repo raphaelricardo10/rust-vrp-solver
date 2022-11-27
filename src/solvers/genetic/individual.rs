@@ -1,4 +1,10 @@
-use crate::domain::{route::Route, stop::Stop};
+use rand::{seq::IteratorRandom, thread_rng, Rng};
+
+use crate::{
+    domain::{route::Route, stop::Stop},
+    services::route::route_service::RouteService,
+    stop_swapper::{path::Path, StopSwapper},
+};
 
 pub(super) type Gene = Stop;
 pub(super) type Chromosome = Route;
@@ -6,7 +12,10 @@ pub(super) type GeneAddress = (usize, usize);
 
 impl Default for Individual {
     fn default() -> Self {
-        Self { fitness: f64::MAX, chromosomes: Default::default() }
+        Self {
+            fitness: f64::MAX,
+            chromosomes: Default::default(),
+        }
     }
 }
 
@@ -24,6 +33,38 @@ impl Individual {
             fitness,
             chromosomes,
         }
+    }
+
+    pub(crate) fn from_random<R>(rng: &mut R, route_service: &mut RouteService) -> Individual
+    where
+        R: Rng + ?Sized,
+    {
+        let vehicle_ids: Vec<u32> = route_service
+            .get_vehicles()
+            .iter()
+            .map(|vehicle| vehicle.id)
+            .collect();
+
+        route_service.assign_starting_points();
+
+        while route_service.has_available_stop().unwrap() {
+            for vehicle_id in vehicle_ids.iter() {
+                let stop = match route_service.get_random_stop(*vehicle_id, rng) {
+                    Some(stop) => stop,
+                    None => continue,
+                };
+
+                route_service
+                    .assign_stop_to_route(*vehicle_id, stop.id)
+                    .unwrap();
+            }
+        }
+
+        route_service.assign_stop_points();
+
+        let routes: Vec<Route> = route_service.get_all_routes().values().cloned().collect();
+
+        Individual::new(routes)
     }
 
     fn calculate_fitness(chromosomes: &[Chromosome]) -> f64 {
@@ -64,6 +105,100 @@ impl Individual {
         self.insert_gene(address2, aux);
 
         self.fitness += fitness_change;
+
+        Some(())
+    }
+
+    pub(crate) fn choose_random_chromosome<R>(
+        &self,
+        rng: &mut R,
+        min_genes: usize,
+    ) -> Option<(usize, &Chromosome)>
+    where
+        R: Rng + ?Sized,
+    {
+        self.chromosomes
+            .iter()
+            .enumerate()
+            .filter(|(_, chromosome)| chromosome.stops.len() >= min_genes)
+            .choose(rng)
+    }
+
+    pub(crate) fn choose_random_gene_pair<R>(
+        &self,
+        rng: &mut R,
+    ) -> Option<(GeneAddress, GeneAddress)>
+    where
+        R: Rng + ?Sized,
+    {
+        let (chromosome_index, chromosome): (usize, &Chromosome) = self
+            .chromosomes
+            .iter()
+            .enumerate()
+            .filter(|(_, chromosome)| chromosome.stops.len() > 3)
+            .choose(&mut thread_rng())?;
+
+        let addresses: Vec<GeneAddress> = chromosome
+            .stops
+            .iter()
+            .enumerate()
+            .skip(1)
+            .take(chromosome.stops.len() - 2)
+            .choose_multiple(rng, 2)
+            .iter()
+            .map(|(gene_index, _)| (chromosome_index, *gene_index))
+            .collect();
+
+        Some((addresses[0], addresses[1]))
+    }
+
+    pub(crate) fn choose_random_gene<R>(&self, rng: &mut R) -> Option<GeneAddress>
+    where
+        R: Rng + ?Sized,
+    {
+        let (chromosome_index, chromosome) =
+            self.chromosomes.iter().enumerate().choose(rng).unwrap();
+
+        if chromosome.stops.len() == 1 {
+            return Some((chromosome_index, 0));
+        }
+
+        let (gene_index, _) = chromosome
+            .stops
+            .iter()
+            .enumerate()
+            .skip(1)
+            .take(chromosome.stops.len() - 2)
+            .choose(rng)?;
+
+        Some((chromosome_index, gene_index))
+    }
+
+    pub(crate) fn swap_random_genes<R>(
+        &mut self,
+        stop_swapper: &StopSwapper,
+        rng: &mut R,
+    ) -> Option<()>
+    where
+        R: Rng + ?Sized,
+    {
+        let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng)?;
+
+        let path1 = Path::from_stop_index(
+            &self.chromosomes.get(address1.0)?.stops,
+            address1.1,
+            &stop_swapper.distance_service,
+        )?;
+
+        let path2 = Path::from_stop_index(
+            &self.chromosomes.get(address2.0)?.stops,
+            address2.1,
+            &stop_swapper.distance_service,
+        )?;
+
+        let swap_cost = stop_swapper.calculate_swap_cost(&path1, &path2);
+
+        self.swap_genes(address1, address2, swap_cost);
 
         Some(())
     }

@@ -12,7 +12,7 @@ use crate::{
         route::route_service::RouteService,
     },
     solvers::{
-        genetic::{genetic_solver::GeneticSolver, individual::Individual, population::Population},
+        genetic::{individual::Individual, population::Population},
         greedy::greedy_solver::GreedySolver,
     },
     stop_swapper::{path::Path, StopSwapper},
@@ -25,7 +25,7 @@ pub type GreedySolverFactory = Box<dyn Fn(u32) -> GreedySolver>;
 pub type RouteServiceFactory = Box<dyn Fn(u32) -> RouteService>;
 
 pub(crate) type IndividualFactory = Box<dyn FnMut(u32) -> Individual>;
-pub(crate) type PopulationFactory = Box<dyn Fn(u32, u32) -> Population>;
+pub(crate) type PopulationFactory = Box<dyn FnMut(u32, u32) -> Population>;
 pub(crate) type ParentSliceFactory = Box<dyn FnMut(usize) -> (Individual, HashSet<Stop>)>;
 
 pub struct PathFactory {
@@ -200,7 +200,7 @@ pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> 
     let wrapper = move |number_of_chromosomes| -> Individual {
         let mut route_service = route_service_factory(number_of_chromosomes);
 
-        GeneticSolver::generate_random_individual(&mut route_service, &mut rng)
+        Individual::from_random(&mut rng, &mut route_service)
     };
 
     Box::new(wrapper)
@@ -208,14 +208,12 @@ pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> 
 
 #[fixture]
 pub(crate) fn population_factory(route_service_factory: RouteServiceFactory) -> PopulationFactory {
+    let mut rng = ChaCha8Rng::seed_from_u64(0);
+
     let wrapper = move |number_of_individuals, number_of_chromosomes| -> Population {
         let mut route_service = route_service_factory(number_of_chromosomes);
 
-        GeneticSolver::generate_random_population(
-            number_of_individuals,
-            &mut route_service,
-            &mut thread_rng(),
-        )
+        Population::from_random(number_of_individuals, &mut rng, &mut route_service)
     };
 
     Box::new(wrapper)
