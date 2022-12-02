@@ -3,9 +3,9 @@ use rstest::rstest;
 
 use crate::{domain::stop::Stop, solvers::grasp::grasp_solver::GraspSolver};
 
-use super::fixtures::distances_fixture::distances;
-use super::fixtures::stops_fixture::stops;
-use super::fixtures::vehicles_fixture::{vehicle_factory, VehicleFactory};
+use crate::tests::fixtures::distances_fixture::distances;
+use crate::tests::fixtures::stops_fixture::stops;
+use crate::tests::fixtures::vehicles_fixture::{vehicle_factory, VehicleFactory};
 
 #[rstest]
 fn grasp_solution_is_generated(

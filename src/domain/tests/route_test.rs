@@ -5,10 +5,10 @@ use crate::{
     services::distance::distance_service::DistanceService,
 };
 
-use super::fixtures::routes_fixture::{route_factory, RouteFactory};
-use super::fixtures::services_fixture::distance_service;
-use super::fixtures::stops_fixture::full_stops;
-use super::fixtures::stops_fixture::stops;
+use crate::tests::fixtures::routes_fixture::{route_factory, RouteFactory};
+use crate::tests::fixtures::services_fixture::distance_service;
+use crate::tests::fixtures::stops_fixture::full_stops;
+use crate::tests::fixtures::stops_fixture::stops;
 
 #[rstest]
 fn route_distance_calculation(stops: Vec<Stop>, route_factory: RouteFactory) {

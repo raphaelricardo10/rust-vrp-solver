@@ -12,18 +12,18 @@ use crate::{
     },
 };
 
-use super::fixtures::routes_fixture::{route_factory, RouteFactory};
-use super::fixtures::stops_fixture::stops;
+use crate::tests::fixtures::routes_fixture::{route_factory, RouteFactory};
+use crate::tests::fixtures::stops_fixture::stops;
 
-use super::fixtures::distances_fixture::distances;
-use super::fixtures::genetic_algorithm_fixture::{
+use crate::tests::fixtures::distances_fixture::distances;
+use crate::tests::fixtures::genetic_algorithm_fixture::{
     individual_factory, parent_slice_factory, population_factory,
 };
-use super::fixtures::genetic_algorithm_fixture::{
+use crate::tests::fixtures::genetic_algorithm_fixture::{
     IndividualFactory, ParentSliceFactory, PopulationFactory,
 };
-use super::fixtures::services_fixture::distance_service;
-use super::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
+use crate::tests::fixtures::services_fixture::distance_service;
+use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 
 #[rstest]
 fn test_generate_random_individual(mut individual_factory: IndividualFactory) {
