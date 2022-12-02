@@ -79,7 +79,7 @@ fn test_slice_cost_is_correct(
 ) {
     let individual = individual_factory(1);
     let route = &individual.chromosomes[0];
-    let slice_cost = OrderCrossover::calculate_slice_cost(&route.stops, &distance_service);
+    let slice_cost = Individual::calculate_slice_cost(&route.stops, &distance_service);
 
     assert_eq!(slice_cost, route.total_distance());
 }
@@ -94,8 +94,9 @@ fn test_can_generate_a_offspring(
     let parent1 = individual_factory(1);
     let parent2 = individual_factory(1);
 
-    let offspring =
-        OrderCrossover::make_offspring(parent1, parent2, &mut rng, &distance_service).unwrap();
+    let offspring = parent1
+        .crossover_with(parent2, &mut rng, &distance_service)
+        .unwrap();
 
     assert_ne!(offspring.fitness, 0.0);
 }
@@ -105,7 +106,7 @@ fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
     let (parent, slice) = parent_slice_factory(2);
 
     let chromosome_without_duplicates =
-        OrderCrossover::drop_gene_duplicates(&parent.chromosomes[0], &slice);
+        Individual::drop_gene_duplicates(&parent.chromosomes[0], &slice);
 
     assert_eq!(chromosome_without_duplicates.len(), 3);
 
@@ -119,7 +120,7 @@ fn test_can_drop_all_genes_from_duplicates(mut parent_slice_factory: ParentSlice
     let (parent, slice) = parent_slice_factory(3);
 
     let chromosome_without_duplicates =
-        OrderCrossover::drop_gene_duplicates(&parent.chromosomes[0], &slice);
+        Individual::drop_gene_duplicates(&parent.chromosomes[0], &slice);
 
     assert_eq!(chromosome_without_duplicates.len(), 2);
     assert_eq!(chromosome_without_duplicates[0].id, 0);
@@ -135,7 +136,7 @@ fn test_can_generate_offspring_chromosome(
     let (_, parent1_slice) = parent_slice_factory(2);
     let parent2 = individual_factory(1);
 
-    let chromosome = OrderCrossover::make_offspring_chromosome(
+    let chromosome = Individual::make_offspring_chromosome(
         &parent1_slice,
         parent2.chromosomes[0].clone(),
         &distance_service,
@@ -153,7 +154,7 @@ fn test_can_generate_offspring_chromosome_dropping_a_whole_chromosome(
     let (_, parent1_slice) = parent_slice_factory(3);
     let parent2 = individual_factory(1);
 
-    let chromosome = OrderCrossover::make_offspring_chromosome(
+    let chromosome = Individual::make_offspring_chromosome(
         &parent1_slice,
         parent2.chromosomes[0].clone(),
         &distance_service,
@@ -174,16 +175,16 @@ fn test_can_insert_parent_slice_in_empty_offspring(
     let mut offspring = Individual::new(vec![chromosome]);
 
     let slice = &stops[1..=3];
-    let slice_cost = OrderCrossover::calculate_slice_cost(slice, &distance_service);
+    let slice_cost = Individual::calculate_slice_cost(slice, &distance_service);
 
-    OrderCrossover::insert_parent_slice_in_offspring(
-        &mut offspring,
-        insertion_point,
-        slice.to_vec(),
-        slice_cost,
-        &distance_service,
-    )
-    .unwrap();
+    offspring
+        .insert_parent_slice(
+            insertion_point,
+            slice.to_vec(),
+            slice_cost,
+            &distance_service,
+        )
+        .unwrap();
 
     assert_ne!(offspring.fitness, 0.0);
 }

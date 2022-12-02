@@ -1,15 +1,15 @@
 use rand::Rng;
 
 use crate::{
-    services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
+    services::distance::distance_service::DistanceService, solvers::genetic::individual::{Individual, GeneAddress, Gene},
 };
 
 use super::crossover_operator::CrossoverOperator;
 
 pub(crate) struct Offspring<T: CrossoverOperator<T>> {
+    crossover_op: T,
     pub(super) parent1: Individual,
     pub(super) parent2: Individual,
-    crossover_op: T,
     pub(crate) individual: Individual,
 }
 
