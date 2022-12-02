@@ -1,7 +1,7 @@
-use crate::tests::fixtures::GreedySolverFactory;
+use crate::tests::fixtures::greedy_solver_fixture::GreedySolverFactory;
 use rstest::rstest;
 
-use super::fixtures::greedy_solver_factory;
+use super::fixtures::greedy_solver_fixture::greedy_solver_factory;
 
 #[rstest]
 fn greedy_solution_is_correct_single_vehicle(greedy_solver_factory: GreedySolverFactory) {

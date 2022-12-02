@@ -2,7 +2,7 @@ use rstest::rstest;
 
 use crate::stop_swapper::StopSwapper;
 
-use super::fixtures::{path_factory, stop_swapper, PathFactory};
+use super::fixtures::stop_swapper_fixture::{path_factory, stop_swapper, PathFactory};
 
 #[rstest]
 fn can_calculate_path_swap_cost(stop_swapper: StopSwapper, path_factory: PathFactory) {

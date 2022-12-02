@@ -1,8 +1,6 @@
 use rstest::rstest;
 
-use crate::tests::fixtures::RouteServiceFactory;
-
-use super::fixtures::route_service_factory;
+use super::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 
 #[rstest]
 fn route_service_started(route_service_factory: RouteServiceFactory) {

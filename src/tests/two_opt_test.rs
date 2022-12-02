@@ -6,8 +6,10 @@ use rstest::rstest;
 
 use crate::domain::stop::Stop;
 
-use super::fixtures::RouteFactory;
-use super::fixtures::{distance_service, route_factory, stops_with_crossings, two_opt};
+use super::fixtures::routes_fixture::{route_factory, RouteFactory};
+use super::fixtures::services_fixture::distance_service;
+use super::fixtures::stops_fixture::stops_with_crossings;
+use super::fixtures::two_opt::two_opt;
 
 #[rstest]
 fn can_calculate_insertion_cost(

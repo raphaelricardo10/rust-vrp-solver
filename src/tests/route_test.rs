@@ -3,10 +3,12 @@ use rstest::rstest;
 use crate::{
     domain::{route::Route, stop::Stop, vehicle::Vehicle},
     services::distance::distance_service::DistanceService,
-    tests::fixtures::RouteFactory,
 };
 
-use super::fixtures::{distance_service, full_stops, route_factory, stops};
+use super::fixtures::routes_fixture::{route_factory, RouteFactory};
+use super::fixtures::services_fixture::distance_service;
+use super::fixtures::stops_fixture::full_stops;
+use super::fixtures::stops_fixture::stops;
 
 #[rstest]
 fn route_distance_calculation(stops: Vec<Stop>, route_factory: RouteFactory) {

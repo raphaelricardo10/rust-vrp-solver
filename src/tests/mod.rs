@@ -14,7 +14,6 @@ pub mod greedy_solver_test;
 pub mod grasp_solver_test;
 
 mod fixtures;
-
 #[cfg(test)]
 pub mod two_opt_test;
 

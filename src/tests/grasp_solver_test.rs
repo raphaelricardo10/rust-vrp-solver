@@ -1,11 +1,11 @@
 use crate::services::distance::distance_service::DistanceMatrix;
 use rstest::rstest;
 
-use crate::{
-    domain::stop::Stop, solvers::grasp::grasp_solver::GraspSolver, tests::fixtures::VehicleFactory,
-};
+use crate::{domain::stop::Stop, solvers::grasp::grasp_solver::GraspSolver};
 
-use super::fixtures::{distances, stops, vehicle_factory};
+use super::fixtures::distances_fixture::distances;
+use super::fixtures::stops_fixture::stops;
+use super::fixtures::vehicles_fixture::{vehicle_factory, VehicleFactory};
 
 #[rstest]
 fn grasp_solution_is_generated(
