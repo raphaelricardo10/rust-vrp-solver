@@ -84,14 +84,16 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             individual.swap_random_genes(stop_swapper, self.rng);
         }
     }
-    
+
     pub(crate) fn crossover(
         &mut self,
         parent1: &Individual,
         parent2: &Individual,
     ) -> Option<(Individual, Individual)> {
-        let mut offspring1 = Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op.clone());
-        let mut offspring2 = Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op.clone());
+        let mut offspring1 =
+            Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op.clone());
+        let mut offspring2 =
+            Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op.clone());
 
         offspring1.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
         offspring2.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;

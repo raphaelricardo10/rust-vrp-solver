@@ -1,5 +1,5 @@
-use rstest::rstest;
 use crate::tests::fixtures::GreedySolverFactory;
+use rstest::rstest;
 
 use super::fixtures::greedy_solver_factory;
 

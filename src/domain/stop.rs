@@ -1,6 +1,5 @@
 use std::hash::Hash;
-#[derive(Copy, Clone)]
-#[derive(Eq)]
+#[derive(Copy, Clone, Eq)]
 pub struct Stop {
     pub id: u32,
     pub usage: u32,

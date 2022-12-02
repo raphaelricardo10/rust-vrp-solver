@@ -36,11 +36,7 @@ impl<'a> DistanceService {
     }
 
     pub fn get_distance(&self, from: &Stop, to: &Stop) -> Option<f64> {
-        Some(
-            self.distances
-                .get(&(from.id, to.id))?
-                .distance,
-        )
+        Some(self.distances.get(&(from.id, to.id))?.distance)
     }
 
     pub(crate) fn get_distances_from(

@@ -116,5 +116,4 @@ impl<'a> GraspSolver {
     fn should_update_solution(&self, solution: &Solution) -> bool {
         solution.is_better_than(&self.solution)
     }
-
 }
