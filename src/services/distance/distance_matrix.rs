@@ -2,13 +2,13 @@ use std::cmp::Ordering;
 
 use crate::domain::stop::Stop;
 
-pub(crate) struct DistanceMatrixEntry {
-    pub(crate) distance: f64,
-    pub(crate) destination: Stop,
+pub(super) struct DistanceMatrixEntry {
+    pub(super) distance: f64,
+    pub(super) destination: Stop,
 }
 
 impl DistanceMatrixEntry {
-    pub(crate) fn new(destination: Stop, distance: f64) -> DistanceMatrixEntry {
+    pub(super) fn new(destination: Stop, distance: f64) -> DistanceMatrixEntry {
         DistanceMatrixEntry {
             distance,
             destination,

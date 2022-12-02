@@ -21,8 +21,8 @@ impl Default for Individual {
 
 #[derive(Clone)]
 pub(crate) struct Individual {
-    pub(crate) fitness: f64,
-    pub(crate) chromosomes: Vec<Chromosome>,
+    pub(super) fitness: f64,
+    pub(super) chromosomes: Vec<Chromosome>,
 }
 
 impl Individual {

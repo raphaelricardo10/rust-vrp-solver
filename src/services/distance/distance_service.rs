@@ -6,7 +6,7 @@ use super::distance_matrix::DistanceMatrixEntry;
 
 pub type DistancesMatrixKey = (u32, u32);
 pub type DistanceMatrix = HashMap<DistancesMatrixKey, f64>;
-pub(crate) type MappedDistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
+pub(super) type MappedDistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
 
 pub type StopsMap = HashMap<u32, Stop>;
 
@@ -39,7 +39,7 @@ impl<'a> DistanceService {
         Some(self.distances.get(&(from.id, to.id))?.distance)
     }
 
-    pub(crate) fn get_distances_from(
+    pub(super) fn get_distances_from(
         &'a self,
         stop: &'a Stop,
     ) -> impl Iterator<Item = &DistanceMatrixEntry> {

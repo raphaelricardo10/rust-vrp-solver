@@ -6,22 +6,20 @@ use crate::{
     domain::stop::Stop,
     services::distance::distance_service::{DistanceMatrix, DistanceService},
     solvers::genetic::{
-        crossover::{offspring::Offspring, order_crossover::OrderCrossover},
-        genetic_solver::GeneticSolver,
+        crossover::order_crossover::OrderCrossover, genetic_solver::GeneticSolver,
         individual::Individual,
     },
 };
 
+use crate::solvers::genetic::crossover::offspring::Offspring;
+
 use crate::tests::fixtures::routes_fixture::{route_factory, RouteFactory};
 use crate::tests::fixtures::stops_fixture::stops;
 
+use super::fixtures::{individual_factory, parent_slice_factory, population_factory};
+use super::fixtures::{IndividualFactory, ParentSliceFactory, PopulationFactory};
+
 use crate::tests::fixtures::distances_fixture::distances;
-use crate::tests::fixtures::genetic_algorithm_fixture::{
-    individual_factory, parent_slice_factory, population_factory,
-};
-use crate::tests::fixtures::genetic_algorithm_fixture::{
-    IndividualFactory, ParentSliceFactory, PopulationFactory,
-};
 use crate::tests::fixtures::services_fixture::distance_service;
 use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 

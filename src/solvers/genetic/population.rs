@@ -6,7 +6,7 @@ use super::individual::Individual;
 
 #[derive(Default)]
 pub(crate) struct Population {
-    pub(crate) individuals: Vec<Individual>,
+    pub(super) individuals: Vec<Individual>,
 }
 
 impl Population {
