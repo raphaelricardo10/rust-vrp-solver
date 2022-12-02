@@ -11,12 +11,12 @@ use crate::{
 
 use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 
-pub(super) type IndividualFactory = Box<dyn FnMut(u32) -> Individual>;
-pub(super) type PopulationFactory = Box<dyn FnMut(u32, u32) -> Population>;
-pub(super) type ParentSliceFactory = Box<dyn FnMut(usize) -> (Individual, HashSet<Stop>)>;
+pub(crate) type IndividualFactory = Box<dyn FnMut(u32) -> Individual>;
+pub(crate) type PopulationFactory = Box<dyn FnMut(u32, u32) -> Population>;
+pub(crate) type ParentSliceFactory = Box<dyn FnMut(usize) -> (Individual, HashSet<Stop>)>;
 
 #[fixture]
-pub(super) fn individual_factory(route_service_factory: RouteServiceFactory) -> IndividualFactory {
+pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> IndividualFactory {
     let mut rng = ChaCha8Rng::seed_from_u64(0);
 
     let wrapper = move |number_of_chromosomes| -> Individual {
@@ -29,7 +29,7 @@ pub(super) fn individual_factory(route_service_factory: RouteServiceFactory) -> 
 }
 
 #[fixture]
-pub(super) fn population_factory(route_service_factory: RouteServiceFactory) -> PopulationFactory {
+pub(crate) fn population_factory(route_service_factory: RouteServiceFactory) -> PopulationFactory {
     let mut rng = ChaCha8Rng::seed_from_u64(0);
 
     let wrapper = move |number_of_individuals, number_of_chromosomes| -> Population {
@@ -42,7 +42,7 @@ pub(super) fn population_factory(route_service_factory: RouteServiceFactory) -> 
 }
 
 #[fixture]
-pub(super) fn parent_slice_factory(
+pub(crate) fn parent_slice_factory(
     mut individual_factory: IndividualFactory,
 ) -> ParentSliceFactory {
     let wrapper = move |number_of_genes| -> (Individual, HashSet<Stop>) {

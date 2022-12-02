@@ -1,3 +1,7 @@
+pub(crate) mod fixtures;
 #[cfg(test)]
-pub mod genetic_algorithm_test;
-mod fixtures;
+mod genetic_algorithm_test;
+#[cfg(test)]
+mod individual_test;
+#[cfg(test)]
+mod population_test;
