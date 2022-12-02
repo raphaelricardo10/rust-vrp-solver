@@ -1,7 +1,7 @@
 use rand::Rng;
 
 use crate::{
-    services::distance::distance_service::DistanceService, solvers::genetic::individual::{Individual, GeneAddress, Gene},
+    services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
 };
 
 use super::crossover_operator::CrossoverOperator;

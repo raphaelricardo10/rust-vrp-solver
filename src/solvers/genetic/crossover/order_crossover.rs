@@ -1,10 +1,7 @@
-use std::collections::HashSet;
-
 use rand::Rng;
 
 use crate::{
-    services::distance::distance_service::DistanceService,
-    solvers::genetic::individual::{Chromosome, Gene, GeneAddress, Individual},
+    services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
 };
 
 use super::crossover_operator::CrossoverOperator;
