@@ -4,32 +4,25 @@ use rand::Rng;
 
 use crate::{
     services::distance::distance_service::DistanceService,
-    solvers::genetic::individual::{Chromosome, Gene, GeneAddress, Individual},
+    solvers::genetic::individual::{Chromosome, Gene, Individual},
 };
 
 pub(super) type GeneSet = HashSet<Gene>;
-pub(super) type SliceAddress = GeneAddress;
 
 pub(crate) struct ParentSlice {
     pub(super) cost: f64,
     pub(super) slice: Vec<Gene>,
     pub(super) gene_set: HashSet<Gene>,
-    pub(super) address: SliceAddress,
 }
 
 impl ParentSlice {
-    pub(super) fn new(
-        slice: Vec<Gene>,
-        address: SliceAddress,
-        distance_service: &DistanceService,
-    ) -> Self {
+    pub(super) fn new(slice: Vec<Gene>, distance_service: &DistanceService) -> Self {
         let cost = Self::calculate_slice_cost(&slice, distance_service);
         let gene_set: GeneSet = HashSet::from_iter(slice.iter().cloned());
 
         Self {
             cost,
             slice,
-            address,
             gene_set,
         }
     }
@@ -67,17 +60,14 @@ impl ParentSlice {
     where
         R: Rng + ?Sized,
     {
-        let (chromosome_index, chromosome) = parent.choose_random_chromosome(rng, 4)?;
+        let (_, chromosome) = parent.choose_random_chromosome(rng, 4)?;
 
         let max_size = chromosome.stops.len() - 1;
 
         let (lower_bound, upper_bound) = Self::generate_range(1, max_size, rng);
 
-        let address: GeneAddress = (chromosome_index, lower_bound);
-
         Some(Self::new(
             chromosome.stops[lower_bound..upper_bound].to_vec(),
-            address,
             distance_service,
         ))
     }

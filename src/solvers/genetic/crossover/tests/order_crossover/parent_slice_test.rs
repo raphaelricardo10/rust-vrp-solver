@@ -90,7 +90,7 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     let mut offspring = Individual::new(vec![chromosome]);
 
-    let slice = ParentSlice::new(stops[1..=3].to_vec(), (0, 0), &distance_service);
+    let slice = ParentSlice::new(stops[1..=3].to_vec(), &distance_service);
 
     offspring
         .insert_parent_slice(slice, insertion_point, &distance_service)

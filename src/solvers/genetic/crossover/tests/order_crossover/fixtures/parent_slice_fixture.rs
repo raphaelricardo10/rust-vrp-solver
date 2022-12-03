@@ -28,7 +28,7 @@ pub(crate) fn parent_slice_factory(
                 .cloned(),
         );
 
-        let parent_slice = ParentSlice::new(slice, (0, 0), &distance_service);
+        let parent_slice = ParentSlice::new(slice, &distance_service);
 
         (parent, parent_slice)
     };
