@@ -13,11 +13,17 @@ use rstest::rstest;
 use crate::services::distance::distance_service::DistanceService;
 
 #[rstest]
-fn test_slice_cost_is_correct(mut parent_slice_factory: ParentSliceFactory) {
-    let (_, slice) = parent_slice_factory(2);
+fn test_slice_cost_is_correct(
+    distance_service: DistanceService,
+    mut individual_factory: IndividualFactory,
+) {
+    let individual = individual_factory(1);
+    let route = &individual.chromosomes[0];
+    let slice_cost = ParentSlice::calculate_slice_cost(&route.stops, &distance_service);
 
-    assert_eq!(slice.cost, 2.0);
+    assert_eq!(slice_cost, route.total_distance());
 }
+
 
 #[rstest]
 fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
