@@ -31,7 +31,7 @@ impl Individual {
         let distance_before = match self.chromosomes[insertion_point.0].stops.len() == 1 {
             true => 0.0,
             false => distance_service.get_distance(
-                &self.chromosomes[insertion_point.0].stops[parent_slice.address.1 - 1],
+                &self.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
                 parent_slice.slice.first()?,
             )?,
         };
@@ -43,7 +43,7 @@ impl Individual {
 
         self.chromosomes[insertion_point.0].add_multiple_stops_at(
             parent_slice.slice,
-            parent_slice.address.1,
+            insertion_point.1,
             parent_slice.cost + distance_before + distance_after,
         );
 
