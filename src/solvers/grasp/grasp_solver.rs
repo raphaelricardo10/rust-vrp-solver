@@ -1,5 +1,5 @@
-use rand::{seq::SliceRandom, Rng};
 use rand::thread_rng;
+use rand::{seq::SliceRandom, Rng};
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
