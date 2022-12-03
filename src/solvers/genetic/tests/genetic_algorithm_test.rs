@@ -12,7 +12,7 @@ use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServi
 use crate::tests::fixtures::stops_fixture::stops;
 
 #[rstest]
-fn test_genetic_algorithm_can_optimize_route(
+fn test_genetic_algorithm_can_generate_a_good_route(
     distances: DistanceMatrix,
     stops: Vec<Stop>,
     route_service_factory: RouteServiceFactory,
@@ -27,7 +27,7 @@ fn test_genetic_algorithm_can_optimize_route(
         3,
         0.05,
         10,
-        100,
+        5,
         route_service,
         &mut rng,
     );
