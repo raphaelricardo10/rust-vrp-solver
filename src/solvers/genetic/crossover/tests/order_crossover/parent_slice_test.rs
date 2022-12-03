@@ -24,7 +24,6 @@ fn test_slice_cost_is_correct(
     assert_eq!(slice_cost, route.total_distance());
 }
 
-
 #[rstest]
 fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
     let (parent, slice) = parent_slice_factory(2);
