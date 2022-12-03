@@ -48,11 +48,11 @@ impl<T: CrossoverOperator<T> + Clone> Offspring<T> {
     }
 
     pub(crate) fn has_evolved(&self) -> bool {
-        if self.individual.fitness > self.parent1.fitness {
+        if self.individual.fitness >= self.parent1.fitness {
             return false;
         }
 
-        if self.individual.fitness > self.parent2.fitness {
+        if self.individual.fitness >= self.parent2.fitness {
             return false;
         }
 
