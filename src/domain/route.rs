@@ -2,6 +2,7 @@ use crate::errors::vehicle::vehicle_overload::VehicleOverloadError;
 
 use super::{stop::Stop, vehicle::Vehicle};
 
+#[repr(C)]
 #[derive(Clone)]
 pub struct Route {
     pub stops: Vec<Stop>,

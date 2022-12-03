@@ -1,4 +1,6 @@
 use std::hash::Hash;
+
+#[repr(C)]
 #[derive(Copy, Clone, Eq)]
 pub struct Stop {
     pub id: u32,

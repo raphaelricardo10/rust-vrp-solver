@@ -2,6 +2,7 @@ use crate::errors::vehicle::{
     negative_capacity::NegativeVehicleCapacityError, vehicle_overload::VehicleOverloadError,
 };
 
+#[repr(C)]
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Vehicle {
     usage: u32,
