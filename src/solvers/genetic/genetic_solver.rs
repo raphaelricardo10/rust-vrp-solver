@@ -60,7 +60,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         }
     }
 
-    pub(crate) fn selection(&self) -> Vec<(usize, Individual)> {
+    pub(super) fn selection(&self) -> Vec<(usize, Individual)> {
         self.population
             .get_k_bests(self.elite_size)
             .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
@@ -70,7 +70,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             .collect()
     }
 
-    pub(crate) fn mutation(&mut self) {
+    pub(super) fn mutation(&mut self) {
         let stop_swapper = &self.stop_swapper;
 
         let mutated_individuals: Vec<&mut Individual> = self
