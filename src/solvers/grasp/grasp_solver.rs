@@ -1,4 +1,4 @@
-use rand::seq::SliceRandom;
+use rand::{seq::SliceRandom, Rng};
 use rand::thread_rng;
 
 use crate::{
@@ -8,7 +8,8 @@ use crate::{
     solvers::solution::Solution,
 };
 
-pub struct GraspSolver {
+pub struct GraspSolver<'a, R: Rng + ?Sized> {
+    rng: &'a mut R,
     rcl_size: usize,
     pub solution: Solution,
     local_search: TwoOptSearcher,
@@ -17,15 +18,17 @@ pub struct GraspSolver {
     times_without_improvement: u8,
 }
 
-impl<'a> GraspSolver {
+impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
     pub fn new(
         rcl_size: usize,
         vehicles: Vec<Vehicle>,
         distances: &'a DistanceMatrix,
         max_improvement_times: u8,
         stops: Vec<Stop>,
-    ) -> GraspSolver {
-        GraspSolver {
+        rng: &'a mut R,
+    ) -> Self {
+        Self {
+            rng,
             rcl_size,
             max_improvement_times,
             solution: Solution::default(),
@@ -96,11 +99,11 @@ impl<'a> GraspSolver {
         }
     }
 
-    pub fn get_random_near_stop(&self, vehicle_id: u32) -> Option<&Stop> {
+    pub fn get_random_near_stop(&mut self, vehicle_id: u32) -> Option<&Stop> {
         let near_stops = self
             .route_service
             .get_k_nearest_stops(vehicle_id, self.rcl_size)?;
-        let chosen = *near_stops.choose(&mut thread_rng())?;
+        let chosen = *near_stops.choose(self.rng)?;
 
         Some(chosen)
     }
