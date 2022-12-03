@@ -11,7 +11,9 @@ use crate::{
 };
 
 use super::{
-    crossover::{order_crossover::OrderCrossover, offspring::Offspring}, individual::Individual, population::Population,
+    crossover::{offspring::Offspring, order_crossover::OrderCrossover},
+    individual::Individual,
+    population::Population,
 };
 
 pub struct GeneticSolver<'a, R: Rng + ?Sized> {

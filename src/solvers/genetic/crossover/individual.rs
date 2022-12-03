@@ -1,4 +1,4 @@
-use std::{cmp, collections::HashSet};
+use std::collections::HashSet;
 
 use rand::Rng;
 
@@ -10,7 +10,6 @@ use crate::{
 use super::parent_slice::ParentSlice;
 
 impl Individual {
-
     pub(super) fn drop_gene_duplicates(
         chromosome: &Chromosome,
         compare_set: &HashSet<Gene>,

@@ -1,13 +1,8 @@
-use std::collections::HashSet;
-
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::fixture;
 
-use crate::{
-    domain::stop::Stop,
-    solvers::genetic::{individual::Individual, population::Population},
-};
+use crate::solvers::genetic::{individual::Individual, population::Population};
 
 use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 

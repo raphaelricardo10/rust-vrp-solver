@@ -4,7 +4,8 @@ use crate::{
     services::distance::distance_service::DistanceService,
     solvers::genetic::{
         crossover::parent_slice::ParentSlice,
-        tests::fixtures::{individual_factory, IndividualFactory}, individual::Individual,
+        individual::Individual,
+        tests::fixtures::{individual_factory, IndividualFactory},
     },
     tests::fixtures::services_fixture::distance_service,
 };
