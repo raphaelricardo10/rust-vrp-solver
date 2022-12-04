@@ -1,5 +1,5 @@
 #[repr(C)]
-pub struct C_DistanceMatrixEntry{
+pub struct CDistanceMatrixEntry{
     pub from: u32,
     pub to: u32,
     pub distance: f64
