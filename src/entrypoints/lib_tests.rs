@@ -1,4 +1,9 @@
-use crate::domain::{stop::Stop, vehicle::Vehicle};
+use crate::{
+    domain::{stop::Stop, vehicle::Vehicle},
+    services::distance::distance_service::DistanceMatrix,
+};
+
+use super::c_interfaces::c_distance_matrix::C_DistanceMatrixEntry;
 
 #[no_mangle]
 pub extern "C" fn update_vehicle(mut vehicle: Vehicle) -> Vehicle {
@@ -29,12 +34,18 @@ pub unsafe extern "C" fn add_vehicle_to_array(
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn read_distance_matrix(distance_matrix: *mut f64, num_stops: usize, a: usize, b: usize) -> f64 {
-    let arr = ndarray::aview_mut1(unsafe {
-        std::slice::from_raw_parts_mut(distance_matrix, num_stops * num_stops)
-    })
-    .into_shape((num_stops, num_stops))
-    .unwrap();
+pub unsafe extern "C" fn read_distance_matrix(
+    distances_ptr: *mut C_DistanceMatrixEntry,
+    num_entries: usize,
+    a: u32,
+    b: u32,
+) -> f64 {
+    let distance_matrix: DistanceMatrix = unsafe {
+        std::slice::from_raw_parts(distances_ptr, num_entries)
+            .iter()
+            .map(|entry| ((entry.from, entry.to), entry.distance))
+            .collect()
+    };
 
-    arr[[a,b]]
+    *distance_matrix.get(&(a, b)).unwrap()
 }
