@@ -7,6 +7,7 @@ use crate::{
 };
 
 use super::{
+    arg_sizes::ArgSizes,
     c_interfaces::c_distance_matrix::CDistanceMatrixEntry,
     factories::{copy_result, distance_matrix_factory, vector_factory},
     parameters::GeneticAlgorithmParameters,
@@ -19,17 +20,17 @@ use super::{
 pub unsafe extern "C" fn genetic_solver(
     vehicles_ptr: *mut Vehicle,
     stops_ptr: *mut Stop,
-    parameters: GeneticAlgorithmParameters,
     distances_ptr: *mut CDistanceMatrixEntry,
-    len_distances: usize,
+    arg_sizes: ArgSizes,
+    parameters: GeneticAlgorithmParameters,
     result: *mut u32,
 ) {
     let mut rng = thread_rng();
 
-    let vehicles = unsafe { vector_factory(vehicles_ptr, parameters.number_of_routes) };
-    let stops = unsafe { vector_factory(stops_ptr, parameters.number_of_stops) };
+    let vehicles = unsafe { vector_factory(vehicles_ptr, arg_sizes.vehicles) };
+    let stops = unsafe { vector_factory(stops_ptr, arg_sizes.stops) };
 
-    let distances = unsafe { distance_matrix_factory(distances_ptr, len_distances) };
+    let distances = unsafe { distance_matrix_factory(distances_ptr, arg_sizes.distances) };
 
     let route_service = RouteService::new(vehicles, &distances, stops.clone());
 
