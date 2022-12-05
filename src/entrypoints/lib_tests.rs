@@ -2,7 +2,7 @@ use crate::domain::{stop::Stop, vehicle::Vehicle};
 
 use super::{
     c_interfaces::c_distance_matrix::CDistanceMatrixEntry,
-    factories::distance_matrix::distance_matrix,
+    factories::{copy_result, distance_matrix_factory, slice_factory},
 };
 
 #[no_mangle]
@@ -27,10 +27,11 @@ pub unsafe extern "C" fn add_vehicle_to_array(
     num_vehicles: usize,
     result: *mut Vehicle,
 ) {
-    let mut vehicles = unsafe { std::slice::from_raw_parts(vehicles_ptr, num_vehicles).to_vec() };
+    let mut vehicles = slice_factory(vehicles_ptr, num_vehicles);
 
     vehicles.push(Vehicle::new(3, 130));
-    std::ptr::copy_nonoverlapping(vehicles.as_ptr(), result, vehicles.len());
+
+    copy_result(vehicles, result);
 }
 
 #[no_mangle]
@@ -40,7 +41,7 @@ pub unsafe extern "C" fn read_distance_matrix(
     a: u32,
     b: u32,
 ) -> f64 {
-    let distance_matrix = distance_matrix(distances_ptr, num_entries);
+    let distance_matrix = distance_matrix_factory(distances_ptr, num_entries);
 
     *distance_matrix.get(&(a, b)).unwrap()
 }
