@@ -14,7 +14,7 @@ pub unsafe fn distance_matrix_factory(
         .collect()
 }
 
-pub unsafe fn slice_factory<T: Clone>(ptr: *mut T, len: usize) -> Vec<T> {
+pub unsafe fn vector_factory<T: Clone>(ptr: *mut T, len: usize) -> Vec<T> {
     slice::from_raw_parts(ptr, len).to_vec()
 }
 

@@ -2,7 +2,7 @@ use crate::domain::{stop::Stop, vehicle::Vehicle};
 
 use super::{
     c_interfaces::c_distance_matrix::CDistanceMatrixEntry,
-    factories::{copy_result, distance_matrix_factory, slice_factory},
+    factories::{copy_result, distance_matrix_factory, vector_factory},
 };
 
 #[no_mangle]
@@ -27,7 +27,7 @@ pub unsafe extern "C" fn add_vehicle_to_array(
     num_vehicles: usize,
     result: *mut Vehicle,
 ) {
-    let mut vehicles = slice_factory(vehicles_ptr, num_vehicles);
+    let mut vehicles = vector_factory(vehicles_ptr, num_vehicles);
 
     vehicles.push(Vehicle::new(3, 130));
 
