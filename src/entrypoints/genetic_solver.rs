@@ -27,10 +27,10 @@ pub unsafe extern "C" fn genetic_solver(
 ) {
     let mut rng = thread_rng();
 
-    let vehicles = unsafe { vector_factory(vehicles_ptr, arg_sizes.vehicles) };
-    let stops = unsafe { vector_factory(stops_ptr, arg_sizes.stops) };
+    let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
+    let stops = vector_factory(stops_ptr, arg_sizes.stops);
 
-    let distances = unsafe { distance_matrix_factory(distances_ptr, arg_sizes.distances) };
+    let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
 
     let route_service = RouteService::new(vehicles, &distances, stops.clone());
 
