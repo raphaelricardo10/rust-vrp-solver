@@ -76,7 +76,7 @@ impl ParentSlice {
         &self,
         chromosome: Chromosome,
         distance_service: &DistanceService,
-    ) -> Chromosome {
+    ) -> Option<Chromosome> {
         let mut offspring_chromosome = Chromosome::new(chromosome.vehicle);
 
         offspring_chromosome
@@ -87,7 +87,7 @@ impl ParentSlice {
             Individual::drop_gene_duplicates(&chromosome, &self.gene_set);
 
         if unrepeated_genes.len() == 2 {
-            return offspring_chromosome;
+            return Some(offspring_chromosome);
         }
 
         unrepeated_genes
@@ -100,10 +100,9 @@ impl ParentSlice {
                         .unwrap(),
                 )
             })
-            .for_each(|(gene, distance)| {
-                offspring_chromosome.add_stop(gene, distance).unwrap();
-            });
+            .try_for_each(|(gene, distance)| offspring_chromosome.add_stop(gene, distance))
+            .ok()?;
 
-        offspring_chromosome
+        Some(offspring_chromosome)
     }
 }

@@ -66,7 +66,9 @@ impl Individual {
         let mut offspring_chromosomes: Vec<Chromosome> = Vec::new();
 
         for chromosome in parent.chromosomes {
-            offspring_chromosomes.push(parent_slice.merge_into(chromosome, distance_service));
+            let merged_chromosome = parent_slice.merge_into(chromosome, distance_service)?;
+            
+            offspring_chromosomes.push(merged_chromosome);
         }
 
         let mut offspring = Individual::new(offspring_chromosomes);
