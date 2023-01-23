@@ -6,12 +6,12 @@ use crate::{
     solvers::genetic::genetic_solver::GeneticSolver,
 };
 
-use super::{
-    abi::abi_distance_matrix::ABIDistanceMatrixEntry,
-    arg_sizes::ArgSizes,
-    factories::{copy_result, distance_matrix_factory, vector_factory},
+use super::abi::{
+    abi_distance_matrix::ABIDistanceMatrixEntry, arg_sizes::ArgSizes,
     parameters::GeneticAlgorithmParameters,
 };
+
+use super::factories::{copy_result, distance_matrix_factory, vector_factory};
 
 /// # Safety
 ///
