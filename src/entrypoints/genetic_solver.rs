@@ -15,7 +15,8 @@ use super::factories::{copy_result, distance_matrix_factory, vector_factory};
 
 /// # Safety
 ///
-/// Make sure that all the size are consistent.
+/// Make sure that all the values in arg_sizes are consistent
+/// with the input pointers.
 #[no_mangle]
 pub unsafe extern "C" fn genetic_solver(
     vehicles_ptr: *mut Vehicle,
