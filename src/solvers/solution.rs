@@ -2,11 +2,14 @@ use std::collections::HashMap;
 
 use crate::services::route::route_service::RouteMap;
 
-type Result = HashMap<u32, Vec<u32>>;
+type VehicleId = u32;
+type StopIds = Vec<u32>;
+
+type Result = HashMap<VehicleId, StopIds>;
 
 pub struct Solution {
     pub total_distance: f64,
-    pub result: HashMap<u32, Vec<u32>>,
+    pub result: Result,
 }
 
 impl Default for Solution {
@@ -29,7 +32,7 @@ impl Solution {
     fn map_result(routes: &RouteMap) -> Result {
         routes
             .iter()
-            .map(|(vehicle_id, route)| -> (u32, Vec<u32>) {
+            .map(|(vehicle_id, route)| -> (VehicleId, StopIds) {
                 (
                     *vehicle_id,
                     route.stops.iter().map(|stop| stop.id).collect(),
