@@ -7,8 +7,8 @@ use crate::{
 };
 
 use super::{
+    abi::abi_distance_matrix::ABIDistanceMatrixEntry,
     arg_sizes::ArgSizes,
-    c_interfaces::c_distance_matrix::CDistanceMatrixEntry,
     factories::{copy_result, distance_matrix_factory, vector_factory},
     parameters::GeneticAlgorithmParameters,
 };
@@ -20,7 +20,7 @@ use super::{
 pub unsafe extern "C" fn genetic_solver(
     vehicles_ptr: *mut Vehicle,
     stops_ptr: *mut Stop,
-    distances_ptr: *mut CDistanceMatrixEntry,
+    distances_ptr: *mut ABIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
     parameters: GeneticAlgorithmParameters,
     result: *mut u32,
