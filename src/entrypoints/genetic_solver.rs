@@ -7,7 +7,7 @@ use crate::{
 };
 
 use super::abi::{
-    distance_matrix::ABIDistanceMatrixEntry, arg_sizes::ArgSizes,
+    arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
     parameters::GeneticAlgorithmParameters,
 };
 

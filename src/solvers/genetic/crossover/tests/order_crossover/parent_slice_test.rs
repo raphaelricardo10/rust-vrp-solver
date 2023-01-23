@@ -59,7 +59,9 @@ fn test_can_generate_offspring_chromosome(
     let (_, parent1_slice) = parent_slice_factory(2);
     let parent2 = individual_factory(1);
 
-    let chromosome = parent1_slice.merge_into(parent2.chromosomes[0].clone(), &distance_service).unwrap();
+    let chromosome = parent1_slice
+        .merge_into(parent2.chromosomes[0].clone(), &distance_service)
+        .unwrap();
 
     assert_eq!(chromosome.stops.len(), 3);
 }
@@ -73,7 +75,9 @@ fn test_can_generate_offspring_dropping_all_genes(
     let (_, parent1_slice) = parent_slice_factory(3);
     let parent2 = individual_factory(1);
 
-    let chromosome = parent1_slice.merge_into(parent2.chromosomes[0].clone(), &distance_service).unwrap();
+    let chromosome = parent1_slice
+        .merge_into(parent2.chromosomes[0].clone(), &distance_service)
+        .unwrap();
 
     assert_eq!(chromosome.stops.len(), 1);
 }

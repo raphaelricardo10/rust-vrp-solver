@@ -67,7 +67,7 @@ impl Individual {
 
         for chromosome in parent.chromosomes {
             let merged_chromosome = parent_slice.merge_into(chromosome, distance_service)?;
-            
+
             offspring_chromosomes.push(merged_chromosome);
         }
 

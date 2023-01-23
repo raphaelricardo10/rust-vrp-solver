@@ -1,4 +1,4 @@
-pub mod genetic_solver;
 mod abi;
-mod lib_tests;
 mod factories;
+pub mod genetic_solver;
+mod lib_tests;
