@@ -1,7 +1,7 @@
 use crate::domain::{stop::Stop, vehicle::Vehicle};
 
 use super::{
-    abi::abi_distance_matrix::ABIDistanceMatrixEntry,
+    abi::distance_matrix::ABIDistanceMatrixEntry,
     factories::{copy_result, distance_matrix_factory, vector_factory},
 };
 
