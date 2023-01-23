@@ -8,7 +8,7 @@ use crate::{
 
 use super::abi::{
     arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
-    parameters::GeneticAlgorithmParameters,
+    parameters::GeneticAlgorithmParameters, route::ABIRoute,
 };
 
 use super::factories::{copy_result, distance_matrix_factory, vector_factory};
@@ -24,7 +24,7 @@ pub unsafe extern "C" fn genetic_solver(
     distances_ptr: *mut ABIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
     parameters: GeneticAlgorithmParameters,
-    result: *mut u32,
+    result: *mut ABIRoute,
 ) {
     let mut rng = thread_rng();
 
@@ -49,8 +49,15 @@ pub unsafe extern "C" fn genetic_solver(
 
     genetic_solver.solve();
 
-    copy_result(
-        genetic_solver.solution.result.get(&0).unwrap().to_vec(),
-        result,
-    );
+    genetic_solver
+        .solution
+        .result
+        .into_iter()
+        .enumerate()
+        .for_each(|(index, (vehicle_id, stop_ids))| {
+            let route = &mut *result.offset(index.try_into().unwrap());
+
+            route.vehicle_id = vehicle_id;
+            copy_result(stop_ids, route.stop_ids)
+        });
 }
