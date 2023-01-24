@@ -1,4 +1,4 @@
-use crate::{services::route::route_service::RouteMap};
+use crate::services::route::route_service::RouteMap;
 
 pub struct Solution {
     pub routes: RouteMap,
