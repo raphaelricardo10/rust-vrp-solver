@@ -28,6 +28,7 @@ fn test_genetic_algorithm_can_generate_a_good_route(
         0.05,
         10,
         5,
+        0.2,
         route_service,
         &mut rng,
     );

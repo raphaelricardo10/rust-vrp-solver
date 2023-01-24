@@ -2,6 +2,7 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 
 use crate::{
     domain::stop::Stop,
+    local_search::two_opt::TwoOptSearcher,
     services::{
         distance::distance_service::DistanceMatrix,
         route::route_service::{RouteMap, RouteService},
@@ -26,6 +27,8 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     pub solution: Solution,
     best: Individual,
     crossover_op: OrderCrossover,
+    local_search: TwoOptSearcher,
+    local_search_rate: f64,
     rng: &'a mut R,
 }
 
@@ -39,10 +42,12 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         mutation_rate: f64,
         max_crossover_tries: u8,
         max_generations: u32,
+        local_search_rate: f64,
         mut route_service: RouteService,
         rng: &'a mut R,
     ) -> Self {
-        let stop_swapper = StopSwapper::new(stops, distances);
+        let stop_swapper = StopSwapper::new(stops.clone(), distances);
+        let local_search = TwoOptSearcher::new(stops, distances);
         let crossover_op = OrderCrossover::new(max_crossover_tries);
         let population = Population::from_random(population_size, rng, &mut route_service);
 
@@ -52,8 +57,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             population,
             crossover_op,
             stop_swapper,
+            local_search,
             mutation_rate,
             max_generations,
+            local_search_rate,
             best: Default::default(),
             solution: Default::default(),
             current_generation: Default::default(),
@@ -101,6 +108,21 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         Some((offspring1.individual, offspring2.individual))
     }
 
+    pub(super) fn apply_local_search(&mut self) {
+        let selected_individuals: Vec<&mut Individual> = self
+            .population
+            .individuals
+            .iter_mut()
+            .filter(|_| self.rng.gen_bool(self.local_search_rate))
+            .collect();
+
+        for individual in selected_individuals {
+            for chromosome in individual.chromosomes.iter_mut() {
+                self.local_search.run(chromosome);
+            }
+        }
+    }
+
     fn stop_condition_met(&self) -> bool {
         self.current_generation >= self.max_generations
     }
@@ -135,6 +157,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             }
 
             self.mutation();
+            self.apply_local_search();
 
             self.current_generation += 1;
         }

@@ -43,6 +43,7 @@ pub unsafe extern "C" fn genetic_solver(
         parameters.mutation_rate,
         parameters.max_crossover_tries,
         parameters.max_generations,
+        0.2,
         route_service,
         &mut rng,
     );
