@@ -34,8 +34,8 @@ fn test_genetic_algorithm_can_generate_a_good_route(
 
     solver.solve();
 
-    let solution_v1 = solver.solution.result.get(&0).unwrap();
-    let solution_v2 = solver.solution.result.get(&1).unwrap();
+    let solution_v1 = &solver.solution.routes.get(&0).unwrap().stops;
+    let solution_v2 = &solver.solution.routes.get(&1).unwrap().stops;
 
     assert_ne!(solution_v1.len(), 0);
     assert_ne!(solution_v2.len(), 0);

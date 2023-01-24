@@ -51,13 +51,15 @@ pub unsafe extern "C" fn genetic_solver(
 
     genetic_solver
         .solution
-        .result
+        .routes
         .into_iter()
         .enumerate()
-        .for_each(|(index, (vehicle_id, stop_ids))| {
+        .for_each(|(index, (vehicle_id, solution))| {
             let route = &mut *result.offset(index.try_into().unwrap());
 
             route.vehicle_id = vehicle_id;
+            let stop_ids = solution.stops.iter().map(|stop| stop.id).collect();
+
             copy_result(stop_ids, route.stop_ids)
         });
 }
