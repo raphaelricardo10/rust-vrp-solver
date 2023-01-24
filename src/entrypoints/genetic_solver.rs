@@ -58,6 +58,7 @@ pub unsafe extern "C" fn genetic_solver(
             let route = &mut *result.offset(index.try_into().unwrap());
 
             route.vehicle_id = vehicle_id;
+            route.number_of_stops = stop_ids.len();
             copy_result(stop_ids, route.stop_ids)
         });
 }
