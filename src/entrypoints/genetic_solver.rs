@@ -59,7 +59,9 @@ pub unsafe extern "C" fn genetic_solver(
 
             route.vehicle_id = vehicle_id;
             route.total_distance = solution.total_distance();
-            let stop_ids = solution.stops.iter().map(|stop| stop.id).collect();
+            let stop_ids: Vec<u32> = solution.stops.iter().map(|stop| stop.id).collect();
+
+            route.number_of_stops = stop_ids.len();
 
             copy_result(stop_ids, route.stop_ids)
         });
