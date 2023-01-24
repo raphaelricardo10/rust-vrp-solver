@@ -58,6 +58,7 @@ pub unsafe extern "C" fn genetic_solver(
             let route = &mut *result.offset(index.try_into().unwrap());
 
             route.vehicle_id = vehicle_id;
+            route.total_distance = solution.total_distance();
             let stop_ids = solution.stops.iter().map(|stop| stop.id).collect();
 
             copy_result(stop_ids, route.stop_ids)
