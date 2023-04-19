@@ -50,8 +50,7 @@ impl TwoOptSearcher {
                     None => continue,
                 };
 
-            let base_index = path.current.index;
-            route.swap_stops(base_index, swap_candidate_index, distance_change);
+            route.swap_stops(stop_index, swap_candidate_index, distance_change);
         }
 
         Some(())
