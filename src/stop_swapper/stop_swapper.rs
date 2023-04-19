@@ -24,7 +24,7 @@ impl StopSwapper {
             return true;
         }
 
-        if neighborhood1.prev.index == neighborhood2.current.index {
+        if neighborhood1.previous.index == neighborhood2.current.index {
             return true;
         }
 
@@ -37,7 +37,7 @@ impl StopSwapper {
         distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
         let swapped_neighborhood_1 = Neighborhood::new(
-            neighborhood1.prev,
+            neighborhood1.previous,
             neighborhood2.current,
             neighborhood1.next,
             distance_service,
@@ -45,7 +45,7 @@ impl StopSwapper {
         .unwrap();
 
         let swapped_neighborhood_2 = Neighborhood::new(
-            neighborhood2.prev,
+            neighborhood2.previous,
             neighborhood1.current,
             neighborhood2.next,
             distance_service,
@@ -60,12 +60,12 @@ impl StopSwapper {
         mut neighborhood2: &'a Neighborhood<'a>,
         distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
-        if neighborhood1.prev.stop.id == neighborhood2.current.stop.id {
+        if neighborhood1.previous.stop.id == neighborhood2.current.stop.id {
             std::mem::swap(&mut neighborhood1, &mut neighborhood2);
         }
 
         let swapped_neighborhood_1 = Neighborhood::new(
-            neighborhood1.prev,
+            neighborhood1.previous,
             neighborhood2.current,
             neighborhood1.current,
             distance_service,

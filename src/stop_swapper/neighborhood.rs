@@ -4,7 +4,7 @@ use super::neighbor::Neighbor;
 
 #[derive(Copy, Clone)]
 pub(crate) struct Neighborhood<'a> {
-    pub(crate) prev: Neighbor<'a>,
+    pub(crate) previous: Neighbor<'a>,
     pub(crate) current: Neighbor<'a>,
     pub(crate) next: Neighbor<'a>,
     pub(crate) cost: f64,
@@ -12,13 +12,13 @@ pub(crate) struct Neighborhood<'a> {
 
 impl<'a> Neighborhood<'a> {
     pub(crate) fn new(
-        prev: Neighbor<'a>,
+        previous: Neighbor<'a>,
         current: Neighbor<'a>,
         next: Neighbor<'a>,
         distance_service: &DistanceService,
     ) -> Option<Neighborhood<'a>> {
         let mut neighborhood = Neighborhood {
-            prev,
+            previous,
             current,
             next,
             cost: 0.0,
@@ -44,7 +44,7 @@ impl<'a> Neighborhood<'a> {
 
     fn calculate_cost(&self, distance_service: &DistanceService) -> Option<f64> {
         Some(
-            distance_service.get_distance(self.prev.stop, self.current.stop)?
+            distance_service.get_distance(self.previous.stop, self.current.stop)?
                 + distance_service.get_distance(self.current.stop, self.next.stop)?,
         )
     }
