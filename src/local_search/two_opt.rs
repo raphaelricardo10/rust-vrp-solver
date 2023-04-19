@@ -1,7 +1,7 @@
 use crate::{
     domain::{route::Route, stop::Stop},
     services::distance::distance_service::DistanceMatrix,
-    stop_swapper::{path::Neighborhood, StopSwapper},
+    stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
 pub struct TwoOptSearcher {

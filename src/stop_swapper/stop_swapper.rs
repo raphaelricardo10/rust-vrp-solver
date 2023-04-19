@@ -3,7 +3,7 @@ use crate::{
     services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
-use super::path::Neighborhood;
+use super::neighborhood::Neighborhood;
 
 pub(crate) struct StopSwapper {
     pub(crate) distance_service: DistanceService,

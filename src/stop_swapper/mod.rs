@@ -1,5 +1,5 @@
-pub(crate) mod path;
-pub(crate) mod path_node;
+pub(crate) mod neighborhood;
+pub(crate) mod neighbor;
 
 #[allow(clippy::module_inception)]
 mod stop_swapper;

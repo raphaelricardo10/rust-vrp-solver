@@ -6,7 +6,7 @@ use rstest::fixture;
 
 use crate::{
     domain::stop::Stop, services::distance::distance_service::DistanceService,
-    stop_swapper::path::Neighborhood,
+    stop_swapper::neighborhood::Neighborhood,
 };
 
 use super::{services_fixture::distance_service, stops_fixture::stops_with_crossings};

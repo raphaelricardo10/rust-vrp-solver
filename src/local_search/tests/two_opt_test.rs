@@ -1,4 +1,4 @@
-use crate::stop_swapper::path::Neighborhood;
+use crate::stop_swapper::neighborhood::Neighborhood;
 use crate::{
     local_search::two_opt::TwoOptSearcher, services::distance::distance_service::DistanceService,
 };

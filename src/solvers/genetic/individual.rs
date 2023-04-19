@@ -3,7 +3,7 @@ use rand::{seq::IteratorRandom, thread_rng, Rng};
 use crate::{
     domain::{route::Route, stop::Stop},
     services::route::route_service::RouteService,
-    stop_swapper::{path::Neighborhood, StopSwapper},
+    stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
 pub(super) type Gene = Stop;

@@ -1,6 +1,6 @@
 use crate::{domain::stop::Stop, services::distance::distance_service::DistanceService};
 
-use super::path_node::Neighbor;
+use super::neighbor::Neighbor;
 
 #[derive(Copy, Clone)]
 pub(crate) struct Neighborhood<'a> {
