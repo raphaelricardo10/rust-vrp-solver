@@ -1,4 +1,4 @@
-use crate::stop_swapper::path::Path;
+use crate::stop_swapper::path::Neighborhood;
 use crate::{
     local_search::two_opt::TwoOptSearcher, services::distance::distance_service::DistanceService,
 };
@@ -16,7 +16,7 @@ fn can_calculate_insertion_cost(
     distance_service: DistanceService,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let path = Path::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
+    let path = Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
 
     assert_eq!(path.cost, 8.0);
 }

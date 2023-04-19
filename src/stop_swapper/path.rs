@@ -3,21 +3,21 @@ use crate::{domain::stop::Stop, services::distance::distance_service::DistanceSe
 use super::path_node::PathNode;
 
 #[derive(Copy, Clone)]
-pub(crate) struct Path<'a> {
+pub(crate) struct Neighborhood<'a> {
     pub(crate) prev: PathNode<'a>,
     pub(crate) current: PathNode<'a>,
     pub(crate) next: PathNode<'a>,
     pub(crate) cost: f64,
 }
 
-impl<'a> Path<'a> {
+impl<'a> Neighborhood<'a> {
     pub(crate) fn new(
         prev: PathNode<'a>,
         current: PathNode<'a>,
         next: PathNode<'a>,
         distance_service: &DistanceService,
-    ) -> Option<Path<'a>> {
-        let mut path = Path {
+    ) -> Option<Neighborhood<'a>> {
+        let mut path = Neighborhood {
             prev,
             current,
             next,
@@ -33,7 +33,7 @@ impl<'a> Path<'a> {
         stops: &'a [Stop],
         stop_index: usize,
         distance_service: &DistanceService,
-    ) -> Option<Path<'a>> {
+    ) -> Option<Neighborhood<'a>> {
         Self::new(
             PathNode::new(stop_index - 1, &stops[stop_index - 1]),
             PathNode::new(stop_index, &stops[stop_index]),

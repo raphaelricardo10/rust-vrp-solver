@@ -3,7 +3,7 @@ use rand::{seq::IteratorRandom, thread_rng, Rng};
 use crate::{
     domain::{route::Route, stop::Stop},
     services::route::route_service::RouteService,
-    stop_swapper::{path::Path, StopSwapper},
+    stop_swapper::{path::Neighborhood, StopSwapper},
 };
 
 pub(super) type Gene = Stop;
@@ -184,13 +184,13 @@ impl Individual {
     {
         let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng)?;
 
-        let path1 = Path::from_stop_index(
+        let path1 = Neighborhood::from_stop_index(
             &self.chromosomes.get(address1.0)?.stops,
             address1.1,
             &stop_swapper.distance_service,
         )?;
 
-        let path2 = Path::from_stop_index(
+        let path2 = Neighborhood::from_stop_index(
             &self.chromosomes.get(address2.0)?.stops,
             address2.1,
             &stop_swapper.distance_service,

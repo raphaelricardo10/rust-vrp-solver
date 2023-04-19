@@ -6,7 +6,7 @@ use rstest::fixture;
 
 use crate::{
     domain::stop::Stop, services::distance::distance_service::DistanceService,
-    stop_swapper::path::Path,
+    stop_swapper::path::Neighborhood,
 };
 
 use super::{services_fixture::distance_service, stops_fixture::stops_with_crossings};
@@ -25,8 +25,8 @@ impl<'a> PathFactory {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn make_path(&'a self, stop_index: usize) -> Option<Path<'a>> {
-        Path::from_stop_index(&self.stops, stop_index, &self.distance_service)
+    pub(crate) fn make_path(&'a self, stop_index: usize) -> Option<Neighborhood<'a>> {
+        Neighborhood::from_stop_index(&self.stops, stop_index, &self.distance_service)
     }
 }
 
