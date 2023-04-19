@@ -31,7 +31,7 @@ impl StopSwapper {
     fn swap_non_consecutive_paths<'a>(
         path1: &'a Neighborhood<'a>,
         path2: &'a Neighborhood<'a>,
-        distance_service: &'a DistanceService,
+        distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
         let swapped_path_1 =
             Neighborhood::new(path1.prev, path2.current, path1.next, distance_service).unwrap();
@@ -45,7 +45,7 @@ impl StopSwapper {
     fn swap_consecutive_paths<'a>(
         mut path1: &'a Neighborhood<'a>,
         mut path2: &'a Neighborhood<'a>,
-        distance_service: &'a DistanceService,
+        distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
         if path1.prev.stop.id == path2.current.stop.id {
             std::mem::swap(&mut path1, &mut path2);
