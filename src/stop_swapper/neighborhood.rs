@@ -17,16 +17,16 @@ impl<'a> Neighborhood<'a> {
         next: Neighbor<'a>,
         distance_service: &DistanceService,
     ) -> Option<Neighborhood<'a>> {
-        let mut path = Neighborhood {
+        let mut neighborhood = Neighborhood {
             prev,
             current,
             next,
             cost: 0.0,
         };
 
-        path.cost = path.calculate_cost(distance_service)?;
+        neighborhood.cost = neighborhood.calculate_cost(distance_service)?;
 
-        Some(path)
+        Some(neighborhood)
     }
 
     pub(crate) fn from_stop_index(

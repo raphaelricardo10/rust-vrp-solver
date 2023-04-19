@@ -11,12 +11,12 @@ use crate::{
 
 use super::{services_fixture::distance_service, stops_fixture::stops_with_crossings};
 
-pub struct PathFactory {
+pub struct NeighborhoodFactory {
     pub stops: Vec<Stop>,
     pub distance_service: DistanceService,
 }
 
-impl<'a> PathFactory {
+impl<'a> NeighborhoodFactory {
     fn new(stops: Vec<Stop>, distance_service: DistanceService) -> Self {
         Self {
             stops,
@@ -25,17 +25,17 @@ impl<'a> PathFactory {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn make_path(&'a self, stop_index: usize) -> Option<Neighborhood<'a>> {
+    pub(crate) fn make_neighborhood(&'a self, stop_index: usize) -> Option<Neighborhood<'a>> {
         Neighborhood::from_stop_index(&self.stops, stop_index, &self.distance_service)
     }
 }
 
 #[fixture]
-pub fn path_factory(
+pub fn neighborhood_factory(
     stops_with_crossings: Vec<Stop>,
     distance_service: DistanceService,
-) -> PathFactory {
-    PathFactory::new(stops_with_crossings, distance_service)
+) -> NeighborhoodFactory {
+    NeighborhoodFactory::new(stops_with_crossings, distance_service)
 }
 
 #[fixture]

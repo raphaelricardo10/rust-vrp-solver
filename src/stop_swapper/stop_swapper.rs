@@ -16,78 +16,113 @@ impl StopSwapper {
         }
     }
 
-    fn are_paths_consecutive(path1: &Neighborhood, path2: &Neighborhood) -> bool {
-        if path1.next.index == path2.current.index {
+    fn are_neighborhoods_consecutive(
+        neighborhood1: &Neighborhood,
+        neighborhood2: &Neighborhood,
+    ) -> bool {
+        if neighborhood1.next.index == neighborhood2.current.index {
             return true;
         }
 
-        if path1.prev.index == path2.current.index {
+        if neighborhood1.prev.index == neighborhood2.current.index {
             return true;
         }
 
         false
     }
 
-    fn swap_non_consecutive_paths<'a>(
-        path1: &'a Neighborhood<'a>,
-        path2: &'a Neighborhood<'a>,
+    fn swap_non_consecutive_neighborhoods<'a>(
+        neighborhood1: &'a Neighborhood<'a>,
+        neighborhood2: &'a Neighborhood<'a>,
         distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
-        let swapped_path_1 =
-            Neighborhood::new(path1.prev, path2.current, path1.next, distance_service).unwrap();
+        let swapped_neighborhood_1 = Neighborhood::new(
+            neighborhood1.prev,
+            neighborhood2.current,
+            neighborhood1.next,
+            distance_service,
+        )
+        .unwrap();
 
-        let swapped_path_2 =
-            Neighborhood::new(path2.prev, path1.current, path2.next, distance_service).unwrap();
+        let swapped_neighborhood_2 = Neighborhood::new(
+            neighborhood2.prev,
+            neighborhood1.current,
+            neighborhood2.next,
+            distance_service,
+        )
+        .unwrap();
 
-        (swapped_path_1, swapped_path_2)
+        (swapped_neighborhood_1, swapped_neighborhood_2)
     }
 
-    fn swap_consecutive_paths<'a>(
-        mut path1: &'a Neighborhood<'a>,
-        mut path2: &'a Neighborhood<'a>,
+    fn swap_consecutive_neighborhoods<'a>(
+        mut neighborhood1: &'a Neighborhood<'a>,
+        mut neighborhood2: &'a Neighborhood<'a>,
         distance_service: &DistanceService,
     ) -> (Neighborhood<'a>, Neighborhood<'a>) {
-        if path1.prev.stop.id == path2.current.stop.id {
-            std::mem::swap(&mut path1, &mut path2);
+        if neighborhood1.prev.stop.id == neighborhood2.current.stop.id {
+            std::mem::swap(&mut neighborhood1, &mut neighborhood2);
         }
 
-        let swapped_path_1 =
-            Neighborhood::new(path1.prev, path2.current, path1.current, distance_service).unwrap();
+        let swapped_neighborhood_1 = Neighborhood::new(
+            neighborhood1.prev,
+            neighborhood2.current,
+            neighborhood1.current,
+            distance_service,
+        )
+        .unwrap();
 
-        let swapped_path_2 =
-            Neighborhood::new(path2.current, path1.current, path2.next, distance_service).unwrap();
+        let swapped_neighborhood_2 = Neighborhood::new(
+            neighborhood2.current,
+            neighborhood1.current,
+            neighborhood2.next,
+            distance_service,
+        )
+        .unwrap();
 
-        (swapped_path_1, swapped_path_2)
+        (swapped_neighborhood_1, swapped_neighborhood_2)
     }
 
-    pub(crate) fn calculate_swap_cost(&self, path1: &Neighborhood, path2: &Neighborhood) -> f64 {
-        let (swapped_path1, swapped_path2);
+    pub(crate) fn calculate_swap_cost(
+        &self,
+        neighborhood1: &Neighborhood,
+        neighborhood2: &Neighborhood,
+    ) -> f64 {
+        let (swapped_neighborhood1, swapped_neighborhood2);
 
-        if Self::are_paths_consecutive(path1, path2) {
-            (swapped_path1, swapped_path2) =
-                Self::swap_consecutive_paths(path1, path2, &self.distance_service);
+        if Self::are_neighborhoods_consecutive(neighborhood1, neighborhood2) {
+            (swapped_neighborhood1, swapped_neighborhood2) = Self::swap_consecutive_neighborhoods(
+                neighborhood1,
+                neighborhood2,
+                &self.distance_service,
+            );
         } else {
-            (swapped_path1, swapped_path2) =
-                Self::swap_non_consecutive_paths(path1, path2, &self.distance_service);
+            (swapped_neighborhood1, swapped_neighborhood2) =
+                Self::swap_non_consecutive_neighborhoods(
+                    neighborhood1,
+                    neighborhood2,
+                    &self.distance_service,
+                );
         }
 
-        (swapped_path1.cost + swapped_path2.cost) - (path1.cost + path2.cost)
+        (swapped_neighborhood1.cost + swapped_neighborhood2.cost)
+            - (neighborhood1.cost + neighborhood2.cost)
     }
 
     pub(crate) fn get_minimum_swap_cost(
         &self,
-        path: &Neighborhood,
+        neighborhood: &Neighborhood,
         stops: &Vec<Stop>,
     ) -> Option<(usize, f64)> {
         stops[..stops.len() - 1]
             .iter()
             .enumerate()
-            .skip(path.next.index + 1)
+            .skip(neighborhood.next.index + 1)
             .map(|(stop_index, _)| {
                 (
                     stop_index,
                     self.calculate_swap_cost(
-                        path,
+                        neighborhood,
                         &Neighborhood::from_stop_index(stops, stop_index, &self.distance_service)
                             .unwrap(),
                     ),

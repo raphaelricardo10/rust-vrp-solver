@@ -16,9 +16,10 @@ fn can_calculate_insertion_cost(
     distance_service: DistanceService,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let path = Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
+    let neighborhood =
+        Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
 
-    assert_eq!(path.cost, 8.0);
+    assert_eq!(neighborhood.cost, 8.0);
 }
 
 #[rstest]

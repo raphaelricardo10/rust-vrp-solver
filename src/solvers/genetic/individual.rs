@@ -184,19 +184,19 @@ impl Individual {
     {
         let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng)?;
 
-        let path1 = Neighborhood::from_stop_index(
+        let neighborhood1 = Neighborhood::from_stop_index(
             &self.chromosomes.get(address1.0)?.stops,
             address1.1,
             &stop_swapper.distance_service,
         )?;
 
-        let path2 = Neighborhood::from_stop_index(
+        let neighborhood2 = Neighborhood::from_stop_index(
             &self.chromosomes.get(address2.0)?.stops,
             address2.1,
             &stop_swapper.distance_service,
         )?;
 
-        let swap_cost = stop_swapper.calculate_swap_cost(&path1, &path2);
+        let swap_cost = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
 
         self.swap_genes(address1, address2, swap_cost);
 

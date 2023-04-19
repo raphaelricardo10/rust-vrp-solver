@@ -19,9 +19,14 @@ impl TwoOptSearcher {
         swap_cost < 0.0
     }
 
-    fn find_improvements(&self, stops: &Vec<Stop>, path: &Neighborhood) -> Option<(usize, f64)> {
-        let (swap_candidate_index, swap_cost) =
-            self.stop_swapper.get_minimum_swap_cost(path, stops)?;
+    fn find_improvements(
+        &self,
+        stops: &Vec<Stop>,
+        neighborhood: &Neighborhood,
+    ) -> Option<(usize, f64)> {
+        let (swap_candidate_index, swap_cost) = self
+            .stop_swapper
+            .get_minimum_swap_cost(neighborhood, stops)?;
 
         let swap_candidate = Neighborhood::from_stop_index(
             stops,
@@ -38,14 +43,14 @@ impl TwoOptSearcher {
 
     pub fn run(&self, route: &mut Route) -> Option<()> {
         for stop_index in 1..route.stops.len() - 1 {
-            let path = Neighborhood::from_stop_index(
+            let neighborhood = Neighborhood::from_stop_index(
                 &route.stops,
                 stop_index,
                 &self.stop_swapper.distance_service,
             )?;
 
             let (swap_candidate_index, distance_change) =
-                match self.find_improvements(&route.stops, &path) {
+                match self.find_improvements(&route.stops, &neighborhood) {
                     Some(candidate_index) => candidate_index,
                     None => continue,
                 };
