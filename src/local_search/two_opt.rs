@@ -44,14 +44,14 @@ impl TwoOptSearcher {
                 &self.stop_swapper.distance_service,
             )?;
 
-            let (swap_candidate_index, swap_cost) =
+            let (swap_candidate_index, distance_change) =
                 match self.find_improvements(&route.stops, &path) {
                     Some(candidate_index) => candidate_index,
                     None => continue,
                 };
 
             let base_index = path.current.index;
-            route.swap_stops(base_index, swap_candidate_index, swap_cost);
+            route.swap_stops(base_index, swap_candidate_index, distance_change);
         }
 
         Some(())
