@@ -93,7 +93,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
                 .assign_stop_to_route(*vehicle_id, stop_id)
                 .unwrap();
 
-            let route = self.route_service.get_route_mut(*vehicle_id).unwrap();
+            let route = self.route_service.get_route_mut(*vehicle_id);
             self.local_search.run(route);
         }
     }
@@ -109,7 +109,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
 
     fn run_local_search(&mut self, vehicle_ids: &Vec<u32>) {
         for vehicle_id in vehicle_ids {
-            let route = self.route_service.get_route_mut(*vehicle_id).unwrap();
+            let route = self.route_service.get_route_mut(*vehicle_id);
 
             self.local_search.run(route);
         }

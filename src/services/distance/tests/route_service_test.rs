@@ -17,7 +17,7 @@ fn can_assign_stop_to_route(route_service_factory: RouteServiceFactory) {
 
     route_service.assign_stop_to_route(0, 0).unwrap();
 
-    assert_eq!(route_service.get_route(0).unwrap().stops.len(), 1)
+    assert_eq!(route_service.get_route(0).stops.len(), 1)
 }
 
 #[rstest]

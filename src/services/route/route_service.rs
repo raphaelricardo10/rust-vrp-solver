@@ -63,12 +63,16 @@ impl RouteService {
         &self.available_stops
     }
 
-    pub fn get_route(&self, vehicle_id: u32) -> Option<&Route> {
-        self.routes.get(&vehicle_id)
+    pub fn get_route(&self, vehicle_id: u32) -> &Route {
+        self.routes.get(&vehicle_id).expect(&format!(
+            "it should exist a route for the vehicle {vehicle_id}"
+        ))
     }
 
-    pub fn get_route_mut(&mut self, vehicle_id: u32) -> Option<&mut Route> {
-        self.routes.get_mut(&vehicle_id)
+    pub fn get_route_mut(&mut self, vehicle_id: u32) -> &mut Route {
+        self.routes.get_mut(&vehicle_id).expect(&format!(
+            "it should exist a route for the vehicle {vehicle_id}"
+        ))
     }
 
     pub fn get_all_routes(&self) -> &RouteMap {
@@ -148,7 +152,7 @@ impl RouteService {
     }
 
     pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&Stop> {
-        let route = self.get_route(vehicle_id)?;
+        let route = self.get_route(vehicle_id);
         let current_stop = route.get_current_stop()?;
 
         self.distance_service
@@ -156,7 +160,7 @@ impl RouteService {
     }
 
     pub fn get_k_nearest_stops(&self, vehicle_id: u32, k: usize) -> Option<Vec<&Stop>> {
-        let route = self.get_route(vehicle_id)?;
+        let route = self.get_route(vehicle_id);
         let current_stop = route.get_current_stop()?;
 
         Some(
