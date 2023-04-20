@@ -178,25 +178,26 @@ impl Individual {
     {
         let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng);
 
-        let neighborhood1 = Neighborhood::from_stop_index(
-            &self
-                .chromosomes
+        let neighborhood1 = Neighborhood::from((
+            self.chromosomes
+                .as_slice()
                 .get(address1.0)
                 .expect("the chromosome index must be inside of the bounds vector")
-                .stops,
+                .stops
+                .as_slice(),
             address1.1,
             &stop_swapper.distance_service,
-        );
+        ));
 
-        let neighborhood2 = Neighborhood::from_stop_index(
-            &self
-                .chromosomes
+        let neighborhood2 = Neighborhood::from((
+            self.chromosomes
                 .get(address2.0)
                 .expect("the chromosome index must be inside of the bounds vector")
-                .stops,
+                .stops
+                .as_slice(),
             address2.1,
             &stop_swapper.distance_service,
-        );
+        ));
 
         let swap_cost = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
 

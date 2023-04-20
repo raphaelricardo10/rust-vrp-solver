@@ -16,7 +16,7 @@ fn can_calculate_insertion_cost(
     distance_service: DistanceService,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let neighborhood = Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service);
+    let neighborhood = Neighborhood::from((stops_with_crossings.as_slice(), 1, &distance_service));
 
     assert_eq!(neighborhood.cost, 8.0);
 }

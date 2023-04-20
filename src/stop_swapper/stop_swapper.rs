@@ -119,7 +119,7 @@ impl StopSwapper {
                     stop_index,
                     self.calculate_swap_cost(
                         neighborhood,
-                        &Neighborhood::from_stop_index(stops, stop_index, &self.distance_service),
+                        &Neighborhood::from((stops.as_slice(), stop_index, &self.distance_service)),
                     ),
                 )
             })
