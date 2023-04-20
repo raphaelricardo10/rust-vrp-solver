@@ -16,7 +16,7 @@ impl<'a> Neighborhood<'a> {
         current: Neighbor<'a>,
         next: Neighbor<'a>,
         distance_service: &DistanceService,
-    ) -> Option<Neighborhood<'a>> {
+    ) -> Neighborhood<'a> {
         let mut neighborhood = Neighborhood {
             previous,
             current,
@@ -24,16 +24,16 @@ impl<'a> Neighborhood<'a> {
             cost: 0.0,
         };
 
-        neighborhood.cost = neighborhood.calculate_cost(distance_service)?;
+        neighborhood.cost = neighborhood.calculate_cost(distance_service);
 
-        Some(neighborhood)
+        neighborhood
     }
 
     pub(crate) fn from_stop_index(
         stops: &'a [Stop],
         stop_index: usize,
         distance_service: &DistanceService,
-    ) -> Option<Neighborhood<'a>> {
+    ) -> Neighborhood<'a> {
         Self::new(
             Neighbor::new(stop_index - 1, &stops[stop_index - 1]),
             Neighbor::new(stop_index, &stops[stop_index]),
@@ -42,10 +42,8 @@ impl<'a> Neighborhood<'a> {
         )
     }
 
-    fn calculate_cost(&self, distance_service: &DistanceService) -> Option<f64> {
-        Some(
-            distance_service.get_distance(self.previous.stop, self.current.stop)?
-                + distance_service.get_distance(self.current.stop, self.next.stop)?,
-        )
+    fn calculate_cost(&self, distance_service: &DistanceService) -> f64 {
+        distance_service.get_distance(self.previous.stop, self.current.stop)
+            + distance_service.get_distance(self.current.stop, self.next.stop)
     }
 }

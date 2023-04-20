@@ -11,8 +11,8 @@ fn can_calculate_neighborhood_swap_cost(
     stop_swapper: StopSwapper,
     neighborhood_factory: NeighborhoodFactory,
 ) {
-    let neighborhood1 = neighborhood_factory.make_neighborhood(1).unwrap();
-    let neighborhood2 = neighborhood_factory.make_neighborhood(3).unwrap();
+    let neighborhood1 = neighborhood_factory.make_neighborhood(1);
+    let neighborhood2 = neighborhood_factory.make_neighborhood(3);
 
     let swap_cost = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
 
@@ -24,11 +24,9 @@ fn can_get_the_minimum_swap_cost(
     stop_swapper: StopSwapper,
     neighborhood_factory: NeighborhoodFactory,
 ) {
-    let neighborhood = neighborhood_factory.make_neighborhood(1).unwrap();
+    let neighborhood = neighborhood_factory.make_neighborhood(1);
 
-    let swap_cost = stop_swapper
-        .get_minimum_swap_cost(&neighborhood, &neighborhood_factory.stops)
-        .unwrap();
+    let swap_cost = stop_swapper.get_minimum_swap_cost(&neighborhood, &neighborhood_factory.stops);
 
     assert_eq!(swap_cost.1, -5.0);
 }
@@ -38,8 +36,8 @@ fn can_calculate_neighborhood_swap_cost_of_consecutive_swaps(
     stop_swapper: StopSwapper,
     neighborhood_factory: NeighborhoodFactory,
 ) {
-    let neighborhood1 = neighborhood_factory.make_neighborhood(1).unwrap();
-    let neighborhood2 = neighborhood_factory.make_neighborhood(2).unwrap();
+    let neighborhood1 = neighborhood_factory.make_neighborhood(1);
+    let neighborhood2 = neighborhood_factory.make_neighborhood(2);
 
     let swap_cost1 = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
     let swap_cost2 = stop_swapper.calculate_swap_cost(&neighborhood2, &neighborhood1);

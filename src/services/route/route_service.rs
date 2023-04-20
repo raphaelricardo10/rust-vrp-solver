@@ -108,10 +108,7 @@ impl RouteService {
         let new_stop = self.available_stops.remove(&stop_id).unwrap();
 
         let distance = match route.get_current_stop() {
-            Some(last_stop) => self
-                .distance_service
-                .get_distance(last_stop, &new_stop)
-                .unwrap(),
+            Some(last_stop) => self.distance_service.get_distance(last_stop, &new_stop),
             None => 0.0,
         };
 
@@ -128,16 +125,14 @@ impl RouteService {
         Some(())
     }
 
-    pub fn assign_stop_points(&mut self) -> Option<()> {
+    pub fn assign_stop_points(&mut self) {
         for route in &mut self.routes.values_mut() {
-            let first_stop = route.stops.first()?;
-            let last_stop = route.stops.last()?;
-            let distance = self.distance_service.get_distance(last_stop, first_stop)?;
+            let first_stop = route.stops.first().expect("the route should not be empty");
+            let last_stop = route.stops.last().expect("the route should not be empty");
+            let distance = self.distance_service.get_distance(last_stop, first_stop);
 
             route.add_stop(*first_stop, distance).ok();
         }
-
-        Some(())
     }
 
     fn is_stop_feasible(&self, stop: &Stop, route: &Route) -> bool {

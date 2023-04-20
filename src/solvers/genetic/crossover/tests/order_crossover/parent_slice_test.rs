@@ -95,9 +95,7 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     let slice = ParentSlice::new(stops[1..=3].to_vec(), &distance_service);
 
-    offspring
-        .insert_parent_slice(slice, insertion_point, &distance_service)
-        .unwrap();
+    offspring.insert_parent_slice(slice, insertion_point, &distance_service);
 
     assert_ne!(offspring.fitness, 0.0);
 }

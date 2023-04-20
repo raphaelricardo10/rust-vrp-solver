@@ -30,11 +30,7 @@ impl ParentSlice {
     pub(super) fn calculate_slice_cost(slice: &[Gene], distance_service: &DistanceService) -> f64 {
         slice
             .windows(2)
-            .map(|window| {
-                distance_service
-                    .get_distance(&window[0], &window[1])
-                    .unwrap()
-            })
+            .map(|window| distance_service.get_distance(&window[0], &window[1]))
             .sum()
     }
 
@@ -79,9 +75,7 @@ impl ParentSlice {
     ) -> Option<Chromosome> {
         let mut offspring_chromosome = Chromosome::new(chromosome.vehicle);
 
-        offspring_chromosome
-            .add_stop(chromosome.stops[0], 0.0)
-            .unwrap();
+        offspring_chromosome.add_stop(chromosome.stops[0], 0.0).ok();
 
         let unrepeated_genes: Vec<Gene> =
             Individual::drop_gene_duplicates(&chromosome, &self.gene_set);
@@ -95,9 +89,7 @@ impl ParentSlice {
             .map(|window| {
                 (
                     window[1],
-                    distance_service
-                        .get_distance(&window[0], &window[1])
-                        .unwrap(),
+                    distance_service.get_distance(&window[0], &window[1]),
                 )
             })
             .try_for_each(|(gene, distance)| offspring_chromosome.add_stop(gene, distance))

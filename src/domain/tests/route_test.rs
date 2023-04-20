@@ -25,9 +25,7 @@ fn route_cannot_overload_vehicle(full_stops: Vec<Stop>, distance_service: Distan
 
     route.add_stop(full_stops[0], 0.0).unwrap();
 
-    let distance = distance_service
-        .get_distance(&full_stops[0], &full_stops[1])
-        .unwrap();
+    let distance = distance_service.get_distance(&full_stops[0], &full_stops[1]);
 
     if route.add_stop(full_stops[1], distance).is_ok() {
         panic!();

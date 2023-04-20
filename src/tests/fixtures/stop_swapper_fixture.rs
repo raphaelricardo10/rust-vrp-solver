@@ -25,7 +25,7 @@ impl<'a> NeighborhoodFactory {
     }
 
     #[allow(dead_code)]
-    pub(crate) fn make_neighborhood(&'a self, stop_index: usize) -> Option<Neighborhood<'a>> {
+    pub(crate) fn make_neighborhood(&'a self, stop_index: usize) -> Neighborhood<'a> {
         Neighborhood::from_stop_index(&self.stops, stop_index, &self.distance_service)
     }
 }

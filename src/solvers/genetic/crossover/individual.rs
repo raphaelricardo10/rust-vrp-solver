@@ -27,19 +27,19 @@ impl Individual {
         parent_slice: ParentSlice,
         insertion_point: GeneAddress,
         distance_service: &DistanceService,
-    ) -> Option<()> {
+    ) {
         let distance_before = match self.chromosomes[insertion_point.0].stops.len() == 1 {
             true => 0.0,
             false => distance_service.get_distance(
                 &self.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
-                parent_slice.slice.first()?,
-            )?,
+                parent_slice.slice.first().expect("the parent slice should not be empty"),
+            ),
         };
 
         let distance_after = distance_service.get_distance(
-            parent_slice.slice.last()?,
+            parent_slice.slice.last().expect("the parent slice should not be empty"),
             &self.chromosomes[insertion_point.0].stops[insertion_point.1],
-        )?;
+        );
 
         self.chromosomes[insertion_point.0].add_multiple_stops_at(
             parent_slice.slice,
@@ -48,8 +48,6 @@ impl Individual {
         );
 
         self.update_fitness();
-
-        Some(())
     }
 
     pub(crate) fn crossover_with<R>(
@@ -74,7 +72,7 @@ impl Individual {
         let mut offspring = Individual::new(offspring_chromosomes);
         let insertion_point: GeneAddress = offspring.choose_random_gene(rng).unwrap();
 
-        offspring.insert_parent_slice(parent_slice, insertion_point, distance_service)?;
+        offspring.insert_parent_slice(parent_slice, insertion_point, distance_service);
 
         Some(offspring)
     }

@@ -35,8 +35,14 @@ impl<'a> DistanceService {
             .collect()
     }
 
-    pub fn get_distance(&self, from: &Stop, to: &Stop) -> Option<f64> {
-        Some(self.distances.get(&(from.id, to.id))?.distance)
+    pub fn get_distance(&self, from: &Stop, to: &Stop) -> f64 {
+        self.distances
+            .get(&(from.id, to.id))
+            .expect(&format!(
+                "the distance matrix should contain the entry [{0}, {1}]",
+                from.id, to.id
+            ))
+            .distance
     }
 
     pub(super) fn get_distances_from(

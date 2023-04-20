@@ -124,10 +124,7 @@ impl Individual {
             .choose(rng)
     }
 
-    pub(crate) fn choose_random_gene_pair<R>(
-        &self,
-        rng: &mut R,
-    ) -> Option<(GeneAddress, GeneAddress)>
+    pub(crate) fn choose_random_gene_pair<R>(&self, rng: &mut R) -> (GeneAddress, GeneAddress)
     where
         R: Rng + ?Sized,
     {
@@ -136,7 +133,8 @@ impl Individual {
             .iter()
             .enumerate()
             .filter(|(_, chromosome)| chromosome.stops.len() > 3)
-            .choose(&mut thread_rng())?;
+            .choose(&mut thread_rng())
+            .expect("the chromosome should not be empty");
 
         let addresses: Vec<GeneAddress> = chromosome
             .stops
@@ -149,7 +147,7 @@ impl Individual {
             .map(|(gene_index, _)| (chromosome_index, *gene_index))
             .collect();
 
-        Some((addresses[0], addresses[1]))
+        (addresses[0], addresses[1])
     }
 
     pub(crate) fn choose_random_gene<R>(&self, rng: &mut R) -> Option<GeneAddress>
@@ -174,32 +172,34 @@ impl Individual {
         Some((chromosome_index, gene_index))
     }
 
-    pub(crate) fn swap_random_genes<R>(
-        &mut self,
-        stop_swapper: &StopSwapper,
-        rng: &mut R,
-    ) -> Option<()>
+    pub(crate) fn swap_random_genes<R>(&mut self, stop_swapper: &StopSwapper, rng: &mut R)
     where
         R: Rng + ?Sized,
     {
-        let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng)?;
+        let (address1, address2): (GeneAddress, GeneAddress) = self.choose_random_gene_pair(rng);
 
         let neighborhood1 = Neighborhood::from_stop_index(
-            &self.chromosomes.get(address1.0)?.stops,
+            &self
+                .chromosomes
+                .get(address1.0)
+                .expect("the chromosome index must be inside of the bounds vector")
+                .stops,
             address1.1,
             &stop_swapper.distance_service,
-        )?;
+        );
 
         let neighborhood2 = Neighborhood::from_stop_index(
-            &self.chromosomes.get(address2.0)?.stops,
+            &self
+                .chromosomes
+                .get(address2.0)
+                .expect("the chromosome index must be inside of the bounds vector")
+                .stops,
             address2.1,
             &stop_swapper.distance_service,
-        )?;
+        );
 
         let swap_cost = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
 
         self.swap_genes(address1, address2, swap_cost);
-
-        Some(())
     }
 }

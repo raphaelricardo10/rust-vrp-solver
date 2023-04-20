@@ -16,8 +16,7 @@ fn can_calculate_insertion_cost(
     distance_service: DistanceService,
     stops_with_crossings: Vec<Stop>,
 ) {
-    let neighborhood =
-        Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service).unwrap();
+    let neighborhood = Neighborhood::from_stop_index(&stops_with_crossings, 1, &distance_service);
 
     assert_eq!(neighborhood.cost, 8.0);
 }
@@ -30,7 +29,7 @@ fn can_optimize_route(
 ) {
     let mut route = route_factory(stops_with_crossings);
 
-    two_opt.run(&mut route).unwrap();
+    two_opt.run(&mut route);
 
     assert_eq!(route.stops.get(0).unwrap().id, 0);
     assert_eq!(route.stops.get(1).unwrap().id, 2);

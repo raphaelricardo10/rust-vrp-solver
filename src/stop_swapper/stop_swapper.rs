@@ -41,16 +41,14 @@ impl StopSwapper {
             neighborhood2.current,
             neighborhood1.next,
             distance_service,
-        )
-        .unwrap();
+        );
 
         let swapped_neighborhood_2 = Neighborhood::new(
             neighborhood2.previous,
             neighborhood1.current,
             neighborhood2.next,
             distance_service,
-        )
-        .unwrap();
+        );
 
         (swapped_neighborhood_1, swapped_neighborhood_2)
     }
@@ -69,16 +67,14 @@ impl StopSwapper {
             neighborhood2.current,
             neighborhood1.current,
             distance_service,
-        )
-        .unwrap();
+        );
 
         let swapped_neighborhood_2 = Neighborhood::new(
             neighborhood2.current,
             neighborhood1.current,
             neighborhood2.next,
             distance_service,
-        )
-        .unwrap();
+        );
 
         (swapped_neighborhood_1, swapped_neighborhood_2)
     }
@@ -113,21 +109,21 @@ impl StopSwapper {
         &self,
         neighborhood: &Neighborhood,
         stops: &Vec<Stop>,
-    ) -> Option<(usize, f64)> {
+    ) -> (usize, f64) {
         stops[..stops.len() - 1]
             .iter()
             .enumerate()
-            .skip(neighborhood.next.index + 1)
+            .skip(neighborhood.next.index - 1)
             .map(|(stop_index, _)| {
                 (
                     stop_index,
                     self.calculate_swap_cost(
                         neighborhood,
-                        &Neighborhood::from_stop_index(stops, stop_index, &self.distance_service)
-                            .unwrap(),
+                        &Neighborhood::from_stop_index(stops, stop_index, &self.distance_service),
                     ),
                 )
             })
             .min_by(|(_, cost1), (_, cost2)| cost1.partial_cmp(cost2).unwrap())
+            .expect("the stops vector should not be empty")
     }
 }
