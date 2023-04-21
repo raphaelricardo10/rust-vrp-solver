@@ -114,7 +114,7 @@ impl Individual {
         &self,
         rng: &mut R,
         min_genes: usize,
-    ) -> Option<(usize, &Chromosome)>
+    ) -> (usize, &Chromosome)
     where
         R: Rng + ?Sized,
     {
@@ -123,6 +123,7 @@ impl Individual {
             .enumerate()
             .filter(|(_, chromosome)| chromosome.stops.len() >= min_genes)
             .choose(rng)
+            .expect("the chromosome should not be empty")
     }
 
     pub(crate) fn choose_random_gene_pair<R>(&self, rng: &mut R) -> (GeneAddress, GeneAddress)

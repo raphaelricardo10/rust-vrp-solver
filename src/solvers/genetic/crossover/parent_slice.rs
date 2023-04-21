@@ -22,7 +22,7 @@ impl<'a, 'b, 'c, R: Rng + ?Sized> From<RandomParentSliceGeneratorParams<'a, 'b, 
     for ParentSlice
 {
     fn from((parent, rng, distance_service): RandomParentSliceGeneratorParams<R>) -> Self {
-        let (_, chromosome) = parent.choose_random_chromosome(rng, 4).unwrap();
+        let (_, chromosome) = parent.choose_random_chromosome(rng, 4);
 
         let max_size = chromosome.stops.len() - 1;
 
