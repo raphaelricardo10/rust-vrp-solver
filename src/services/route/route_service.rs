@@ -186,8 +186,12 @@ impl RouteService {
     where
         R: Rng + ?Sized,
     {
-        let route = self.routes.get(&vehicle_id)?;
+        let route = self
+            .routes
+            .get(&vehicle_id)
+            .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"));
 
-        self.get_feasible_stops(route).choose(rng)
+        self.get_feasible_stops(route)
+            .choose(rng)
     }
 }
