@@ -110,8 +110,9 @@ impl StopSwapper {
         neighborhood: &Neighborhood,
         stops: &Vec<Stop>,
     ) -> (usize, f64) {
-        stops[..stops.len() - 1]
+        stops
             .iter()
+            .take(stops.len() - 1)
             .enumerate()
             .skip(neighborhood.next.index - 1)
             .map(|(stop_index, _)| {
