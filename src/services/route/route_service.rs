@@ -129,7 +129,12 @@ impl RouteService {
         let starting_stop = self.available_stops.remove(&0)?;
 
         for route in &mut self.routes.values_mut() {
-            route.add_stop(starting_stop, 0.0).ok();
+            route.add_stop(starting_stop, 0.0).unwrap_or_else(|_| {
+                panic!(
+                    "the vehicle {0} should support the load of {1} from stop {2}",
+                    route.vehicle.id, starting_stop.usage, starting_stop.id
+                )
+            });
         }
 
         Some(())
@@ -141,7 +146,9 @@ impl RouteService {
             let last_stop = route.stops.last().expect("the route should not be empty");
             let distance = self.distance_service.get_distance(last_stop, first_stop);
 
-            route.add_stop(*first_stop, distance).ok();
+            route
+                .add_stop(*first_stop, distance)
+                .expect("the vehicle should support the load from the stop");
         }
     }
 
