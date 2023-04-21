@@ -56,7 +56,7 @@ impl Individual {
 
                 route_service
                     .assign_stop_to_route(*vehicle_id, stop.id)
-                    .unwrap();
+                    .unwrap_or_else(|_| panic!("the vehicle {vehicle_id} should support the load"));
             }
         }
 
@@ -150,15 +150,19 @@ impl Individual {
         (addresses[0], addresses[1])
     }
 
-    pub(crate) fn choose_random_gene<R>(&self, rng: &mut R) -> Option<GeneAddress>
+    pub(crate) fn choose_random_gene<R>(&self, rng: &mut R) -> GeneAddress
     where
         R: Rng + ?Sized,
     {
-        let (chromosome_index, chromosome) =
-            self.chromosomes.iter().enumerate().choose(rng).unwrap();
+        let (chromosome_index, chromosome) = self
+            .chromosomes
+            .iter()
+            .enumerate()
+            .choose(rng)
+            .expect("the chromosome should not be empty");
 
         if chromosome.stops.len() == 1 {
-            return Some((chromosome_index, 0));
+            return (chromosome_index, 0);
         }
 
         let (gene_index, _) = chromosome
@@ -167,9 +171,10 @@ impl Individual {
             .enumerate()
             .skip(1)
             .take(chromosome.stops.len() - 2)
-            .choose(rng)?;
+            .choose(rng)
+            .expect("the chromosome should not be empty");
 
-        Some((chromosome_index, gene_index))
+        (chromosome_index, gene_index)
     }
 
     pub(crate) fn swap_random_genes<R>(&mut self, stop_swapper: &StopSwapper, rng: &mut R)

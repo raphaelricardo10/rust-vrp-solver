@@ -71,7 +71,20 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         self.population
             .get_k_bests(self.elite_size)
             .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
-            .unwrap()
+            .unwrap_or_else(|err| match err {
+                rand::distributions::WeightedError::NoItem => {
+                    panic!("the candidate list should not be empty")
+                }
+                rand::distributions::WeightedError::InvalidWeight => {
+                    panic!("the weight value should be between 0 and f64::MAX")
+                }
+                rand::distributions::WeightedError::AllWeightsZero => {
+                    panic!("at least one weight must be a non-zero value")
+                }
+                rand::distributions::WeightedError::TooMany => {
+                    panic!("the quantity of weights must be between 0 and u32::MAX")
+                }
+            })
             .cloned()
             .enumerate()
             .collect()

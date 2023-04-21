@@ -76,7 +76,7 @@ impl Individual {
         }
 
         let mut offspring = Individual::new(offspring_chromosomes);
-        let insertion_point: GeneAddress = offspring.choose_random_gene(rng).unwrap();
+        let insertion_point: GeneAddress = offspring.choose_random_gene(rng);
 
         offspring.insert_parent_slice(parent_slice, insertion_point, distance_service);
 

@@ -37,7 +37,9 @@ impl GreedySolver {
 
             self.route_service
                 .assign_stop_to_route(vehicle_id, stop_id)
-                .unwrap();
+                .unwrap_or_else(|_| {
+                    panic!("the vehicle {vehicle_id} should support the load from {stop_id}")
+                });
         }
     }
 

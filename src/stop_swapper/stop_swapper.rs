@@ -123,7 +123,13 @@ impl StopSwapper {
                     ),
                 )
             })
-            .min_by(|(_, cost1), (_, cost2)| cost1.partial_cmp(cost2).unwrap())
+            .min_by(|(_, cost1), (_, cost2)| {
+                cost1.partial_cmp(cost2).unwrap_or_else(|| {
+                    panic!(
+                        "it should be possible to compare the swap costs {cost1} and {cost2}"
+                    )
+                })
+            })
             .expect("the stops vector should not be empty")
     }
 }
