@@ -1,3 +1,5 @@
+use std::marker::PhantomData;
+
 use rand::Rng;
 
 use crate::{
@@ -6,31 +8,30 @@ use crate::{
 
 use super::crossover_operator::CrossoverOperator;
 
-pub(crate) struct Offspring<T: CrossoverOperator> {
-    crossover_op: T,
+pub(crate) struct Offspring<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Sized> {
+    crossover_op: &'a T,
     pub(super) parent1: Individual,
     pub(super) parent2: Individual,
     pub(crate) individual: Individual,
+    _t: PhantomData<(&'a T, R)>,
 }
 
-impl<T: CrossoverOperator + Clone> Offspring<T> {
-    pub(crate) fn new(parent1: Individual, parent2: Individual, crossover_op: T) -> Self {
+impl<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Sized> Offspring<'a, R, T> {
+    pub(crate) fn new(parent1: Individual, parent2: Individual, crossover_op: & 'a T) -> Self {
         Self {
             parent1,
             parent2,
             crossover_op,
             individual: Default::default(),
+            _t: PhantomData,
         }
     }
 
-    pub(crate) fn try_to_evolve<R>(
+    pub(crate) fn try_to_evolve(
         &mut self,
         rng: &mut R,
         distance_service: &DistanceService,
-    ) -> Option<()>
-    where
-        R: Rng + ?Sized,
-    {
+    ) -> Option<()> {
         for _ in 0..self.crossover_op.max_of_tries() {
             self.individual = self.crossover_op.run(
                 self.parent1.clone(),

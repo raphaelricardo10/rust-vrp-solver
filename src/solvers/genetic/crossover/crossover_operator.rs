@@ -4,16 +4,14 @@ use crate::{
     services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
 };
 
-pub(crate) trait CrossoverOperator {
-    fn run<R>(
+pub(crate) trait CrossoverOperator<R: Rng + ?Sized> {
+    fn run(
         &self,
         parent1: Individual,
         parent2: Individual,
         rng: &mut R,
         distance_service: &DistanceService,
-    ) -> Option<Individual>
-    where
-        R: Rng + ?Sized;
+    ) -> Option<Individual>;
 
     fn max_of_tries(&self) -> u8;
 }

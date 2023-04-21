@@ -11,17 +11,14 @@ pub(crate) struct OrderCrossover {
     max_of_tries: u8,
 }
 
-impl CrossoverOperator for OrderCrossover {
-    fn run<R>(
+impl<R: Rng + ?Sized> CrossoverOperator<R> for OrderCrossover {
+    fn run(
         &self,
         parent1: Individual,
         parent2: Individual,
         rng: &mut R,
         distance_service: &DistanceService,
-    ) -> Option<Individual>
-    where
-        R: Rng + ?Sized,
-    {
+    ) -> Option<Individual> {
         parent1.crossover_with(parent2, rng, distance_service)
     }
 
