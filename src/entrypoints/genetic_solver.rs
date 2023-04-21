@@ -56,7 +56,11 @@ pub unsafe extern "C" fn genetic_solver(
         .into_iter()
         .enumerate()
         .for_each(|(index, (vehicle_id, solution))| {
-            let route = &mut *result.offset(index.try_into().unwrap());
+            let route = &mut *result.offset(
+                index
+                    .try_into()
+                    .expect("the index should fit in memory address size"),
+            );
 
             route.vehicle_id = vehicle_id;
             route.total_distance = solution.total_distance();

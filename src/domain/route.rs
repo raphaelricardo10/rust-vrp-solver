@@ -56,7 +56,10 @@ impl Route {
         self.stops.splice(index..index, stops);
 
         if index == 0 {
-            self.stops.insert(0, *self.stops.last().unwrap());
+            self.stops.insert(
+                0,
+                *self.stops.last().expect("the route should not be empty"),
+            );
         }
 
         self.total_distance += distance_change;

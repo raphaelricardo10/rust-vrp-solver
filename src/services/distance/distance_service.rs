@@ -26,10 +26,15 @@ impl<'a> DistanceService {
 
         distances
             .iter()
-            .map(|x| {
+            .map(|((source_stop_id, destination_stop_id), distance)| {
                 (
-                    (x.0 .0, x.0 .1),
-                    DistanceMatrixEntry::new(*stops_map.get(&x.0 .1).unwrap(), *x.1),
+                    (*source_stop_id, *destination_stop_id),
+                    DistanceMatrixEntry::new(
+                        *stops_map.get(&destination_stop_id).expect(&format!(
+                            "the stops should contain the stop {destination_stop_id}"
+                        )),
+                        *distance,
+                    ),
                 )
             })
             .collect()
@@ -62,7 +67,12 @@ impl<'a> DistanceService {
     ) -> Option<&Stop> {
         self.get_distances_from(stop)
             .filter(|entry| filter(&entry.destination))
-            .min_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap())
+            .min_by(|stop1, stop2| {
+                stop1.partial_cmp(stop2).expect(&format!(
+                    "it should be possible to compare stop {0} and stop {1}, whose distances are respectively: {2} and {3}",
+                    stop1.destination.id, stop2.destination.id, stop1.distance, stop2.distance
+                ))
+            })
             .map(|x| &x.destination)
     }
 
@@ -77,7 +87,12 @@ impl<'a> DistanceService {
             .filter(|entry| filter(&entry.destination))
             .collect::<Vec<&DistanceMatrixEntry>>();
 
-        stops.sort_by(|stop1, stop2| stop1.partial_cmp(stop2).unwrap());
+        stops.sort_by(|stop1, stop2| {
+            stop1.partial_cmp(stop2).expect(&format!(
+                "it should be possible to compare stop {0} and stop {1}, whose distances are respectively: {2} and {3}",
+                stop1.destination.id, stop2.destination.id, stop1.distance, stop2.distance
+            ))
+        });
 
         let number_of_stops = min(stops.len(), k);
 
