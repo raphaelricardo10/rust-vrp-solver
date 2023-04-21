@@ -16,7 +16,7 @@ pub(crate) fn individual_factory(route_service_factory: RouteServiceFactory) -> 
     let wrapper = move |number_of_chromosomes| -> Individual {
         let mut route_service = route_service_factory(number_of_chromosomes);
 
-        Individual::from_random(&mut rng, &mut route_service)
+        Individual::from((&mut rng, &mut route_service))
     };
 
     Box::new(wrapper)
@@ -29,7 +29,7 @@ pub(crate) fn population_factory(route_service_factory: RouteServiceFactory) -> 
     let wrapper = move |number_of_individuals, number_of_chromosomes| -> Population {
         let mut route_service = route_service_factory(number_of_chromosomes);
 
-        Population::from_random(number_of_individuals, &mut rng, &mut route_service)
+        Population::from((number_of_individuals, &mut rng, &mut route_service))
     };
 
     Box::new(wrapper)

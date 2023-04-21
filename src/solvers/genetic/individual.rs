@@ -25,20 +25,10 @@ pub(crate) struct Individual {
     pub(super) chromosomes: Vec<Chromosome>,
 }
 
-impl Individual {
-    pub fn new(chromosomes: Vec<Chromosome>) -> Self {
-        let fitness = Self::calculate_fitness(&chromosomes);
+pub(crate) type RandomIndividualGeneratorParams<'a, 'b, R> = (&'a mut R, &'b mut RouteService);
 
-        Self {
-            fitness,
-            chromosomes,
-        }
-    }
-
-    pub(crate) fn from_random<R>(rng: &mut R, route_service: &mut RouteService) -> Individual
-    where
-        R: Rng + ?Sized,
-    {
+impl<'a, 'b, R: Rng + ?Sized> From<RandomIndividualGeneratorParams<'a, 'b, R>> for Individual {
+    fn from((rng, route_service): RandomIndividualGeneratorParams<R>) -> Self {
         let vehicle_ids: Vec<u32> = route_service
             .get_vehicles()
             .iter()
@@ -65,6 +55,17 @@ impl Individual {
         let routes: Vec<Route> = route_service.get_all_routes().values().cloned().collect();
 
         Individual::new(routes)
+    }
+}
+
+impl Individual {
+    pub fn new(chromosomes: Vec<Chromosome>) -> Self {
+        let fitness = Self::calculate_fitness(&chromosomes);
+
+        Self {
+            fitness,
+            chromosomes,
+        }
     }
 
     fn calculate_fitness(chromosomes: &[Chromosome]) -> f64 {

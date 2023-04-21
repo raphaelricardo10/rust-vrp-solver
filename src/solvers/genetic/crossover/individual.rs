@@ -65,7 +65,7 @@ impl Individual {
     where
         R: Rng + ?Sized,
     {
-        let parent_slice = ParentSlice::from_random(self, rng, distance_service)?;
+        let parent_slice = ParentSlice::from((self, &mut *rng, distance_service));
 
         let mut offspring_chromosomes: Vec<Chromosome> = Vec::new();
 

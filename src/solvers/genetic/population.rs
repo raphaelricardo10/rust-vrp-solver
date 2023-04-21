@@ -9,6 +9,23 @@ pub(crate) struct Population {
     pub(super) individuals: Vec<Individual>,
 }
 
+pub(crate) type RandomPopulationGeneratorParams<'a, 'b, R> = (u32, &'a mut R, &'b mut RouteService);
+
+impl<'a, 'b, R: Rng + ?Sized> From<RandomPopulationGeneratorParams<'a, 'b, R>> for Population {
+    fn from((size, rng, route_service): RandomPopulationGeneratorParams<R>) -> Self {
+        let mut population = Self::default();
+
+        for _ in 0..size {
+            let individual = Individual::from((&mut *rng, &mut *route_service));
+            population.individuals.push(individual);
+
+            route_service.reset();
+        }
+
+        population
+    }
+}
+
 impl Population {
     #[allow(dead_code)]
     pub(super) fn new(individuals: Vec<Individual>) -> Self {
@@ -17,21 +34,5 @@ impl Population {
 
     pub(super) fn get_k_bests(&self, k: usize) -> &[Individual] {
         &self.individuals[..k]
-    }
-
-    pub(crate) fn from_random<R>(size: u32, rng: &mut R, route_service: &mut RouteService) -> Self
-    where
-        R: Rng + ?Sized,
-    {
-        let mut population = Self::default();
-
-        for _ in 0..size {
-            let individual = Individual::from_random(rng, route_service);
-            population.individuals.push(individual);
-
-            route_service.reset();
-        }
-
-        population
     }
 }

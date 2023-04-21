@@ -49,7 +49,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         let stop_swapper = StopSwapper::new(stops.clone(), distances);
         let local_search = TwoOptSearcher::new(stops, distances);
         let crossover_op = OrderCrossover::new(max_crossover_tries);
-        let population = Population::from_random(population_size, rng, &mut route_service);
+        let population = Population::from((population_size, &mut *rng, &mut route_service));
 
         Self {
             rng,

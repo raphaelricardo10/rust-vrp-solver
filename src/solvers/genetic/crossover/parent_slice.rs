@@ -15,6 +15,26 @@ pub(crate) struct ParentSlice {
     pub(super) gene_set: HashSet<Gene>,
 }
 
+pub(crate) type RandomParentSliceGeneratorParams<'a, 'b, 'c, R> =
+    (&'a Individual, &'b mut R, &'c DistanceService);
+
+impl<'a, 'b, 'c, R: Rng + ?Sized> From<RandomParentSliceGeneratorParams<'a, 'b, 'c, R>>
+    for ParentSlice
+{
+    fn from((parent, rng, distance_service): RandomParentSliceGeneratorParams<R>) -> Self {
+        let (_, chromosome) = parent.choose_random_chromosome(rng, 4).unwrap();
+
+        let max_size = chromosome.stops.len() - 1;
+
+        let (lower_bound, upper_bound) = Self::generate_range(1, max_size, rng);
+
+        Self::new(
+            chromosome.stops[lower_bound..upper_bound].to_vec(),
+            distance_service,
+        )
+    }
+}
+
 impl ParentSlice {
     pub(super) fn new(slice: Vec<Gene>, distance_service: &DistanceService) -> Self {
         let cost = Self::calculate_slice_cost(&slice, distance_service);
@@ -46,26 +66,6 @@ impl ParentSlice {
         }
 
         (cmp::min(a, b), cmp::max(a, b))
-    }
-
-    pub(super) fn from_random<R>(
-        parent: &Individual,
-        rng: &mut R,
-        distance_service: &DistanceService,
-    ) -> Option<Self>
-    where
-        R: Rng + ?Sized,
-    {
-        let (_, chromosome) = parent.choose_random_chromosome(rng, 4)?;
-
-        let max_size = chromosome.stops.len() - 1;
-
-        let (lower_bound, upper_bound) = Self::generate_range(1, max_size, rng);
-
-        Some(Self::new(
-            chromosome.stops[lower_bound..upper_bound].to_vec(),
-            distance_service,
-        ))
     }
 
     pub(super) fn merge_into(
