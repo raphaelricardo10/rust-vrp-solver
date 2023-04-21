@@ -64,15 +64,15 @@ impl RouteService {
     }
 
     pub fn get_route(&self, vehicle_id: u32) -> &Route {
-        self.routes.get(&vehicle_id).expect(&format!(
-            "it should exist a route for the vehicle {vehicle_id}"
-        ))
+        self.routes
+            .get(&vehicle_id)
+            .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"))
     }
 
     pub fn get_route_mut(&mut self, vehicle_id: u32) -> &mut Route {
-        self.routes.get_mut(&vehicle_id).expect(&format!(
-            "it should exist a route for the vehicle {vehicle_id}"
-        ))
+        self.routes
+            .get_mut(&vehicle_id)
+            .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"))
     }
 
     pub fn get_all_routes(&self) -> &RouteMap {
@@ -107,14 +107,15 @@ impl RouteService {
         vehicle_id: u32,
         stop_id: u32,
     ) -> Result<(), VehicleOverloadError> {
-        let route = self.routes.get_mut(&vehicle_id).expect(&format!(
-            "it should exist a route for the vehicle {vehicle_id}"
-        ));
+        let route = self
+            .routes
+            .get_mut(&vehicle_id)
+            .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"));
 
         let new_stop = self
             .available_stops
             .remove(&stop_id)
-            .expect(&format!("the stop {stop_id} should be available"));
+            .unwrap_or_else(|| panic!("the stop {stop_id} should be available"));
 
         let distance = match route.get_current_stop() {
             Some(last_stop) => self.distance_service.get_distance(last_stop, &new_stop),
