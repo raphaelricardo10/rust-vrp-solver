@@ -79,17 +79,30 @@ impl Individual {
         self.fitness = Self::calculate_fitness(&self.chromosomes);
     }
 
-    pub(crate) fn get_gene(&self, address: GeneAddress) -> Option<Gene> {
-        self.chromosomes
-            .get(address.0)?
+    pub(crate) fn get_gene(&self, address: GeneAddress) -> Gene {
+        *self
+            .chromosomes
+            .get(address.0)
+            .unwrap_or_else(|| {
+                panic!("the chromosome {0} should exist", address.0);
+            })
             .stops
             .get(address.1)
-            .copied()
+            .unwrap_or_else(|| {
+                panic!(
+                    "the gene {0} should exist in chromosome {1}",
+                    address.1, address.0
+                );
+            })
     }
 
-    pub(crate) fn insert_gene(&mut self, address: GeneAddress, gene: Gene) -> Option<()> {
-        self.chromosomes.get_mut(address.0)?.stops[address.1] = gene;
-        Some(())
+    pub(crate) fn insert_gene(&mut self, address: GeneAddress, gene: Gene) {
+        self.chromosomes
+            .get_mut(address.0)
+            .unwrap_or_else(|| {
+                panic!("the chromosome {0} should exist", address.0);
+            })
+            .stops[address.1] = gene;
     }
 
     pub(crate) fn swap_genes(
@@ -97,17 +110,15 @@ impl Individual {
         address1: GeneAddress,
         address2: GeneAddress,
         fitness_change: f64,
-    ) -> Option<()> {
-        let gene1 = self.get_gene(address1)?;
-        let gene2 = self.get_gene(address2)?;
+    ) {
+        let gene1 = self.get_gene(address1);
+        let gene2 = self.get_gene(address2);
 
         let aux = gene1;
         self.insert_gene(address1, gene2);
         self.insert_gene(address2, aux);
 
         self.fitness += fitness_change;
-
-        Some(())
     }
 
     pub(crate) fn choose_random_chromosome<R>(

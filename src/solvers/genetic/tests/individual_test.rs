@@ -41,9 +41,9 @@ fn test_gene_swap(stops: Vec<Stop>, route_factory: RouteFactory) {
     let address1 = (0, 1);
     let address2 = (0, 2);
 
-    individual.swap_genes(address1, address2, -2.0).unwrap();
+    individual.swap_genes(address1, address2, -2.0);
 
     assert_eq!(individual.fitness, 7.0);
-    assert_eq!(individual.get_gene(address1).unwrap().id, stops[2].id);
-    assert_eq!(individual.get_gene(address2).unwrap().id, stops[1].id);
+    assert_eq!(individual.get_gene(address1).id, stops[2].id);
+    assert_eq!(individual.get_gene(address2).id, stops[1].id);
 }
