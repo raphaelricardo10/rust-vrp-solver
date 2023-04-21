@@ -75,7 +75,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
         self.route_service.reset();
         self.route_service.assign_starting_points();
 
-        while self.route_service.has_available_stop().unwrap() {
+        while self.route_service.has_available_stop() {
             self.run_iteration(vehicle_ids)
         }
 

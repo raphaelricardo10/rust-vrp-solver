@@ -90,16 +90,16 @@ impl RouteService {
             .sum()
     }
 
-    pub fn has_available_stop(&self) -> Option<bool> {
+    pub fn has_available_stop(&self) -> bool {
         for route in self.routes.values() {
             let feasible_stops_number = self.get_feasible_stops(route).count();
 
             if feasible_stops_number > 0 {
-                return Some(true);
+                return true;
             }
         }
 
-        Some(false)
+        false
     }
 
     pub fn assign_stop_to_route(

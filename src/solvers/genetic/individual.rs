@@ -47,7 +47,7 @@ impl Individual {
 
         route_service.assign_starting_points();
 
-        while route_service.has_available_stop().unwrap() {
+        while route_service.has_available_stop() {
             for vehicle_id in vehicle_ids.iter() {
                 let stop = match route_service.get_random_stop(*vehicle_id, rng) {
                     Some(stop) => stop,

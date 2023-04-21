@@ -57,6 +57,6 @@ impl GreedySolver {
     }
 
     fn stop_condition_met(&self) -> bool {
-        !self.route_service.has_available_stop().unwrap()
+        !self.route_service.has_available_stop()
     }
 }
