@@ -4,7 +4,7 @@ use crate::{
     services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
 };
 
-pub(crate) trait CrossoverOperator<T: CrossoverOperator<T>> {
+pub(crate) trait CrossoverOperator {
     fn run<R>(
         &self,
         parent1: Individual,

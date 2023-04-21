@@ -11,7 +11,7 @@ pub(crate) struct OrderCrossover {
     max_of_tries: u8,
 }
 
-impl CrossoverOperator<OrderCrossover> for OrderCrossover {
+impl CrossoverOperator for OrderCrossover {
     fn run<R>(
         &self,
         parent1: Individual,

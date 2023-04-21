@@ -6,14 +6,14 @@ use crate::{
 
 use super::crossover_operator::CrossoverOperator;
 
-pub(crate) struct Offspring<T: CrossoverOperator<T>> {
+pub(crate) struct Offspring<T: CrossoverOperator> {
     crossover_op: T,
     pub(super) parent1: Individual,
     pub(super) parent2: Individual,
     pub(crate) individual: Individual,
 }
 
-impl<T: CrossoverOperator<T> + Clone> Offspring<T> {
+impl<T: CrossoverOperator + Clone> Offspring<T> {
     pub(crate) fn new(parent1: Individual, parent2: Individual, crossover_op: T) -> Self {
         Self {
             parent1,
