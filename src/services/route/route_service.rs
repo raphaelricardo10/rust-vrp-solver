@@ -125,8 +125,10 @@ impl RouteService {
         route.add_stop(new_stop, distance)
     }
 
-    pub fn assign_starting_points(&mut self) -> Option<()> {
-        let starting_stop = self.available_stops.remove(&0)?;
+    pub fn assign_starting_points(&mut self) {
+        let starting_stop = self.available_stops.remove(&0).unwrap_or_else(|| {
+            panic!("the stop depot (stop 0) should be available");
+        });
 
         for route in &mut self.routes.values_mut() {
             route.add_stop(starting_stop, 0.0).unwrap_or_else(|_| {
@@ -136,8 +138,6 @@ impl RouteService {
                 )
             });
         }
-
-        Some(())
     }
 
     pub fn assign_stop_points(&mut self) {
