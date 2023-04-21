@@ -32,12 +32,18 @@ impl Individual {
             true => 0.0,
             false => distance_service.get_distance(
                 &self.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
-                parent_slice.slice.first().expect("the parent slice should not be empty"),
+                parent_slice
+                    .slice
+                    .first()
+                    .expect("the parent slice should not be empty"),
             ),
         };
 
         let distance_after = distance_service.get_distance(
-            parent_slice.slice.last().expect("the parent slice should not be empty"),
+            parent_slice
+                .slice
+                .last()
+                .expect("the parent slice should not be empty"),
             &self.chromosomes[insertion_point.0].stops[insertion_point.1],
         );
 

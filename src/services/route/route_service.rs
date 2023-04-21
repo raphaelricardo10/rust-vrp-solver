@@ -107,9 +107,14 @@ impl RouteService {
         vehicle_id: u32,
         stop_id: u32,
     ) -> Result<(), VehicleOverloadError> {
-        let route = self.routes.get_mut(&vehicle_id).unwrap();
+        let route = self.routes.get_mut(&vehicle_id).expect(&format!(
+            "it should exist a route for the vehicle {vehicle_id}"
+        ));
 
-        let new_stop = self.available_stops.remove(&stop_id).unwrap();
+        let new_stop = self
+            .available_stops
+            .remove(&stop_id)
+            .expect(&format!("the stop {stop_id} should be available"));
 
         let distance = match route.get_current_stop() {
             Some(last_stop) => self.distance_service.get_distance(last_stop, &new_stop),

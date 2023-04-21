@@ -19,8 +19,7 @@ pub fn route_factory(distance_service: DistanceService) -> RouteFactory {
             route
                 .add_stop(
                     *stop,
-                    distance_service
-                        .get_distance(&stops[index - 1], stop),
+                    distance_service.get_distance(&stops[index - 1], stop),
                 )
                 .unwrap();
         }

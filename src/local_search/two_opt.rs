@@ -24,9 +24,8 @@ impl TwoOptSearcher {
         stops: &Vec<Stop>,
         neighborhood: &Neighborhood,
     ) -> Option<(usize, f64)> {
-        let (swap_candidate_index, swap_cost) = self
-            .stop_swapper
-            .get_minimum_swap_cost(neighborhood, stops);
+        let (swap_candidate_index, swap_cost) =
+            self.stop_swapper.get_minimum_swap_cost(neighborhood, stops);
 
         let swap_candidate = Neighborhood::from((
             stops.as_slice(),
