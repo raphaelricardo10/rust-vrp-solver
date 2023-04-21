@@ -40,7 +40,7 @@ pub unsafe extern "C" fn read_distance_matrix(
     num_entries: usize,
     a: u32,
     b: u32,
-) -> f64 {
+) -> f32 {
     let distance_matrix = distance_matrix_factory(distances_ptr, num_entries);
 
     *distance_matrix.get(&(a, b)).unwrap()

@@ -10,7 +10,7 @@ use crate::{
 pub(super) type GeneSet = HashSet<Gene>;
 
 pub(crate) struct ParentSlice {
-    pub(super) cost: f64,
+    pub(super) cost: f32,
     pub(super) slice: Vec<Gene>,
     pub(super) gene_set: HashSet<Gene>,
 }
@@ -47,7 +47,7 @@ impl ParentSlice {
         }
     }
 
-    pub(super) fn calculate_slice_cost(slice: &[Gene], distance_service: &DistanceService) -> f64 {
+    pub(super) fn calculate_slice_cost(slice: &[Gene], distance_service: &DistanceService) -> f32 {
         slice
             .windows(2)
             .map(|window| distance_service.get_distance(&window[0], &window[1]))

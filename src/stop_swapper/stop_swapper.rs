@@ -83,7 +83,7 @@ impl StopSwapper {
         &self,
         neighborhood1: &Neighborhood,
         neighborhood2: &Neighborhood,
-    ) -> f64 {
+    ) -> f32 {
         let (swapped_neighborhood1, swapped_neighborhood2);
 
         if Self::are_neighborhoods_consecutive(neighborhood1, neighborhood2) {
@@ -109,7 +109,7 @@ impl StopSwapper {
         &self,
         neighborhood: &Neighborhood,
         stops: &Vec<Stop>,
-    ) -> (usize, f64) {
+    ) -> (usize, f32) {
         stops
             .iter()
             .take(stops.len() - 1)

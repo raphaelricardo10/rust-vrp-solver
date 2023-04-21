@@ -83,7 +83,7 @@ impl RouteService {
         self.routes.values().map(|x| &x.vehicle).collect()
     }
 
-    pub fn total_distance(&self) -> f64 {
+    pub fn total_distance(&self) -> f32 {
         self.routes
             .values()
             .map(|route| route.total_distance())
@@ -191,7 +191,6 @@ impl RouteService {
             .get(&vehicle_id)
             .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"));
 
-        self.get_feasible_stops(route)
-            .choose(rng)
+        self.get_feasible_stops(route).choose(rng)
     }
 }

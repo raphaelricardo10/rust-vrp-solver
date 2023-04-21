@@ -7,7 +7,7 @@ pub(crate) struct Neighborhood<'a> {
     pub(crate) previous: Neighbor<'a>,
     pub(crate) current: Neighbor<'a>,
     pub(crate) next: Neighbor<'a>,
-    pub(crate) cost: f64,
+    pub(crate) cost: f32,
 }
 
 pub(crate) type StopReference<'a, 'b> = (&'a [Stop], usize, &'b DistanceService);
@@ -42,7 +42,7 @@ impl<'a> Neighborhood<'a> {
         neighborhood
     }
 
-    fn calculate_cost(&self, distance_service: &DistanceService) -> f64 {
+    fn calculate_cost(&self, distance_service: &DistanceService) -> f32 {
         distance_service.get_distance(self.previous.stop, self.current.stop)
             + distance_service.get_distance(self.current.stop, self.next.stop)
     }

@@ -7,7 +7,7 @@ use super::{stop::Stop, vehicle::Vehicle};
 pub struct Route {
     pub stops: Vec<Stop>,
     pub vehicle: Vehicle,
-    total_distance: f64,
+    total_distance: f32,
 }
 
 impl Route {
@@ -15,7 +15,7 @@ impl Route {
         Route {
             vehicle,
             stops: Vec::new(),
-            total_distance: f64::default(),
+            total_distance: f32::default(),
         }
     }
 
@@ -33,7 +33,7 @@ impl Route {
         self.vehicle.can_support_load(stop.usage)
     }
 
-    pub fn add_stop(&mut self, stop: Stop, distance: f64) -> Result<(), VehicleOverloadError> {
+    pub fn add_stop(&mut self, stop: Stop, distance: f32) -> Result<(), VehicleOverloadError> {
         self.vehicle.load(stop.usage)?;
 
         self.stops.push(stop);
@@ -42,17 +42,17 @@ impl Route {
         Ok(())
     }
 
-    pub fn remove_stop(&mut self, stop_index: usize, distance_reduction: f64) {
+    pub fn remove_stop(&mut self, stop_index: usize, distance_reduction: f32) {
         self.stops.remove(stop_index);
         self.total_distance -= distance_reduction;
     }
 
-    pub fn add_stop_at(&mut self, stop: Stop, index: usize, distance_change: f64) {
+    pub fn add_stop_at(&mut self, stop: Stop, index: usize, distance_change: f32) {
         self.stops.insert(index, stop);
         self.total_distance += distance_change;
     }
 
-    pub fn add_multiple_stops_at(&mut self, stops: Vec<Stop>, index: usize, distance_change: f64) {
+    pub fn add_multiple_stops_at(&mut self, stops: Vec<Stop>, index: usize, distance_change: f32) {
         self.stops.splice(index..index, stops);
 
         if index == 0 {
@@ -65,11 +65,11 @@ impl Route {
         self.total_distance += distance_change;
     }
 
-    pub fn total_distance(&self) -> f64 {
+    pub fn total_distance(&self) -> f32 {
         self.total_distance
     }
 
-    pub fn swap_stops(&mut self, index1: usize, index2: usize, distance_change: f64) {
+    pub fn swap_stops(&mut self, index1: usize, index2: usize, distance_change: f32) {
         self.stops.swap(index1, index2);
         self.total_distance += distance_change;
     }

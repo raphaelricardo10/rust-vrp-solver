@@ -19,7 +19,7 @@ use super::{
 
 pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     elite_size: usize,
-    mutation_rate: f64,
+    mutation_rate: f32,
     population: Population,
     stop_swapper: StopSwapper,
     max_generations: u32,
@@ -28,7 +28,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     best: Individual,
     crossover_op: OrderCrossover,
     local_search: TwoOptSearcher,
-    local_search_rate: f64,
+    local_search_rate: f32,
     rng: &'a mut R,
 }
 
@@ -39,10 +39,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         distances: &DistanceMatrix,
         population_size: u32,
         elite_size: usize,
-        mutation_rate: f64,
+        mutation_rate: f32,
         max_crossover_tries: u8,
         max_generations: u32,
-        local_search_rate: f64,
+        local_search_rate: f32,
         mut route_service: RouteService,
         rng: &'a mut R,
     ) -> Self {
@@ -76,7 +76,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
                     panic!("the candidate list should not be empty")
                 }
                 rand::distributions::WeightedError::InvalidWeight => {
-                    panic!("the weight value should be between 0 and f64::MAX")
+                    panic!("the weight value should be between 0 and f32::MAX")
                 }
                 rand::distributions::WeightedError::AllWeightsZero => {
                     panic!("at least one weight must be a non-zero value")
@@ -97,7 +97,13 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             .population
             .individuals
             .iter_mut()
-            .filter(|_| self.rng.gen_bool(self.mutation_rate))
+            .filter(|_| {
+                self.rng.gen_bool(
+                    self.mutation_rate
+                        .try_into()
+                        .expect("it should be possible to convert the local search rate to f64"),
+                )
+            })
             .collect();
 
         for individual in mutated_individuals {
@@ -126,7 +132,13 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             .population
             .individuals
             .iter_mut()
-            .filter(|_| self.rng.gen_bool(self.local_search_rate))
+            .filter(|_| {
+                self.rng.gen_bool(
+                    self.local_search_rate
+                        .try_into()
+                        .expect("it should be possible to convert the local search rate to f64"),
+                )
+            })
             .collect();
 
         for individual in selected_individuals {

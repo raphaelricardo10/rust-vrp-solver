@@ -13,7 +13,7 @@ pub(super) type GeneAddress = (usize, usize);
 impl Default for Individual {
     fn default() -> Self {
         Self {
-            fitness: f64::MAX,
+            fitness: f32::MAX,
             chromosomes: Default::default(),
         }
     }
@@ -21,7 +21,7 @@ impl Default for Individual {
 
 #[derive(Clone)]
 pub(crate) struct Individual {
-    pub(super) fitness: f64,
+    pub(super) fitness: f32,
     pub(super) chromosomes: Vec<Chromosome>,
 }
 
@@ -68,7 +68,7 @@ impl Individual {
         }
     }
 
-    fn calculate_fitness(chromosomes: &[Chromosome]) -> f64 {
+    fn calculate_fitness(chromosomes: &[Chromosome]) -> f32 {
         chromosomes
             .iter()
             .map(|chromosome| chromosome.total_distance())
@@ -109,7 +109,7 @@ impl Individual {
         &mut self,
         address1: GeneAddress,
         address2: GeneAddress,
-        fitness_change: f64,
+        fitness_change: f32,
     ) {
         let gene1 = self.get_gene(address1);
         let gene2 = self.get_gene(address2);

@@ -15,7 +15,7 @@ impl TwoOptSearcher {
         }
     }
 
-    fn should_swap_stops(swap_cost: f64) -> bool {
+    fn should_swap_stops(swap_cost: f32) -> bool {
         swap_cost < 0.0
     }
 
@@ -23,7 +23,7 @@ impl TwoOptSearcher {
         &self,
         stops: &Vec<Stop>,
         neighborhood: &Neighborhood,
-    ) -> Option<(usize, f64)> {
+    ) -> Option<(usize, f32)> {
         let (swap_candidate_index, swap_cost) =
             self.stop_swapper.get_minimum_swap_cost(neighborhood, stops);
 

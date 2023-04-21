@@ -5,7 +5,7 @@ use crate::domain::stop::Stop;
 use super::distance_matrix::DistanceMatrixEntry;
 
 pub type DistancesMatrixKey = (u32, u32);
-pub type DistanceMatrix = HashMap<DistancesMatrixKey, f64>;
+pub type DistanceMatrix = HashMap<DistancesMatrixKey, f32>;
 pub(super) type MappedDistanceMatrix = HashMap<DistancesMatrixKey, DistanceMatrixEntry>;
 
 pub type StopsMap = HashMap<u32, Stop>;
@@ -40,7 +40,7 @@ impl<'a> DistanceService {
             .collect()
     }
 
-    pub fn get_distance(&self, from: &Stop, to: &Stop) -> f64 {
+    pub fn get_distance(&self, from: &Stop, to: &Stop) -> f32 {
         self.distances
             .get(&(from.id, to.id))
             .unwrap_or_else(|| {

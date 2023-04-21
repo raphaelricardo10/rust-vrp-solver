@@ -2,20 +2,20 @@ use crate::services::route::route_service::RouteMap;
 
 pub struct Solution {
     pub routes: RouteMap,
-    pub total_distance: f64,
+    pub total_distance: f32,
 }
 
 impl Default for Solution {
     fn default() -> Self {
         Self {
-            total_distance: f64::MAX,
+            total_distance: f32::MAX,
             routes: Default::default(),
         }
     }
 }
 
 impl Solution {
-    pub fn new(routes: &RouteMap, total_distance: f64) -> Self {
+    pub fn new(routes: &RouteMap, total_distance: f32) -> Self {
         Self {
             total_distance,
             routes: routes.clone(),
