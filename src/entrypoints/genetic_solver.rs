@@ -2,20 +2,16 @@ use rand::thread_rng;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::route::route_service::RouteService,
-    solvers::{genetic::{
-        crossover::order_crossover::OrderCrossover,
-        genetic_solver::{GeneticSolver, GeneticSolverParameters},
-        population::Population,
-    }, solver::Solver},
+    solvers::{genetic::crossover::order_crossover::OrderCrossover, solver::Solver},
 };
 
-use super::abi::{
-    arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
-    parameters::GeneticAlgorithmParameters, route::ABIRoute,
+use super::{
+    abi::{
+        arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
+        parameters::GeneticAlgorithmParameters, route::ABIRoute,
+    },
+    factories::solver_factories::{copy_solution_to_abi, genetic_solver_factory},
 };
-
-use super::factories::{copy_result, distance_matrix_factory, vector_factory};
 
 /// # Safety
 ///
@@ -32,51 +28,18 @@ pub unsafe extern "C" fn genetic_solver(
 ) {
     let mut rng = thread_rng();
 
-    let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
-    let stops = vector_factory(stops_ptr, arg_sizes.stops);
-
-    let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
-    let mut route_service = RouteService::new(vehicles, &distances, stops.clone());
-    let population = Population::from((parameters.population_size, &mut rng, &mut route_service));
-
     let crossover_op = OrderCrossover::new(parameters.max_crossover_tries);
-
-    let parameters = GeneticSolverParameters {
-        elite_size: parameters.elite_size,
-        mutation_rate: parameters.mutation_rate,
-        max_generations: parameters.max_generations,
-        local_search_rate: parameters.local_search_rate,
-    };
-
-    let mut genetic_solver = GeneticSolver::new(
-        stops,
-        &distances,
-        population,
-        parameters,
+    let mut genetic_solver = genetic_solver_factory(
+        vehicles_ptr,
+        stops_ptr,
+        distances_ptr,
+        arg_sizes,
         &crossover_op,
+        parameters,
         &mut rng,
     );
 
     genetic_solver.solve();
 
-    genetic_solver
-        .solution
-        .routes
-        .into_iter()
-        .enumerate()
-        .for_each(|(index, (vehicle_id, solution))| {
-            let route = &mut *result.offset(
-                index
-                    .try_into()
-                    .expect("the index should fit in memory address size"),
-            );
-
-            route.vehicle_id = vehicle_id;
-            route.total_distance = solution.total_distance();
-            let stop_ids: Vec<u32> = solution.stops.iter().map(|stop| stop.id).collect();
-
-            route.number_of_stops = stop_ids.len();
-
-            copy_result(stop_ids, route.stop_ids)
-        });
+    copy_solution_to_abi(genetic_solver.solution, result);
 }
