@@ -1,4 +1,4 @@
-use crate::tests::fixtures::greedy_solver_fixture::GreedySolverFactory;
+use crate::{solvers::solver::Solver, tests::fixtures::greedy_solver_fixture::GreedySolverFactory};
 use rstest::rstest;
 
 use crate::tests::fixtures::greedy_solver_fixture::greedy_solver_factory;

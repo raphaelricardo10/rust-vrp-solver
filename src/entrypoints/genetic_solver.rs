@@ -3,11 +3,11 @@ use rand::thread_rng;
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::route::route_service::RouteService,
-    solvers::genetic::{
+    solvers::{genetic::{
         crossover::order_crossover::OrderCrossover,
         genetic_solver::{GeneticSolver, GeneticSolverParameters},
         population::Population,
-    },
+    }, solver::Solver},
 };
 
 use super::abi::{

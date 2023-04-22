@@ -1,12 +1,29 @@
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::solution::Solution,
+    solvers::{solution::Solution, solver::Solver},
 };
 
 pub struct GreedySolver {
     pub solution: Solution,
     route_service: RouteService,
+}
+
+impl Solver for GreedySolver {
+    fn solve(&mut self) {
+        self.route_service.assign_starting_points();
+
+        while !self.stop_condition_met() {
+            self.run_iteration();
+        }
+
+        self.route_service.assign_stop_points();
+
+        self.solution = Solution::new(
+            self.route_service.get_all_routes(),
+            self.route_service.total_distance(),
+        );
+    }
 }
 
 impl GreedySolver {
@@ -41,21 +58,6 @@ impl GreedySolver {
                     panic!("the vehicle {vehicle_id} should support the load from {stop_id}")
                 });
         }
-    }
-
-    pub fn solve(&mut self) {
-        self.route_service.assign_starting_points();
-
-        while !self.stop_condition_met() {
-            self.run_iteration();
-        }
-
-        self.route_service.assign_stop_points();
-
-        self.solution = Solution::new(
-            self.route_service.get_all_routes(),
-            self.route_service.total_distance(),
-        );
     }
 
     fn stop_condition_met(&self) -> bool {

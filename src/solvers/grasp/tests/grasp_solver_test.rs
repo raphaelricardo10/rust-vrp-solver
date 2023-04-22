@@ -1,4 +1,5 @@
 use crate::services::distance::distance_service::DistanceMatrix;
+use crate::solvers::solver::Solver;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::rstest;

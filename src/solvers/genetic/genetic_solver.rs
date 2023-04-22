@@ -4,7 +4,7 @@ use crate::{
     domain::stop::Stop,
     local_search::two_opt::TwoOptSearcher,
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteMap},
-    solvers::solution::Solution,
+    solvers::{solution::Solution, solver::Solver},
     stop_swapper::StopSwapper,
 };
 
@@ -21,7 +21,7 @@ pub struct GeneticSolverParameters {
     pub(crate) local_search_rate: f32,
 }
 
-pub struct GeneticSolver<'a, R: Rng> {
+pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     parameters: GeneticSolverParameters,
     population: Population,
     stop_swapper: StopSwapper,
@@ -33,7 +33,51 @@ pub struct GeneticSolver<'a, R: Rng> {
     rng: &'a mut R,
 }
 
-impl<'a, R: Rng> GeneticSolver<'a, R> {
+impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
+    fn solve(&mut self) {
+        while !self.stop_condition_met() {
+            loop {
+                let parents = self.selection();
+
+                let (parent1_index, parent1) = &parents[0];
+                let (parent2_index, parent2) = &parents[1];
+
+                let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
+                    Some(offsprings) => offsprings,
+                    None => break,
+                };
+
+                if self.should_update_best(&offspring1) {
+                    self.best = offspring1.clone();
+                }
+
+                if self.should_update_best(&offspring2) {
+                    self.best = offspring2.clone();
+                }
+
+                self.population.individuals[*parent1_index] = offspring1;
+                self.population.individuals[*parent2_index] = offspring2;
+            }
+
+            self.mutation();
+            self.apply_local_search();
+
+            self.current_generation += 1;
+        }
+
+        let route_map: RouteMap = self
+            .best
+            .chromosomes
+            .iter()
+            .cloned()
+            .map(|chromosome| (chromosome.vehicle.id, chromosome))
+            .collect();
+
+        self.solution = Solution::new(&route_map, self.best.fitness);
+    }
+}
+
+impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     pub(crate) fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
@@ -143,47 +187,5 @@ impl<'a, R: Rng> GeneticSolver<'a, R> {
 
     fn should_update_best(&self, individual: &Individual) -> bool {
         individual.fitness < self.best.fitness
-    }
-
-    pub fn solve(&mut self) {
-        while !self.stop_condition_met() {
-            loop {
-                let parents = self.selection();
-
-                let (parent1_index, parent1) = &parents[0];
-                let (parent2_index, parent2) = &parents[1];
-
-                let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
-                    Some(offsprings) => offsprings,
-                    None => break,
-                };
-
-                if self.should_update_best(&offspring1) {
-                    self.best = offspring1.clone();
-                }
-
-                if self.should_update_best(&offspring2) {
-                    self.best = offspring2.clone();
-                }
-
-                self.population.individuals[*parent1_index] = offspring1;
-                self.population.individuals[*parent2_index] = offspring2;
-            }
-
-            self.mutation();
-            self.apply_local_search();
-
-            self.current_generation += 1;
-        }
-
-        let route_map: RouteMap = self
-            .best
-            .chromosomes
-            .iter()
-            .cloned()
-            .map(|chromosome| (chromosome.vehicle.id, chromosome))
-            .collect();
-
-        self.solution = Solution::new(&route_map, self.best.fitness);
     }
 }

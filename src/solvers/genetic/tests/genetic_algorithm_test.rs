@@ -4,6 +4,7 @@ use rstest::rstest;
 
 use crate::solvers::genetic::genetic_solver::GeneticSolverParameters;
 use crate::solvers::genetic::population::Population;
+use crate::solvers::solver::Solver;
 use crate::{
     domain::stop::Stop,
     services::distance::distance_service::DistanceMatrix,

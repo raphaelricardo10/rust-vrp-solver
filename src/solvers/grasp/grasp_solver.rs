@@ -4,7 +4,7 @@ use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     local_search::two_opt::TwoOptSearcher,
     services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
-    solvers::solution::Solution,
+    solvers::{solution::Solution, solver::Solver},
 };
 
 pub struct GraspSolver<'a, R: Rng + ?Sized> {
@@ -15,6 +15,14 @@ pub struct GraspSolver<'a, R: Rng + ?Sized> {
     route_service: RouteService,
     max_improvement_times: u8,
     times_without_improvement: u8,
+}
+
+impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
+    fn solve(&mut self) {
+        while !self.stop_condition_met() {
+            self.run_generation();
+        }
+    }
 }
 
 impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
@@ -34,12 +42,6 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
             times_without_improvement: Default::default(),
             local_search: TwoOptSearcher::new(stops.clone(), distances),
             route_service: RouteService::new(vehicles, distances, stops),
-        }
-    }
-
-    pub fn solve(&mut self) {
-        while !self.stop_condition_met() {
-            self.run_generation();
         }
     }
 
