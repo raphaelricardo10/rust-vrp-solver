@@ -15,10 +15,10 @@ use super::{
 };
 
 pub struct GeneticSolverParameters {
-    pub(crate) elite_size: usize,
-    pub(crate) mutation_rate: f32,
-    pub(crate) max_generations: u32,
-    pub(crate) local_search_rate: f32,
+    pub elite_size: usize,
+    pub mutation_rate: f32,
+    pub max_generations: u32,
+    pub local_search_rate: f32,
 }
 
 pub struct GeneticSolver<'a, R: Rng + ?Sized> {
