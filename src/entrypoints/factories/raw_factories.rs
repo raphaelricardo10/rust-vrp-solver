@@ -2,7 +2,7 @@ use std::{ptr, slice};
 
 use crate::services::distance::distance_service::DistanceMatrix;
 
-use crate::entrypoints::abi::distance_matrix::ABIDistanceMatrixEntry;
+use crate::entrypoints::structures::distance_matrix::ABIDistanceMatrixEntry;
 
 pub(super) unsafe fn distance_matrix_factory(
     ptr: *mut ABIDistanceMatrixEntry,

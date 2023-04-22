@@ -2,7 +2,7 @@ use rand::Rng;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    entrypoints::abi::{
+    entrypoints::structures::{
         arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
         parameters::GeneticAlgorithmParameters, route::ABIRoute,
     },

@@ -6,7 +6,7 @@ use crate::{
 };
 
 use super::{
-    abi::{
+    structures::{
         arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
         parameters::GeneticAlgorithmParameters, route::ABIRoute,
     },
