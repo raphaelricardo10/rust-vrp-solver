@@ -34,7 +34,6 @@ pub struct GeneticSolver<'a, R: Rng> {
 }
 
 impl<'a, R: Rng> GeneticSolver<'a, R> {
-    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
