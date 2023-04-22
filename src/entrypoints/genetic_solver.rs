@@ -24,7 +24,7 @@ pub unsafe extern "C" fn genetic_solver(
     distances_ptr: *mut ABIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
     parameters: GeneticAlgorithmParameters,
-    result: *mut ABIRoute,
+    result_ptr: *mut ABIRoute,
 ) {
     let mut rng = thread_rng();
 
@@ -41,5 +41,5 @@ pub unsafe extern "C" fn genetic_solver(
 
     genetic_solver.solve();
 
-    copy_solution_to_abi(genetic_solver.solution, result);
+    copy_solution_to_abi(genetic_solver.solution, result_ptr);
 }
