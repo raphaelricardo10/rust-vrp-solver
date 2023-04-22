@@ -32,6 +32,10 @@ impl<'a, R: Rng + ?Sized> Solver for TwoStageGeneticSolver<'a, R> {
     fn get_solution(&self) -> &Solution {
         &self.genetic_solver.solution
     }
+
+    fn reset_solution(&mut self) {
+        self.genetic_solver.solution = Default::default();
+    }
 }
 
 impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {

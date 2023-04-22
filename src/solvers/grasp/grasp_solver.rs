@@ -27,6 +27,10 @@ impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
     fn get_solution(&self) -> &Solution {
         &self.solution
     }
+    
+    fn reset_solution(&mut self) {
+        self.solution = Default::default();
+    }
 }
 
 impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {

@@ -28,6 +28,10 @@ impl Solver for GreedySolver {
     fn get_solution(&self) -> &Solution {
         &self.solution
     }
+
+    fn reset_solution(&mut self) {
+        self.solution = Default::default();
+    }
 }
 
 impl GreedySolver {
