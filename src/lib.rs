@@ -1,6 +1,5 @@
 pub mod domain;
 pub mod entrypoints;
-pub mod errors;
 pub mod local_search;
 pub mod services;
 pub mod solvers;

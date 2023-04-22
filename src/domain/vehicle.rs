@@ -1,4 +1,4 @@
-use crate::errors::vehicle::{
+use crate::domain::errors::vehicle::{
     negative_capacity::NegativeVehicleCapacityError, vehicle_overload::VehicleOverloadError,
 };
 

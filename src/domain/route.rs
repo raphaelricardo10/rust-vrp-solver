@@ -1,4 +1,4 @@
-use crate::errors::vehicle::vehicle_overload::VehicleOverloadError;
+use crate::domain::errors::vehicle::vehicle_overload::VehicleOverloadError;
 
 use super::{stop::Stop, vehicle::Vehicle};
 

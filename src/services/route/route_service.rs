@@ -2,8 +2,10 @@ use rand::{seq::IteratorRandom, Rng};
 use std::collections::{BTreeMap, HashMap};
 
 use crate::{
-    domain::{route::Route, stop::Stop, vehicle::Vehicle},
-    errors::vehicle::vehicle_overload::VehicleOverloadError,
+    domain::{
+        errors::vehicle::vehicle_overload::VehicleOverloadError, route::Route, stop::Stop,
+        vehicle::Vehicle,
+    },
     services::distance::distance_service::{DistanceMatrix, DistanceService},
 };
 
