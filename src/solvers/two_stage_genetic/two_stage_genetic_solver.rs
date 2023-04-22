@@ -9,6 +9,7 @@ use crate::{
             genetic_solver::{GeneticSolver, GeneticSolverParameters},
             population::Population,
         },
+        solution::Solution,
         solver::Solver,
     },
 };
@@ -26,6 +27,10 @@ pub struct TwoStageGeneticSolverParameters {
 impl<'a, R: Rng + ?Sized> Solver for TwoStageGeneticSolver<'a, R> {
     fn solve(&mut self) {
         self.genetic_solver.solve();
+    }
+
+    fn get_solution(&self) -> &Solution {
+        &self.genetic_solver.solution
     }
 }
 

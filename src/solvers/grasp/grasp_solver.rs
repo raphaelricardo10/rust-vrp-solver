@@ -23,6 +23,10 @@ impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
             self.run_generation();
         }
     }
+
+    fn get_solution(&self) -> &Solution {
+        &self.solution
+    }
 }
 
 impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {

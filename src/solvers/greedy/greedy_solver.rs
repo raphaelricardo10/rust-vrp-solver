@@ -24,6 +24,10 @@ impl Solver for GreedySolver {
             self.route_service.total_distance(),
         );
     }
+
+    fn get_solution(&self) -> &Solution {
+        &self.solution
+    }
 }
 
 impl GreedySolver {

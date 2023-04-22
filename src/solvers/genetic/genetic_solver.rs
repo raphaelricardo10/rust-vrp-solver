@@ -75,6 +75,10 @@ impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
 
         self.solution = Solution::new(&route_map, self.best.fitness);
     }
+
+    fn get_solution(&self) -> &Solution {
+        &self.solution
+    }
 }
 
 impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
