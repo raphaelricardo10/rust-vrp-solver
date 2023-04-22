@@ -1,5 +1,5 @@
 #[repr(C)]
-pub struct ABIRoute {
+pub struct FFIRoute {
     pub(crate) vehicle_id: u32,
     pub(crate) stop_ids: *mut u32,
     pub(crate) number_of_stops: usize,

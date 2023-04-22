@@ -3,8 +3,8 @@ use rand::Rng;
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     entrypoints::structures::{
-        arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
-        parameters::GeneticAlgorithmParameters, route::ABIRoute,
+        arg_sizes::ArgSizes, distance_matrix::FFIDistanceMatrixEntry,
+        parameters::FFIGeneticSolverParameters, route::FFIRoute,
     },
     services::route::route_service::RouteService,
     solvers::{
@@ -22,10 +22,10 @@ use super::raw_factories::{copy_result, distance_matrix_factory, vector_factory}
 pub(crate) unsafe fn genetic_solver_factory<'a, R>(
     vehicles_ptr: *mut Vehicle,
     stops_ptr: *mut Stop,
-    distances_ptr: *mut ABIDistanceMatrixEntry,
+    distances_ptr: *mut FFIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
     crossover_op: &'a dyn CrossoverOperator<R>,
-    parameters: GeneticAlgorithmParameters,
+    parameters: FFIGeneticSolverParameters,
     rng: &'a mut R,
 ) -> GeneticSolver<'a, R>
 where
@@ -48,7 +48,7 @@ where
     GeneticSolver::new(stops, &distances, population, parameters, crossover_op, rng)
 }
 
-pub(crate) unsafe fn copy_solution_to_abi(solution: Solution, result_ptr: *mut ABIRoute) {
+pub(crate) unsafe fn copy_solution_to_abi(solution: Solution, result_ptr: *mut FFIRoute) {
     solution
         .routes
         .into_iter()

@@ -2,10 +2,10 @@ use std::{ptr, slice};
 
 use crate::services::distance::distance_service::DistanceMatrix;
 
-use crate::entrypoints::structures::distance_matrix::ABIDistanceMatrixEntry;
+use crate::entrypoints::structures::distance_matrix::FFIDistanceMatrixEntry;
 
 pub(super) unsafe fn distance_matrix_factory(
-    ptr: *mut ABIDistanceMatrixEntry,
+    ptr: *mut FFIDistanceMatrixEntry,
     len: usize,
 ) -> DistanceMatrix {
     std::slice::from_raw_parts(ptr, len)

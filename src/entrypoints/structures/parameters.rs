@@ -1,5 +1,5 @@
 #[repr(C)]
-pub struct GeneticAlgorithmParameters {
+pub struct FFIGeneticSolverParameters {
     pub population_size: u32,
     pub elite_size: usize,
     pub mutation_rate: f32,

@@ -1,7 +1,7 @@
 use crate::domain::{stop::Stop, vehicle::Vehicle};
 
 use super::{
-    abi::distance_matrix::ABIDistanceMatrixEntry,
+    abi::distance_matrix::FFIDistanceMatrixEntry,
     factories::{copy_result, distance_matrix_factory, vector_factory},
 };
 
@@ -36,7 +36,7 @@ pub unsafe extern "C" fn add_vehicle_to_array(
 
 #[no_mangle]
 pub unsafe extern "C" fn read_distance_matrix(
-    distances_ptr: *mut ABIDistanceMatrixEntry,
+    distances_ptr: *mut FFIDistanceMatrixEntry,
     num_entries: usize,
     a: u32,
     b: u32,

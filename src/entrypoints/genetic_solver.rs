@@ -6,11 +6,11 @@ use crate::{
 };
 
 use super::{
-    structures::{
-        arg_sizes::ArgSizes, distance_matrix::ABIDistanceMatrixEntry,
-        parameters::GeneticAlgorithmParameters, route::ABIRoute,
-    },
     factories::solver_factories::{copy_solution_to_abi, genetic_solver_factory},
+    structures::{
+        arg_sizes::ArgSizes, distance_matrix::FFIDistanceMatrixEntry,
+        parameters::FFIGeneticSolverParameters, route::FFIRoute,
+    },
 };
 
 /// # Safety
@@ -21,10 +21,10 @@ use super::{
 pub unsafe extern "C" fn genetic_solver(
     vehicles_ptr: *mut Vehicle,
     stops_ptr: *mut Stop,
-    distances_ptr: *mut ABIDistanceMatrixEntry,
+    distances_ptr: *mut FFIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
-    parameters: GeneticAlgorithmParameters,
-    result_ptr: *mut ABIRoute,
+    parameters: FFIGeneticSolverParameters,
+    result_ptr: *mut FFIRoute,
 ) {
     let mut rng = thread_rng();
 
