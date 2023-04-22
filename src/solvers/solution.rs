@@ -1,5 +1,6 @@
 use crate::services::route::route_service::RouteMap;
 
+#[derive(Clone)]
 pub struct Solution {
     pub routes: RouteMap,
     pub total_distance: f32,
