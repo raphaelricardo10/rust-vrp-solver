@@ -110,6 +110,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         }
     }
 
+    pub(crate) fn update_population(&mut self, population: Population) {
+        self.population = population;
+    }
+
     pub(super) fn selection(&self) -> Vec<(usize, Individual)> {
         self.population
             .get_k_bests(self.parameters.elite_size)
