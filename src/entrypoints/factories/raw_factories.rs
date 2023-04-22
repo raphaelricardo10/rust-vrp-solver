@@ -4,7 +4,7 @@ use crate::services::distance::distance_service::DistanceMatrix;
 
 use crate::entrypoints::abi::distance_matrix::ABIDistanceMatrixEntry;
 
-pub unsafe fn distance_matrix_factory(
+pub(super) unsafe fn distance_matrix_factory(
     ptr: *mut ABIDistanceMatrixEntry,
     len: usize,
 ) -> DistanceMatrix {
@@ -14,10 +14,10 @@ pub unsafe fn distance_matrix_factory(
         .collect()
 }
 
-pub unsafe fn vector_factory<T: Clone>(ptr: *mut T, len: usize) -> Vec<T> {
+pub(super) unsafe fn vector_factory<T: Clone>(ptr: *mut T, len: usize) -> Vec<T> {
     slice::from_raw_parts(ptr, len).to_vec()
 }
 
-pub unsafe fn copy_result<T>(src: Vec<T>, dest: *mut T) {
+pub(super) unsafe fn copy_result<T>(src: Vec<T>, dest: *mut T) {
     ptr::copy_nonoverlapping(src.as_ptr(), dest, src.len());
 }
