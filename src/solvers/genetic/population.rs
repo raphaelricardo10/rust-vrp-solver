@@ -1,6 +1,6 @@
 use rand::Rng;
 
-use crate::services::route::route_service::RouteService;
+use crate::{services::route::route_service::RouteService, solvers::solution::Solution};
 
 use super::individual::Individual;
 
@@ -23,6 +23,19 @@ impl<'a, 'b, R: Rng + ?Sized> From<RandomPopulationGeneratorParams<'a, 'b, R>> f
         }
 
         population
+    }
+}
+
+impl From<&[Solution]> for Population {
+    fn from(solutions: &[Solution]) -> Self {
+        Self {
+            individuals: solutions
+                .iter()
+                .map(|solution| {
+                    Individual::new(solution.routes.values().cloned().collect())
+                })
+                .collect(),
+        }
     }
 }
 
