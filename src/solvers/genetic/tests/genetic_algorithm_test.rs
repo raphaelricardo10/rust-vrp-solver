@@ -2,9 +2,12 @@ use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::rstest;
 
+use crate::solvers::genetic::genetic_solver::GeneticSolverParameters;
+use crate::solvers::genetic::population::Population;
 use crate::{
-    domain::stop::Stop, services::distance::distance_service::DistanceMatrix,
-    solvers::genetic::genetic_solver::GeneticSolver,
+    domain::stop::Stop,
+    services::distance::distance_service::DistanceMatrix,
+    solvers::genetic::{crossover::order_crossover::OrderCrossover, genetic_solver::GeneticSolver},
 };
 
 use crate::tests::fixtures::distances_fixture::distances;
@@ -19,17 +22,23 @@ fn test_genetic_algorithm_can_generate_a_good_route(
 ) {
     let mut rng = ChaCha8Rng::seed_from_u64(0);
 
-    let route_service = route_service_factory(2);
+    let mut route_service = route_service_factory(2);
+    let population = Population::from((10, &mut rng, &mut route_service));
+    let crossover_op = OrderCrossover::new(5);
+
+    let parameters = GeneticSolverParameters {
+        elite_size: 3,
+        max_generations: 10,
+        local_search_rate: 0.2,
+        mutation_rate: 0.05,
+    };
+
     let mut solver = GeneticSolver::new(
         stops,
         &distances,
-        10,
-        3,
-        0.05,
-        10,
-        5,
-        0.2,
-        route_service,
+        population,
+        parameters,
+        &crossover_op,
         &mut rng,
     );
 

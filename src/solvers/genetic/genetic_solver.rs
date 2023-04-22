@@ -3,64 +3,56 @@ use rand::{seq::SliceRandom, thread_rng, Rng};
 use crate::{
     domain::stop::Stop,
     local_search::two_opt::TwoOptSearcher,
-    services::{
-        distance::distance_service::DistanceMatrix,
-        route::route_service::{RouteMap, RouteService},
-    },
+    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteMap},
     solvers::solution::Solution,
     stop_swapper::StopSwapper,
 };
 
 use super::{
-    crossover::{offspring::Offspring, order_crossover::OrderCrossover},
+    crossover::{crossover_operator::CrossoverOperator, offspring::Offspring},
     individual::Individual,
     population::Population,
 };
 
-pub struct GeneticSolver<'a, R: Rng + ?Sized> {
-    elite_size: usize,
-    mutation_rate: f32,
+pub struct GeneticSolverParameters {
+    pub(crate) elite_size: usize,
+    pub(crate) mutation_rate: f32,
+    pub(crate) max_generations: u32,
+    pub(crate) local_search_rate: f32,
+}
+
+pub struct GeneticSolver<'a, R: Rng> {
+    parameters: GeneticSolverParameters,
     population: Population,
     stop_swapper: StopSwapper,
-    max_generations: u32,
     current_generation: u32,
     pub solution: Solution,
     best: Individual,
-    crossover_op: OrderCrossover,
+    crossover_op: &'a dyn CrossoverOperator<R>,
     local_search: TwoOptSearcher,
-    local_search_rate: f32,
     rng: &'a mut R,
 }
 
-impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
+impl<'a, R: Rng> GeneticSolver<'a, R> {
     #[allow(clippy::too_many_arguments)]
-    pub fn new(
+    pub(crate) fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
-        population_size: u32,
-        elite_size: usize,
-        mutation_rate: f32,
-        max_crossover_tries: u8,
-        max_generations: u32,
-        local_search_rate: f32,
-        mut route_service: RouteService,
+        population: Population,
+        parameters: GeneticSolverParameters,
+        crossover_op: &'a dyn CrossoverOperator<R>,
         rng: &'a mut R,
     ) -> Self {
         let stop_swapper = StopSwapper::new(stops.clone(), distances);
         let local_search = TwoOptSearcher::new(stops, distances);
-        let crossover_op = OrderCrossover::new(max_crossover_tries);
-        let population = Population::from((population_size, &mut *rng, &mut route_service));
 
         Self {
             rng,
-            elite_size,
             population,
+            parameters,
             crossover_op,
             stop_swapper,
             local_search,
-            mutation_rate,
-            max_generations,
-            local_search_rate,
             best: Default::default(),
             solution: Default::default(),
             current_generation: Default::default(),
@@ -69,7 +61,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
 
     pub(super) fn selection(&self) -> Vec<(usize, Individual)> {
         self.population
-            .get_k_bests(self.elite_size)
+            .get_k_bests(self.parameters.elite_size)
             .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
             .unwrap_or_else(|err| match err {
                 rand::distributions::WeightedError::NoItem => {
@@ -93,18 +85,18 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     pub(super) fn mutation(&mut self) {
         let stop_swapper = &self.stop_swapper;
 
-        let mutated_individuals: Vec<&mut Individual> = self
-            .population
-            .individuals
-            .iter_mut()
-            .filter(|_| {
-                self.rng.gen_bool(
-                    self.mutation_rate
-                        .try_into()
-                        .expect("it should be possible to convert the local search rate to f64"),
-                )
-            })
-            .collect();
+        let mutated_individuals: Vec<&mut Individual> =
+            self.population
+                .individuals
+                .iter_mut()
+                .filter(|_| {
+                    self.rng.gen_bool(
+                        self.parameters.mutation_rate.try_into().expect(
+                            "it should be possible to convert the local search rate to f64",
+                        ),
+                    )
+                })
+                .collect();
 
         for individual in mutated_individuals {
             individual.swap_random_genes(stop_swapper, self.rng);
@@ -116,10 +108,8 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         parent1: &Individual,
         parent2: &Individual,
     ) -> Option<(Individual, Individual)> {
-        let mut offspring1 =
-            Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op.clone());
-        let mut offspring2 =
-            Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op.clone());
+        let mut offspring1 = Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op);
+        let mut offspring2 = Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op);
 
         offspring1.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
         offspring2.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
@@ -128,18 +118,18 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     }
 
     pub(super) fn apply_local_search(&mut self) {
-        let selected_individuals: Vec<&mut Individual> = self
-            .population
-            .individuals
-            .iter_mut()
-            .filter(|_| {
-                self.rng.gen_bool(
-                    self.local_search_rate
-                        .try_into()
-                        .expect("it should be possible to convert the local search rate to f64"),
-                )
-            })
-            .collect();
+        let selected_individuals: Vec<&mut Individual> =
+            self.population
+                .individuals
+                .iter_mut()
+                .filter(|_| {
+                    self.rng.gen_bool(
+                        self.parameters.local_search_rate.try_into().expect(
+                            "it should be possible to convert the local search rate to f64",
+                        ),
+                    )
+                })
+                .collect();
 
         for individual in selected_individuals {
             for chromosome in individual.chromosomes.iter_mut() {
@@ -149,7 +139,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     }
 
     fn stop_condition_met(&self) -> bool {
-        self.current_generation >= self.max_generations
+        self.current_generation >= self.parameters.max_generations
     }
 
     fn should_update_best(&self, individual: &Individual) -> bool {

@@ -3,7 +3,11 @@ use rand::thread_rng;
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     services::route::route_service::RouteService,
-    solvers::genetic::genetic_solver::GeneticSolver,
+    solvers::genetic::{
+        crossover::order_crossover::OrderCrossover,
+        genetic_solver::{GeneticSolver, GeneticSolverParameters},
+        population::Population,
+    },
 };
 
 use super::abi::{
@@ -32,19 +36,24 @@ pub unsafe extern "C" fn genetic_solver(
     let stops = vector_factory(stops_ptr, arg_sizes.stops);
 
     let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
+    let mut route_service = RouteService::new(vehicles, &distances, stops.clone());
+    let population = Population::from((parameters.population_size, &mut rng, &mut route_service));
 
-    let route_service = RouteService::new(vehicles, &distances, stops.clone());
+    let crossover_op = OrderCrossover::new(parameters.max_crossover_tries);
+
+    let parameters = GeneticSolverParameters {
+        elite_size: parameters.elite_size,
+        mutation_rate: parameters.mutation_rate,
+        max_generations: parameters.max_generations,
+        local_search_rate: parameters.local_search_rate,
+    };
 
     let mut genetic_solver = GeneticSolver::new(
         stops,
         &distances,
-        parameters.population_size,
-        parameters.elite_size,
-        parameters.mutation_rate,
-        parameters.max_crossover_tries,
-        parameters.max_generations,
-        parameters.local_search_rate,
-        route_service,
+        population,
+        parameters,
+        &crossover_op,
         &mut rng,
     );
 

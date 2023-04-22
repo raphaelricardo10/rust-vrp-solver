@@ -32,7 +32,7 @@ fn test_offspring_can_evolve(parents: Parents, distance_service: DistanceService
     let mut rng = ChaCha8Rng::seed_from_u64(0);
     let crossover_op = OrderCrossover::new(100);
 
-    let mut offspring = Offspring::new(parents.0.clone(), parents.1.clone(), crossover_op);
+    let mut offspring = Offspring::new(parents.0.clone(), parents.1.clone(), &crossover_op);
 
     offspring
         .try_to_evolve(&mut rng, &distance_service)
