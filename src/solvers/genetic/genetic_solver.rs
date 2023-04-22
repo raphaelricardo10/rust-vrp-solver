@@ -1,4 +1,4 @@
-use rand::{seq::SliceRandom, thread_rng, Rng};
+use rand::{seq::SliceRandom, Rng};
 
 use crate::{
     domain::stop::Stop,
@@ -114,10 +114,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         self.population = population;
     }
 
-    pub(super) fn selection(&self) -> Vec<(usize, Individual)> {
+    pub(super) fn selection(&mut self) -> Vec<(usize, Individual)> {
         self.population
             .get_k_bests(self.parameters.elite_size)
-            .choose_multiple_weighted(&mut thread_rng(), 2, |individual| individual.fitness)
+            .choose_multiple_weighted(self.rng, 2, |individual| individual.fitness)
             .unwrap_or_else(|err| match err {
                 rand::distributions::WeightedError::NoItem => {
                     panic!("the candidate list should not be empty")
