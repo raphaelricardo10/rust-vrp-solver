@@ -7,14 +7,18 @@ use crate::{
     solvers::{solution::Solution, solver::Solver},
 };
 
+pub struct GraspSolverParameters {
+    pub rcl_size: usize,
+    pub max_improvement_times: u8,
+}
+
 pub struct GraspSolver<'a, R: Rng + ?Sized> {
     rng: &'a mut R,
-    rcl_size: usize,
     pub solution: Solution,
-    local_search: TwoOptSearcher,
     route_service: RouteService,
-    max_improvement_times: u8,
+    local_search: TwoOptSearcher,
     times_without_improvement: u8,
+    parameters: GraspSolverParameters,
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
@@ -35,18 +39,16 @@ impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
 
 impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
     pub fn new(
-        rcl_size: usize,
+        stops: Vec<Stop>,
         vehicles: Vec<Vehicle>,
         distances: &'a DistanceMatrix,
-        max_improvement_times: u8,
-        stops: Vec<Stop>,
+        parameters: GraspSolverParameters,
         rng: &'a mut R,
     ) -> Self {
         Self {
             rng,
-            rcl_size,
-            max_improvement_times,
-            solution: Solution::default(),
+            parameters,
+            solution: Default::default(),
             times_without_improvement: Default::default(),
             local_search: TwoOptSearcher::new(stops.clone(), distances),
             route_service: RouteService::new(vehicles, distances, stops),
@@ -54,7 +56,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
     }
 
     fn stop_condition_met(&self) -> bool {
-        self.times_without_improvement >= self.max_improvement_times
+        self.times_without_improvement >= self.parameters.max_improvement_times
     }
 
     fn run_generation(&mut self) {
@@ -111,7 +113,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
     pub fn get_random_near_stop(&mut self, vehicle_id: u32) -> Option<&Stop> {
         let near_stops = self
             .route_service
-            .get_k_nearest_stops(vehicle_id, self.rcl_size)?;
+            .get_k_nearest_stops(vehicle_id, self.parameters.rcl_size)?;
         let chosen = *near_stops.choose(self.rng)?;
 
         Some(chosen)

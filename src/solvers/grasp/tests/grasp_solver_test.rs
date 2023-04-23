@@ -1,4 +1,5 @@
 use crate::services::distance::distance_service::DistanceMatrix;
+use crate::solvers::grasp::grasp_solver::GraspSolverParameters;
 use crate::solvers::solver::Solver;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
@@ -19,7 +20,12 @@ fn grasp_solution_is_correct(
     let mut rng = ChaCha8Rng::seed_from_u64(0);
     let vehicles = vehicle_factory(2);
 
-    let mut solver = GraspSolver::new(3, vehicles, &distances, 3, stops, &mut rng);
+    let parameters = GraspSolverParameters {
+        rcl_size: 3,
+        max_improvement_times: 3,
+    };
+
+    let mut solver = GraspSolver::new(stops, vehicles, &distances, parameters, &mut rng);
     solver.solve();
 
     let solution_v1 = &solver.solution.routes.get(&0).unwrap().stops;
