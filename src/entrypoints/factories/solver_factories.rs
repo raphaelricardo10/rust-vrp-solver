@@ -13,7 +13,12 @@ use crate::{
             genetic_solver::{GeneticSolver, GeneticSolverParameters},
             population::Population,
         },
+        grasp::grasp_solver::{GraspSolver, GraspSolverParameters},
         solution::Solution,
+        solver::Solver,
+        two_stage_genetic::two_stage_genetic_solver::{
+            TwoStageGeneticSolver, TwoStageGeneticSolverParameters,
+        },
     },
 };
 
@@ -46,6 +51,59 @@ where
     };
 
     GeneticSolver::new(stops, &distances, population, parameters, crossover_op, rng)
+}
+
+pub(crate) unsafe fn grasp_solver_factory<R>(
+    vehicles_ptr: *mut Vehicle,
+    stops_ptr: *mut Stop,
+    distances_ptr: *mut FFIDistanceMatrixEntry,
+    arg_sizes: ArgSizes,
+    parameters: GraspSolverParameters,
+    rng: &mut R,
+) -> GraspSolver<R>
+where
+    R: Rng + ?Sized,
+{
+    let stops = vector_factory(stops_ptr, arg_sizes.stops);
+    let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
+    let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
+
+    GraspSolver::new(stops, vehicles, &distances, parameters, rng)
+}
+
+pub(crate) unsafe fn two_stage_genetic_solver_factory<'a, R>(
+    stops_ptr: *mut Stop,
+    distances_ptr: *mut FFIDistanceMatrixEntry,
+    arg_sizes: ArgSizes,
+    first_stage_solver: &'a mut dyn Solver,
+    crossover_op: &'a mut dyn CrossoverOperator<R>,
+    parameters: FFIGeneticSolverParameters,
+    rng: &'a mut R,
+) -> TwoStageGeneticSolver<'a, R>
+where
+    R: Rng + ?Sized,
+{
+    let stops = vector_factory(stops_ptr, arg_sizes.stops);
+    let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
+
+    let parameters = TwoStageGeneticSolverParameters {
+        population_size: parameters.population_size,
+        genetic_solver_parameters: GeneticSolverParameters {
+            elite_size: parameters.elite_size,
+            mutation_rate: parameters.mutation_rate,
+            max_generations: parameters.max_generations,
+            local_search_rate: parameters.local_search_rate,
+        },
+    };
+
+    TwoStageGeneticSolver::new(
+        stops,
+        &distances,
+        first_stage_solver,
+        parameters,
+        crossover_op,
+        rng,
+    )
 }
 
 pub(crate) unsafe fn copy_solution_to_abi(solution: Solution, result_ptr: *mut FFIRoute) {
