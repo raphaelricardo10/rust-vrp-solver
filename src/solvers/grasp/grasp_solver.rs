@@ -7,6 +7,7 @@ use crate::{
     solvers::{solution::Solution, solver::Solver},
 };
 
+#[repr(C)]
 pub struct GraspSolverParameters {
     pub rcl_size: usize,
     pub max_improvement_times: u8,
