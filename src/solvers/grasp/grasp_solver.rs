@@ -42,7 +42,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
     pub fn new(
         stops: Vec<Stop>,
         vehicles: Vec<Vehicle>,
-        distances: &'a DistanceMatrix,
+        distances: &DistanceMatrix,
         parameters: GraspSolverParameters,
         rng: &'a mut R,
     ) -> Self {
