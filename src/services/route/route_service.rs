@@ -1,12 +1,15 @@
 use rand::{seq::IteratorRandom, Rng};
-use std::collections::{BTreeMap, HashMap};
+use std::{
+    collections::{BTreeMap, HashMap},
+    rc::Rc,
+};
 
 use crate::{
     domain::{
         errors::vehicle::vehicle_overload::VehicleOverloadError, route::Route, stop::Stop,
         vehicle::Vehicle,
     },
-    services::distance::distance_service::{DistanceMatrix, DistanceService},
+    services::distance::distance_service::DistanceService,
 };
 
 pub type StopMap = HashMap<u32, Stop>;
@@ -16,20 +19,20 @@ pub struct RouteService {
     routes: RouteMap,
     all_stops: Vec<Stop>,
     available_stops: StopMap,
-    distance_service: DistanceService,
+    distance_service: Rc<DistanceService>,
 }
 
 impl RouteService {
     pub fn new(
-        vehicles: Vec<Vehicle>,
-        distances: &DistanceMatrix,
         stops: Vec<Stop>,
-    ) -> RouteService {
-        RouteService {
+        vehicles: Vec<Vehicle>,
+        distance_service: Rc<DistanceService>,
+    ) -> Self {
+        Self {
+            distance_service,
             all_stops: stops.clone(),
             routes: Self::map_routes(vehicles),
-            available_stops: Self::map_stops(stops.clone()),
-            distance_service: DistanceService::new(stops, distances),
+            available_stops: Self::map_stops(stops),
         }
     }
 

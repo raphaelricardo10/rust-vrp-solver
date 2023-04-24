@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use crate::services::distance::distance_service::DistanceMatrix;
 use crate::stop_swapper::StopSwapper;
 use crate::tests::fixtures::distances_fixture::distances;
@@ -40,5 +42,7 @@ pub fn neighborhood_factory(
 
 #[fixture]
 pub(crate) fn stop_swapper(distances: DistanceMatrix, stops: Vec<Stop>) -> StopSwapper {
-    StopSwapper::new(stops, &distances)
+    StopSwapper {
+        distance_service: Rc::new(DistanceService::new(stops, &distances)),
+    }
 }

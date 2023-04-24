@@ -1,9 +1,14 @@
+use std::rc::Rc;
+
 use rand::{seq::SliceRandom, Rng};
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     local_search::two_opt::TwoOptSearcher,
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
     solvers::{solution::Solution, solver::Solver},
 };
 
@@ -32,7 +37,7 @@ impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
     fn get_solution(&self) -> &Solution {
         &self.solution
     }
-    
+
     fn reset_solution(&mut self) {
         self.solution = Default::default();
     }
@@ -46,13 +51,15 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
         parameters: GraspSolverParameters,
         rng: &'a mut R,
     ) -> Self {
+        let distance_service = Rc::new(DistanceService::new(stops.clone(), distances));
+
         Self {
             rng,
             parameters,
             solution: Default::default(),
             times_without_improvement: Default::default(),
-            local_search: TwoOptSearcher::new(stops.clone(), distances),
-            route_service: RouteService::new(vehicles, distances, stops),
+            local_search: TwoOptSearcher::new(distance_service.clone()),
+            route_service: RouteService::new(stops, vehicles, distance_service),
         }
     }
 

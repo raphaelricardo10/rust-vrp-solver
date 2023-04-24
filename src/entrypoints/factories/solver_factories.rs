@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use rand::Rng;
 
 use crate::{
@@ -6,7 +8,7 @@ use crate::{
         arg_sizes::ArgSizes, distance_matrix::FFIDistanceMatrixEntry,
         parameters::FFIGeneticSolverParameters, route::FFIRoute,
     },
-    services::route::route_service::RouteService,
+    services::{route::route_service::RouteService, distance::distance_service::DistanceService},
     solvers::{
         genetic::{
             crossover::crossover_operator::CrossoverOperator,
@@ -38,9 +40,11 @@ where
 {
     let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
     let stops = vector_factory(stops_ptr, arg_sizes.stops);
-
     let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
-    let mut route_service = RouteService::new(vehicles, &distances, stops.clone());
+    
+    let distance_service = Rc::new(DistanceService::new(stops.clone(), &distances));
+    let mut route_service = RouteService::new(stops.clone(), vehicles, distance_service);
+
     let population = Population::from((parameters.population_size, &mut *rng, &mut route_service));
 
     let parameters = GeneticSolverParameters {

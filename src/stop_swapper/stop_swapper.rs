@@ -1,21 +1,14 @@
-use crate::{
-    domain::stop::Stop,
-    services::distance::distance_service::{DistanceMatrix, DistanceService},
-};
+use std::rc::Rc;
+
+use crate::{domain::stop::Stop, services::distance::distance_service::DistanceService};
 
 use super::neighborhood::Neighborhood;
 
 pub(crate) struct StopSwapper {
-    pub(crate) distance_service: DistanceService,
+    pub(crate) distance_service: Rc<DistanceService>,
 }
 
 impl StopSwapper {
-    pub fn new(stops: Vec<Stop>, distances: &DistanceMatrix) -> Self {
-        Self {
-            distance_service: DistanceService::new(stops, distances),
-        }
-    }
-
     fn are_neighborhoods_consecutive(
         neighborhood1: &Neighborhood,
         neighborhood2: &Neighborhood,
@@ -31,11 +24,11 @@ impl StopSwapper {
         false
     }
 
-    fn swap_non_consecutive_neighborhoods<'a>(
-        neighborhood1: &'a Neighborhood<'a>,
-        neighborhood2: &'a Neighborhood<'a>,
+    fn swap_non_consecutive_neighborhoods<'b>(
+        neighborhood1: &'b Neighborhood<'b>,
+        neighborhood2: &'b Neighborhood<'b>,
         distance_service: &DistanceService,
-    ) -> (Neighborhood<'a>, Neighborhood<'a>) {
+    ) -> (Neighborhood<'b>, Neighborhood<'b>) {
         let swapped_neighborhood_1 = Neighborhood::new(
             neighborhood1.previous,
             neighborhood2.current,
@@ -53,11 +46,11 @@ impl StopSwapper {
         (swapped_neighborhood_1, swapped_neighborhood_2)
     }
 
-    fn swap_consecutive_neighborhoods<'a>(
-        mut neighborhood1: &'a Neighborhood<'a>,
-        mut neighborhood2: &'a Neighborhood<'a>,
+    fn swap_consecutive_neighborhoods<'b>(
+        mut neighborhood1: &'b Neighborhood<'b>,
+        mut neighborhood2: &'b Neighborhood<'b>,
         distance_service: &DistanceService,
-    ) -> (Neighborhood<'a>, Neighborhood<'a>) {
+    ) -> (Neighborhood<'b>, Neighborhood<'b>) {
         if neighborhood1.previous.stop.id == neighborhood2.current.stop.id {
             std::mem::swap(&mut neighborhood1, &mut neighborhood2);
         }
@@ -120,7 +113,7 @@ impl StopSwapper {
                     stop_index,
                     self.calculate_swap_cost(
                         neighborhood,
-                        &Neighborhood::from((stops.as_slice(), stop_index, &self.distance_service)),
+                        &Neighborhood::from((stops.as_slice(), stop_index, self.distance_service.as_ref())),
                     ),
                 )
             })

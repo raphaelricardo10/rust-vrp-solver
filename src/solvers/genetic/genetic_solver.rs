@@ -1,9 +1,14 @@
+use std::rc::Rc;
+
 use rand::{seq::SliceRandom, Rng};
 
 use crate::{
     domain::stop::Stop,
     local_search::two_opt::TwoOptSearcher,
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteMap},
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteMap,
+    },
     solvers::{solution::Solution, solver::Solver},
     stop_swapper::StopSwapper,
 };
@@ -30,6 +35,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     best: Individual,
     crossover_op: &'a dyn CrossoverOperator<R>,
     local_search: TwoOptSearcher,
+    distance_service: Rc<DistanceService>,
     rng: &'a mut R,
 }
 
@@ -94,19 +100,21 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         crossover_op: &'a dyn CrossoverOperator<R>,
         rng: &'a mut R,
     ) -> Self {
-        let stop_swapper = StopSwapper::new(stops.clone(), distances);
-        let local_search = TwoOptSearcher::new(stops, distances);
+        let distance_service = Rc::new(DistanceService::new(stops, distances));
 
         Self {
             rng,
             population,
             parameters,
             crossover_op,
-            stop_swapper,
-            local_search,
             best: Default::default(),
             solution: Default::default(),
             current_generation: Default::default(),
+            distance_service: distance_service.clone(),
+            local_search: TwoOptSearcher::new(distance_service.clone()),
+            stop_swapper: StopSwapper {
+                distance_service,
+            },
         }
     }
 
@@ -166,8 +174,8 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         let mut offspring1 = Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op);
         let mut offspring2 = Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op);
 
-        offspring1.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
-        offspring2.try_to_evolve(self.rng, &self.stop_swapper.distance_service)?;
+        offspring1.try_to_evolve(self.rng, &self.distance_service)?;
+        offspring2.try_to_evolve(self.rng, &self.distance_service)?;
 
         Some((offspring1.individual, offspring2.individual))
     }

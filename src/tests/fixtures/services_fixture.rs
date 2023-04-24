@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use super::{distances_fixture::distances, stops_fixture::stops};
 use crate::services::route::route_service::RouteService;
 use crate::tests::fixtures::vehicles_fixture::vehicle_factory;
@@ -27,7 +29,11 @@ pub fn route_service_factory(
     let wrapper = move |number_of_vehicles| -> RouteService {
         let vehicles = vehicle_factory(number_of_vehicles);
 
-        RouteService::new(vehicles, &distances, stops[..stops.len()].to_vec())
+        RouteService::new(
+            stops.clone(),
+            vehicles,
+            Rc::new(DistanceService::new(stops.clone(), &distances)),
+        )
     };
 
     Box::new(wrapper)

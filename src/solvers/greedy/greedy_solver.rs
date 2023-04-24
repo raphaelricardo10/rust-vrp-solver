@@ -1,6 +1,11 @@
+use std::rc::Rc;
+
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::{distance::distance_service::DistanceMatrix, route::route_service::RouteService},
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
     solvers::{solution::Solution, solver::Solver},
 };
 
@@ -42,7 +47,11 @@ impl GreedySolver {
     ) -> GreedySolver {
         GreedySolver {
             solution: Solution::default(),
-            route_service: RouteService::new(vehicles, distances, stops),
+            route_service: RouteService::new(
+                stops.clone(),
+                vehicles,
+                Rc::new(DistanceService::new(stops, distances)),
+            ),
         }
     }
 

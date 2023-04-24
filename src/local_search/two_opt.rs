@@ -1,17 +1,21 @@
+use std::rc::Rc;
+
 use crate::{
     domain::{route::Route, stop::Stop},
-    services::distance::distance_service::DistanceMatrix,
+    services::distance::distance_service::DistanceService,
     stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
 pub struct TwoOptSearcher {
     stop_swapper: StopSwapper,
+    distance_service: Rc<DistanceService>,
 }
 
 impl TwoOptSearcher {
-    pub fn new(stops: Vec<Stop>, distances: &DistanceMatrix) -> Self {
+    pub fn new(distance_service: Rc<DistanceService>) -> Self {
         Self {
-            stop_swapper: StopSwapper::new(stops, distances),
+            distance_service: distance_service.clone(),
+            stop_swapper: StopSwapper { distance_service },
         }
     }
 
@@ -30,7 +34,7 @@ impl TwoOptSearcher {
         let swap_candidate = Neighborhood::from((
             stops.as_slice(),
             swap_candidate_index,
-            &self.stop_swapper.distance_service,
+            self.distance_service.as_ref(),
         ));
 
         if Self::should_swap_stops(swap_cost) {
@@ -45,7 +49,7 @@ impl TwoOptSearcher {
             let neighborhood = Neighborhood::from((
                 route.stops.as_slice(),
                 stop_index,
-                &self.stop_swapper.distance_service,
+                self.distance_service.as_ref(),
             ));
 
             let (swap_candidate_index, distance_change) =

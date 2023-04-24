@@ -204,7 +204,7 @@ impl Individual {
                 .stops
                 .as_slice(),
             address1.1,
-            &stop_swapper.distance_service,
+            stop_swapper.distance_service.as_ref(),
         ));
 
         let neighborhood2 = Neighborhood::from((
@@ -214,7 +214,7 @@ impl Individual {
                 .stops
                 .as_slice(),
             address2.1,
-            &stop_swapper.distance_service,
+            stop_swapper.distance_service.as_ref(),
         ));
 
         let swap_cost = stop_swapper.calculate_swap_cost(&neighborhood1, &neighborhood2);
