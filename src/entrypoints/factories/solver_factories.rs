@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use rand::Rng;
 
 use crate::{
@@ -8,12 +6,10 @@ use crate::{
         arg_sizes::ArgSizes, distance_matrix::FFIDistanceMatrixEntry,
         parameters::FFIGeneticSolverParameters, route::FFIRoute,
     },
-    services::{route::route_service::RouteService, distance::distance_service::DistanceService},
     solvers::{
         genetic::{
             crossover::crossover_operator::CrossoverOperator,
-            genetic_solver::{GeneticSolver, GeneticSolverParameters},
-            population::Population,
+            genetic_solver::GeneticSolverParameters,
         },
         grasp::grasp_solver::{GraspSolver, GraspSolverParameters},
         solution::Solution,
@@ -25,37 +21,6 @@ use crate::{
 };
 
 use super::raw_factories::{copy_result, distance_matrix_factory, vector_factory};
-
-pub(crate) unsafe fn genetic_solver_factory<'a, R>(
-    vehicles_ptr: *mut Vehicle,
-    stops_ptr: *mut Stop,
-    distances_ptr: *mut FFIDistanceMatrixEntry,
-    arg_sizes: ArgSizes,
-    crossover_op: &'a dyn CrossoverOperator<R>,
-    parameters: FFIGeneticSolverParameters,
-    rng: &'a mut R,
-) -> GeneticSolver<'a, R>
-where
-    R: Rng + ?Sized,
-{
-    let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
-    let stops = vector_factory(stops_ptr, arg_sizes.stops);
-    let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
-    
-    let distance_service = Rc::new(DistanceService::new(stops.clone(), &distances));
-    let mut route_service = RouteService::new(stops.clone(), vehicles, distance_service);
-
-    let population = Population::from((parameters.population_size, &mut *rng, &mut route_service));
-
-    let parameters = GeneticSolverParameters {
-        elite_size: parameters.elite_size,
-        mutation_rate: parameters.mutation_rate,
-        max_generations: parameters.max_generations,
-        local_search_rate: parameters.local_search_rate,
-    };
-
-    GeneticSolver::new(stops, &distances, population, parameters, crossover_op, rng)
-}
 
 pub(crate) unsafe fn grasp_solver_factory<R>(
     vehicles_ptr: *mut Vehicle,
