@@ -12,13 +12,12 @@ use crate::{
 };
 
 pub struct RandomSolver<'a, R: Rng + ?Sized> {
-    pub solution: Solution,
     rng: &'a mut R,
     route_service: RouteService,
 }
 
 impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
-    fn solve(&mut self) {
+    fn solve(&mut self) -> Solution {
         let vehicle_ids: Vec<u32> = self
             .route_service
             .get_vehicles()
@@ -43,19 +42,14 @@ impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
 
         self.route_service.assign_stop_points();
 
-        self.solution = Solution::new(
+        let solution = Solution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         );
-    }
 
-    fn reset_solution(&mut self) {
         self.route_service.reset();
-        self.solution = Default::default();
-    }
 
-    fn get_solution(&self) -> &Solution {
-        &self.solution
+        solution
     }
 }
 
@@ -72,7 +66,6 @@ impl<'a, R: Rng + ?Sized> RandomSolver<'a, R> {
         Self {
             rng,
             route_service,
-            solution: Default::default(),
         }
     }
 }

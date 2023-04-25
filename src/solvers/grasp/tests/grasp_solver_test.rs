@@ -26,12 +26,12 @@ fn grasp_solution_is_correct(
     };
 
     let mut solver = GraspSolver::new(stops, vehicles, &distances, parameters, &mut rng);
-    solver.solve();
+    let solution = solver.solve();
 
-    let solution_v1 = &solver.solution.routes.get(&0).unwrap().stops;
-    let solution_v2 = &solver.solution.routes.get(&1).unwrap().stops;
+    let solution_v1 = &solution.routes.get(&0).unwrap().stops;
+    let solution_v2 = &solution.routes.get(&1).unwrap().stops;
 
     assert_ne!(solution_v1.len(), 0);
     assert_ne!(solution_v2.len(), 0);
-    assert_eq!(solver.solution.total_distance, 10.0);
+    assert_eq!(solution.total_distance, 10.0);
 }

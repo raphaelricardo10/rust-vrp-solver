@@ -56,7 +56,7 @@ pub unsafe extern "C" fn grasp_genetic_solver(
         &mut rng2,
     );
 
-    genetic_solver.solve();
+    let solution = genetic_solver.solve();
 
-    copy_solution_to_abi(genetic_solver.get_solution().clone(), result_ptr);
+    copy_solution_to_abi(solution, result_ptr);
 }

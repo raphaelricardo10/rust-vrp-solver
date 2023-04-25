@@ -20,7 +20,7 @@ pub struct GraspSolverParameters {
 
 pub struct GraspSolver<'a, R: Rng + ?Sized> {
     rng: &'a mut R,
-    pub solution: Solution,
+    solution: Solution,
     route_service: RouteService,
     local_search: TwoOptSearcher,
     times_without_improvement: u8,
@@ -28,18 +28,14 @@ pub struct GraspSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
-    fn solve(&mut self) {
+    fn solve(&mut self) -> Solution {
         while !self.stop_condition_met() {
             self.run_generation();
         }
-    }
 
-    fn get_solution(&self) -> &Solution {
-        &self.solution
-    }
-
-    fn reset_solution(&mut self) {
+        let solution = self.solution.clone();
         self.solution = Default::default();
+        solution
     }
 }
 

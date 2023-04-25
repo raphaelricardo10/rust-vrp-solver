@@ -51,10 +51,10 @@ fn test_genetic_algorithm_can_generate_a_good_route(
         &mut rng2,
     );
 
-    genetic_solver.solve();
+    let solution = genetic_solver.solve();
 
-    let solution_v1 = &genetic_solver.get_solution().routes.get(&0).unwrap().stops;
-    let solution_v2 = &genetic_solver.get_solution().routes.get(&1).unwrap().stops;
+    let solution_v1 = &solution.routes.get(&0).unwrap().stops;
+    let solution_v2 = &solution.routes.get(&1).unwrap().stops;
 
     assert_ne!(solution_v1.len(), 0);
     assert_ne!(solution_v2.len(), 0);

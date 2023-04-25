@@ -26,20 +26,11 @@ pub struct TwoStageGeneticSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for TwoStageGeneticSolver<'a, R> {
-    fn solve(&mut self) {
+    fn solve(&mut self) -> Solution {
         let solutions = self.generate_initial_solutions();
         let population = Population::from(solutions.as_slice());
         self.genetic_solver.update_population(population);
-        self.genetic_solver.solve();
-    }
-
-    fn get_solution(&self) -> &Solution {
-        &self.genetic_solver.solution
-    }
-
-    fn reset_solution(&mut self) {
-        self.first_stage_solver.reset_solution();
-        self.genetic_solver.reset_solution();
+        self.genetic_solver.solve()
     }
 }
 
@@ -68,12 +59,7 @@ impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
 
     fn generate_initial_solutions(&mut self) -> Vec<Solution> {
         (0..self.population_size)
-            .map(|_| {
-                self.first_stage_solver.reset_solution();
-                self.first_stage_solver.solve();
-
-                self.first_stage_solver.get_solution().clone()
-            })
+            .map(|_| self.first_stage_solver.solve())
             .collect()
     }
 }

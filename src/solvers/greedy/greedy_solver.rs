@@ -10,12 +10,11 @@ use crate::{
 };
 
 pub struct GreedySolver {
-    pub solution: Solution,
     route_service: RouteService,
 }
 
 impl Solver for GreedySolver {
-    fn solve(&mut self) {
+    fn solve(&mut self) -> Solution {
         self.route_service.assign_starting_points();
 
         while !self.stop_condition_met() {
@@ -24,18 +23,10 @@ impl Solver for GreedySolver {
 
         self.route_service.assign_stop_points();
 
-        self.solution = Solution::new(
+        Solution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
-        );
-    }
-
-    fn get_solution(&self) -> &Solution {
-        &self.solution
-    }
-
-    fn reset_solution(&mut self) {
-        self.solution = Default::default();
+        )
     }
 }
 
@@ -46,7 +37,6 @@ impl GreedySolver {
         stops: Vec<Stop>,
     ) -> GreedySolver {
         GreedySolver {
-            solution: Solution::default(),
             route_service: RouteService::new(
                 stops.clone(),
                 vehicles,

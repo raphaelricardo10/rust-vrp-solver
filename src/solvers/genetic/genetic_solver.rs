@@ -40,7 +40,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
-    fn solve(&mut self) {
+    fn solve(&mut self) -> Solution {
         while !self.stop_condition_met() {
             loop {
                 let parents = self.selection();
@@ -79,16 +79,9 @@ impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
             .map(|chromosome| (chromosome.vehicle.id, chromosome))
             .collect();
 
-        self.solution = Solution::new(&route_map, self.best.fitness);
+        Solution::new(&route_map, self.best.fitness)
     }
 
-    fn get_solution(&self) -> &Solution {
-        &self.solution
-    }
-
-    fn reset_solution(&mut self) {
-        self.solution = Default::default();
-    }
 }
 
 impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
