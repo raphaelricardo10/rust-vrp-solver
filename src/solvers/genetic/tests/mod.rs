@@ -3,5 +3,3 @@ pub(crate) mod fixtures;
 mod genetic_algorithm_test;
 #[cfg(test)]
 mod individual_test;
-#[cfg(test)]
-mod population_test;

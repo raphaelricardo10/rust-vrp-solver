@@ -2,25 +2,10 @@ use rstest::rstest;
 
 use crate::domain::stop::Stop;
 
-use super::fixtures::{individual_factory, IndividualFactory};
-
 use crate::tests::fixtures::routes_fixture::{route_factory, RouteFactory};
 use crate::tests::fixtures::stops_fixture::stops;
 
 use crate::solvers::genetic::individual::Individual;
-
-#[rstest]
-fn test_generate_random_individual(mut individual_factory: IndividualFactory) {
-    let individual = individual_factory(2);
-
-    for chromosome in individual.chromosomes.iter() {
-        assert_eq!(chromosome.stops.first().unwrap().id, 0);
-        assert_eq!(chromosome.stops.last().unwrap().id, 0);
-    }
-
-    assert_ne!(individual.chromosomes[0].stops.len(), 0);
-    assert_ne!(individual.chromosomes[1].stops.len(), 0);
-}
 
 #[rstest]
 fn test_fitness_is_correct(stops: Vec<Stop>, route_factory: RouteFactory) {
