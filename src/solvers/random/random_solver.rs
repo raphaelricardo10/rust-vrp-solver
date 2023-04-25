@@ -50,6 +50,7 @@ impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
     }
 
     fn reset_solution(&mut self) {
+        self.route_service.reset();
         self.solution = Default::default();
     }
 
