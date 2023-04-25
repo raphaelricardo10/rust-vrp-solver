@@ -17,7 +17,7 @@ pub(crate) struct Offspring<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Size
 }
 
 impl<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Sized> Offspring<'a, R, T> {
-    pub(crate) fn new(parent1: Individual, parent2: Individual, crossover_op: & 'a T) -> Self {
+    pub(crate) fn new(parent1: Individual, parent2: Individual, crossover_op: &'a T) -> Self {
         Self {
             parent1,
             parent2,

@@ -67,11 +67,13 @@ impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
     }
 
     fn generate_initial_solutions(&mut self) -> Vec<Solution> {
-        (0..self.population_size).map(|_| {
-            self.first_stage_solver.reset_solution();
-            self.first_stage_solver.solve();
+        (0..self.population_size)
+            .map(|_| {
+                self.first_stage_solver.reset_solution();
+                self.first_stage_solver.solve();
 
-            self.first_stage_solver.get_solution().clone()
-        }).collect()
+                self.first_stage_solver.get_solution().clone()
+            })
+            .collect()
     }
 }

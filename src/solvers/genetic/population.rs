@@ -1,5 +1,5 @@
-use crate::solvers::solution::Solution;
 use super::individual::Individual;
+use crate::solvers::solution::Solution;
 
 #[derive(Default)]
 pub(crate) struct Population {

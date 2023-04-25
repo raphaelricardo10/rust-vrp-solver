@@ -2,7 +2,7 @@ use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::fixture;
 
-use crate::solvers::genetic::{individual::Individual};
+use crate::solvers::genetic::individual::Individual;
 
 use crate::tests::fixtures::services_fixture::{route_service_factory, RouteServiceFactory};
 

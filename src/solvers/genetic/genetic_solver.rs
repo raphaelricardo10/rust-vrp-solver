@@ -112,9 +112,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
             current_generation: Default::default(),
             distance_service: distance_service.clone(),
             local_search: TwoOptSearcher::new(distance_service.clone()),
-            stop_swapper: StopSwapper {
-                distance_service,
-            },
+            stop_swapper: StopSwapper { distance_service },
         }
     }
 
