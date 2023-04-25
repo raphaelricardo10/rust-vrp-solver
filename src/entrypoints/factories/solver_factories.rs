@@ -28,7 +28,7 @@ pub(crate) unsafe fn grasp_solver_factory<R>(
     distances_ptr: *mut FFIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
     parameters: GraspSolverParameters,
-    rng: &mut R,
+    rng: Box<R>,
 ) -> GraspSolver<R>
 where
     R: Rng + ?Sized,
@@ -47,7 +47,7 @@ pub(crate) unsafe fn two_stage_genetic_solver_factory<'a, R>(
     first_stage_solver: &'a mut dyn Solver,
     crossover_op: &'a mut dyn CrossoverOperator<R>,
     parameters: FFIGeneticSolverParameters,
-    rng: &'a mut R,
+    rng: Box<R>,
 ) -> TwoStageGeneticSolver<'a, R>
 where
     R: Rng + ?Sized,

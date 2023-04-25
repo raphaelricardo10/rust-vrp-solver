@@ -18,8 +18,8 @@ pub struct GraspSolverParameters {
     pub max_improvement_times: u8,
 }
 
-pub struct GraspSolver<'a, R: Rng + ?Sized> {
-    rng: &'a mut R,
+pub struct GraspSolver<R: Rng + ?Sized> {
+    rng: Box<R>,
     solution: Solution,
     route_service: RouteService,
     local_search: TwoOptSearcher,
@@ -27,7 +27,7 @@ pub struct GraspSolver<'a, R: Rng + ?Sized> {
     parameters: GraspSolverParameters,
 }
 
-impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
+impl<R: Rng + ?Sized> Solver for GraspSolver<R> {
     fn solve(&mut self) -> Solution {
         while !self.stop_condition_met() {
             self.run_generation();
@@ -39,13 +39,13 @@ impl<'a, R: Rng + ?Sized> Solver for GraspSolver<'a, R> {
     }
 }
 
-impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
+impl<R: Rng + ?Sized> GraspSolver<R> {
     pub fn new(
         stops: Vec<Stop>,
         vehicles: Vec<Vehicle>,
         distances: &DistanceMatrix,
         parameters: GraspSolverParameters,
-        rng: &'a mut R,
+        rng: Box<R>,
     ) -> Self {
         let distance_service = Rc::new(DistanceService::new(stops.clone(), distances));
 
@@ -118,7 +118,7 @@ impl<'a, R: Rng + ?Sized> GraspSolver<'a, R> {
         let near_stops = self
             .route_service
             .get_k_nearest_stops(vehicle_id, self.parameters.rcl_size)?;
-        let chosen = *near_stops.choose(self.rng)?;
+        let chosen = *near_stops.choose(&mut self.rng)?;
 
         Some(chosen)
     }

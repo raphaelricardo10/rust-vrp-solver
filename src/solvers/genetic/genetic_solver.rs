@@ -36,7 +36,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     crossover_op: &'a dyn CrossoverOperator<R>,
     local_search: TwoOptSearcher,
     distance_service: Rc<DistanceService>,
-    rng: &'a mut R,
+    rng: Box<R>,
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
@@ -81,7 +81,6 @@ impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
 
         Solution::new(&route_map, self.best.fitness)
     }
-
 }
 
 impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
@@ -91,7 +90,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         population: Population,
         parameters: GeneticSolverParameters,
         crossover_op: &'a dyn CrossoverOperator<R>,
-        rng: &'a mut R,
+        rng: Box<R>,
     ) -> Self {
         let distance_service = Rc::new(DistanceService::new(stops, distances));
 
@@ -116,7 +115,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     pub(super) fn selection(&mut self) -> Vec<(usize, Individual)> {
         self.population
             .get_k_bests(self.parameters.elite_size)
-            .choose_multiple_weighted(self.rng, 2, |individual| individual.fitness)
+            .choose_multiple_weighted(&mut self.rng, 2, |individual| individual.fitness)
             .unwrap_or_else(|err| match err {
                 rand::distributions::WeightedError::NoItem => {
                     panic!("the candidate list should not be empty")
@@ -153,7 +152,7 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
                 .collect();
 
         for individual in mutated_individuals {
-            individual.swap_random_genes(stop_swapper, self.rng);
+            individual.swap_random_genes(stop_swapper, &mut self.rng);
         }
     }
 
@@ -165,8 +164,8 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
         let mut offspring1 = Offspring::new(parent1.clone(), parent2.clone(), self.crossover_op);
         let mut offspring2 = Offspring::new(parent2.clone(), parent1.clone(), self.crossover_op);
 
-        offspring1.try_to_evolve(self.rng, &self.distance_service)?;
-        offspring2.try_to_evolve(self.rng, &self.distance_service)?;
+        offspring1.try_to_evolve(&mut self.rng, &self.distance_service)?;
+        offspring2.try_to_evolve(&mut self.rng, &self.distance_service)?;
 
         Some((offspring1.individual, offspring2.individual))
     }

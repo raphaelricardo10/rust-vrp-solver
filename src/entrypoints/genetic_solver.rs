@@ -32,16 +32,13 @@ pub unsafe extern "C" fn grasp_genetic_solver(
     genetic_solver_parameters: FFIGeneticSolverParameters,
     result_ptr: *mut FFIRoute,
 ) {
-    let mut rng1 = thread_rng();
-    let mut rng2 = thread_rng();
-
     let mut grasp_solver = grasp_solver_factory(
         vehicles_ptr,
         stops_ptr,
         distances_ptr,
         arg_sizes,
         grasp_solver_parameters,
-        &mut rng1,
+        Box::new(thread_rng()),
     );
 
     let mut crossover_op = OrderCrossover::new(genetic_solver_parameters.max_crossover_tries);
@@ -53,7 +50,7 @@ pub unsafe extern "C" fn grasp_genetic_solver(
         &mut grasp_solver,
         &mut crossover_op,
         genetic_solver_parameters,
-        &mut rng2,
+        Box::new(thread_rng()),
     );
 
     let solution = genetic_solver.solve();

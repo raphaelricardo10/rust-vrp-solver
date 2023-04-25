@@ -41,7 +41,7 @@ impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
         first_stage_solver: &'a mut dyn Solver,
         parameters: TwoStageGeneticSolverParameters,
         crossover_op: &'a dyn CrossoverOperator<R>,
-        rng: &'a mut R,
+        rng: Box<R>,
     ) -> Self {
         Self {
             first_stage_solver,

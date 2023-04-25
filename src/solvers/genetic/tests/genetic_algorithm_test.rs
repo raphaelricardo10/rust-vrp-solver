@@ -25,10 +25,9 @@ fn test_genetic_algorithm_can_generate_a_good_route(
 ) {
     let vehicles = vehicle_factory(2);
 
-    let mut rng1 = ChaCha8Rng::seed_from_u64(0);
-    let mut rng2 = ChaCha8Rng::seed_from_u64(0);
-
-    let mut random_solver = RandomSolver::new(stops.clone(), vehicles, &distances, &mut rng1);
+    let rng = ChaCha8Rng::seed_from_u64(0);
+    let mut random_solver =
+        RandomSolver::new(stops.clone(), vehicles, &distances, Box::new(rng.clone()));
 
     let parameters = TwoStageGeneticSolverParameters {
         population_size: 10,
@@ -48,7 +47,7 @@ fn test_genetic_algorithm_can_generate_a_good_route(
         &mut random_solver,
         parameters,
         &crossover_op,
-        &mut rng2,
+        Box::new(rng),
     );
 
     let solution = genetic_solver.solve();

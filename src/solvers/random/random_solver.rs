@@ -11,12 +11,12 @@ use crate::{
     solvers::{solution::Solution, solver::Solver},
 };
 
-pub struct RandomSolver<'a, R: Rng + ?Sized> {
-    rng: &'a mut R,
+pub struct RandomSolver<R: Rng + ?Sized> {
+    rng: Box<R>,
     route_service: RouteService,
 }
 
-impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
+impl<R: Rng + ?Sized> Solver for RandomSolver<R> {
     fn solve(&mut self) -> Solution {
         let vehicle_ids: Vec<u32> = self
             .route_service
@@ -29,7 +29,10 @@ impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
 
         while self.route_service.has_available_stop() {
             for vehicle_id in vehicle_ids.iter() {
-                let stop = match self.route_service.get_random_stop(*vehicle_id, self.rng) {
+                let stop = match self
+                    .route_service
+                    .get_random_stop(*vehicle_id, &mut self.rng)
+                {
                     Some(stop) => stop,
                     None => continue,
                 };
@@ -53,19 +56,16 @@ impl<'a, R: Rng + ?Sized> Solver for RandomSolver<'a, R> {
     }
 }
 
-impl<'a, R: Rng + ?Sized> RandomSolver<'a, R> {
+impl<R: Rng + ?Sized> RandomSolver<R> {
     pub fn new(
         stops: Vec<Stop>,
         vehicles: Vec<Vehicle>,
         distances: &DistanceMatrix,
-        rng: &'a mut R,
+        rng: Box<R>,
     ) -> Self {
         let distance_service = Rc::new(DistanceService::new(stops.clone(), distances));
         let route_service = RouteService::new(stops, vehicles, distance_service);
 
-        Self {
-            rng,
-            route_service,
-        }
+        Self { rng, route_service }
     }
 }

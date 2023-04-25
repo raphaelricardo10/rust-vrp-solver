@@ -17,7 +17,7 @@ fn grasp_solution_is_correct(
     stops: Vec<Stop>,
     vehicle_factory: VehicleFactory,
 ) {
-    let mut rng = ChaCha8Rng::seed_from_u64(0);
+    let rng = ChaCha8Rng::seed_from_u64(0);
     let vehicles = vehicle_factory(2);
 
     let parameters = GraspSolverParameters {
@@ -25,7 +25,7 @@ fn grasp_solution_is_correct(
         max_improvement_times: 3,
     };
 
-    let mut solver = GraspSolver::new(stops, vehicles, &distances, parameters, &mut rng);
+    let mut solver = GraspSolver::new(stops, vehicles, &distances, parameters, Box::new(rng));
     let solution = solver.solve();
 
     let solution_v1 = &solution.routes.get(&0).unwrap().stops;
