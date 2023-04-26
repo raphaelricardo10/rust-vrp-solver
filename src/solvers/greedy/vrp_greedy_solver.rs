@@ -9,11 +9,11 @@ use crate::{
     solvers::{solution::Solution, solver::Solver},
 };
 
-pub struct GreedySolver {
+pub struct VrpGreedySolver {
     route_service: RouteService,
 }
 
-impl Solver for GreedySolver {
+impl Solver for VrpGreedySolver {
     fn solve(&mut self) -> Solution {
         self.route_service.assign_starting_points();
 
@@ -30,13 +30,13 @@ impl Solver for GreedySolver {
     }
 }
 
-impl GreedySolver {
+impl VrpGreedySolver {
     pub fn new(
         vehicles: Vec<Vehicle>,
         distances: &DistanceMatrix,
         stops: Vec<Stop>,
-    ) -> GreedySolver {
-        GreedySolver {
+    ) -> VrpGreedySolver {
+        VrpGreedySolver {
             route_service: RouteService::new(
                 stops.clone(),
                 vehicles,

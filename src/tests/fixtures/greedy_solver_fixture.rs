@@ -1,4 +1,4 @@
-use crate::solvers::greedy::greedy_solver::GreedySolver;
+use crate::solvers::greedy::greedy_solver::VrpGreedySolver;
 use rstest::fixture;
 
 use crate::{domain::stop::Stop, services::distance::distance_service::DistanceMatrix};
@@ -8,7 +8,7 @@ use super::{
     vehicles_fixture::VehicleFactory,
 };
 
-pub type GreedySolverFactory = Box<dyn Fn(u32) -> GreedySolver>;
+pub type GreedySolverFactory = Box<dyn Fn(u32) -> VrpGreedySolver>;
 
 #[fixture]
 pub fn greedy_solver_factory(
@@ -16,10 +16,10 @@ pub fn greedy_solver_factory(
     distances: DistanceMatrix,
     vehicle_factory: VehicleFactory,
 ) -> GreedySolverFactory {
-    let wrapper = move |number_of_vehicles: u32| -> GreedySolver {
+    let wrapper = move |number_of_vehicles: u32| -> VrpGreedySolver {
         let vehicles = vehicle_factory(number_of_vehicles);
 
-        GreedySolver::new(vehicles, &distances, stops.clone())
+        VrpGreedySolver::new(vehicles, &distances, stops.clone())
     };
 
     Box::new(wrapper)
