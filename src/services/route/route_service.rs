@@ -169,6 +169,18 @@ impl RouteService {
         true
     }
 
+    pub fn get_distances_from(&self, vehicle_id: u32) -> Box<dyn Iterator<Item = (u32, f32)> + '_> {
+        let route = self.get_route(vehicle_id);
+        let current_stop = route
+            .get_current_stop()
+            .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"));
+
+        let distances = self.get_feasible_stops(route)
+            .map(move |stop| (stop.id, self.distance_service.get_distance(current_stop, stop)));
+
+        Box::new(distances)
+    }
+
     pub fn get_nearest_stop(&self, vehicle_id: u32) -> Option<&Stop> {
         let route = self.get_route(vehicle_id);
         let current_stop = route.get_current_stop()?;
