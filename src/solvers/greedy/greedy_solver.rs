@@ -1,8 +1,8 @@
 use std::fmt::Display;
 
-use crate::solvers::{solver::Solver, vrp_solution::VrpSolution};
+use crate::solvers::{solver::Solver, solution::Solution};
 
-pub(super) trait GreedySolver {
+pub(super) trait GreedySolver<T: Solution> {
     type SequenceId: Copy;
     type CandidateId: Display;
     type Cost: PartialOrd + Display;
@@ -11,7 +11,7 @@ pub(super) trait GreedySolver {
     fn after_solving_callback(&mut self) {}
     fn choose_candidate(&mut self, sequence_id: Self::SequenceId, candidate_id: Self::CandidateId);
 
-    fn get_solution(&self) -> VrpSolution;
+    fn get_solution(&self) -> T;
     fn get_all_sequences(&self) -> Box<dyn Iterator<Item = Self::SequenceId> + '_>;
     fn get_all_candidates(
         &self,
@@ -46,9 +46,8 @@ pub(super) trait GreedySolver {
     }
 }
 
-impl<T: GreedySolver> Solver<VrpSolution> for T {
-
-    fn solve(&mut self) -> VrpSolution {
+impl<S: Solution, T: GreedySolver<S>> Solver<S> for T {
+    fn solve(&mut self) -> S {
         self.before_solving_callback();
 
         while !self.stop_condition_met() {

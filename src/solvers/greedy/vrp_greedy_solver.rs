@@ -15,7 +15,7 @@ pub struct VrpGreedySolver {
     route_service: RouteService,
 }
 
-impl GreedySolver for VrpGreedySolver {
+impl GreedySolver<VrpSolution> for VrpGreedySolver {
     type Cost = f32;
     type SequenceId = u32;
     type CandidateId = u32;
