@@ -16,9 +16,7 @@ pub struct RandomSolver<R: Rng + ?Sized> {
     route_service: RouteService,
 }
 
-impl<R: Rng + ?Sized> Solver for RandomSolver<R> {
-    type ConcreteSolution = VrpSolution;
-
+impl<R: Rng + ?Sized> Solver<VrpSolution> for RandomSolver<R> {
     fn solve(&mut self) -> VrpSolution {
         let vehicle_ids: Vec<u32> = self
             .route_service

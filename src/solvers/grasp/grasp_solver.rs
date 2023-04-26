@@ -27,8 +27,7 @@ pub struct GraspSolver<R: Rng + ?Sized> {
     parameters: GraspSolverParameters,
 }
 
-impl<R: Rng + ?Sized> Solver for GraspSolver<R> {
-    type ConcreteSolution = VrpSolution;
+impl<R: Rng + ?Sized> Solver<VrpSolution> for GraspSolver<R> {
 
     fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {

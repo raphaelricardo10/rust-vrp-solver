@@ -46,10 +46,9 @@ pub(super) trait GreedySolver {
     }
 }
 
-impl<T: GreedySolver> Solver for T {
-    type ConcreteSolution = VrpSolution;
+impl<T: GreedySolver> Solver<VrpSolution> for T {
 
-    fn solve(&mut self) -> Self::ConcreteSolution {
+    fn solve(&mut self) -> VrpSolution {
         self.before_solving_callback();
 
         while !self.stop_condition_met() {

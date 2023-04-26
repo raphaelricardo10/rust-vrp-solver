@@ -6,3 +6,4 @@ pub mod vrp_solution;
 pub mod solver;
 pub mod two_stage_genetic;
 mod solution;
+mod easy_solver;

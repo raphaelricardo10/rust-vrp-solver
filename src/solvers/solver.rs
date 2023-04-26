@@ -1,6 +1,5 @@
 use super::solution::Solution;
 
-pub trait Solver {
-    type ConcreteSolution: Solution;
-    fn solve(&mut self) -> Self::ConcreteSolution;
+pub trait Solver<T: Solution> {
+    fn solve(&mut self) -> T;
 }

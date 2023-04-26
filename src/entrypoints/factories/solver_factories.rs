@@ -44,7 +44,7 @@ pub(crate) unsafe fn two_stage_genetic_solver_factory<'a, R>(
     stops_ptr: *mut Stop,
     distances_ptr: *mut FFIDistanceMatrixEntry,
     arg_sizes: ArgSizes,
-    first_stage_solver: &'a mut dyn Solver<ConcreteSolution = VrpSolution>,
+    first_stage_solver: &'a mut dyn Solver<VrpSolution>,
     crossover_op: &'a mut dyn CrossoverOperator<R>,
     parameters: FFIGeneticSolverParameters,
     rng: Box<R>,
