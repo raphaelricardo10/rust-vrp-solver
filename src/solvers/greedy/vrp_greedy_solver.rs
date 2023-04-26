@@ -6,27 +6,49 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::{solution::Solution, solver::Solver},
+    solvers::solution::Solution,
 };
+
+use super::greedy_solver::GreedySolver;
 
 pub struct VrpGreedySolver {
     route_service: RouteService,
 }
 
-impl Solver for VrpGreedySolver {
-    fn solve(&mut self) -> Solution {
+impl GreedySolver<u32, u32, f32> for VrpGreedySolver {
+    fn before_solving_callback(&mut self) {
         self.route_service.assign_starting_points();
+    }
 
-        while !self.stop_condition_met() {
-            self.run_iteration();
-        }
-
+    fn after_solving_callback(&mut self) {
         self.route_service.assign_stop_points();
+    }
 
+    fn get_solution(&self) -> Solution {
         Solution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         )
+    }
+
+    fn stop_condition_met(&self) -> bool {
+        !self.route_service.has_available_stop()
+    }
+
+    fn choose_candidate(&mut self, sequence_id: u32, candidate_id: u32) {
+        self.route_service
+            .assign_stop_to_route(sequence_id, candidate_id)
+            .unwrap_or_else(|_| {
+                panic!("the vehicle {sequence_id} should support the load from {candidate_id}")
+            });
+    }
+
+    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = u32> + '_> {
+        Box::new(self.route_service.get_all_routes().keys().cloned())
+    }
+
+    fn get_all_candidates(&self, sequence_id: u32) -> Box<dyn Iterator<Item = (u32, f32)> + '_> {
+        Box::new(self.route_service.get_distances_from(sequence_id))
     }
 }
 
@@ -43,31 +65,5 @@ impl VrpGreedySolver {
                 Rc::new(DistanceService::new(stops, distances)),
             ),
         }
-    }
-
-    fn run_iteration(&mut self) {
-        let vehicle_ids: Vec<u32> = self
-            .route_service
-            .get_all_routes()
-            .keys()
-            .cloned()
-            .collect();
-
-        for vehicle_id in vehicle_ids {
-            let stop_id = match self.route_service.get_nearest_stop(vehicle_id) {
-                None => break,
-                Some(stop) => stop.id,
-            };
-
-            self.route_service
-                .assign_stop_to_route(vehicle_id, stop_id)
-                .unwrap_or_else(|_| {
-                    panic!("the vehicle {vehicle_id} should support the load from {stop_id}")
-                });
-        }
-    }
-
-    fn stop_condition_met(&self) -> bool {
-        !self.route_service.has_available_stop()
     }
 }

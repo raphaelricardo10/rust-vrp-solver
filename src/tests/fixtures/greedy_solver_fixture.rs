@@ -1,4 +1,4 @@
-use crate::solvers::greedy::greedy_solver::VrpGreedySolver;
+use crate::solvers::greedy::vrp_greedy_solver::VrpGreedySolver;
 use rstest::fixture;
 
 use crate::{domain::stop::Stop, services::distance::distance_service::DistanceMatrix};
