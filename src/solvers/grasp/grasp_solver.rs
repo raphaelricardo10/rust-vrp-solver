@@ -9,7 +9,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::{solution::Solution, solver::Solver},
+    solvers::{solver::Solver, vrp_solution::VrpSolution},
 };
 
 #[repr(C)]
@@ -20,7 +20,7 @@ pub struct GraspSolverParameters {
 
 pub struct GraspSolver<R: Rng + ?Sized> {
     rng: Box<R>,
-    solution: Solution,
+    solution: VrpSolution,
     route_service: RouteService,
     local_search: TwoOptSearcher,
     times_without_improvement: u8,
@@ -28,7 +28,7 @@ pub struct GraspSolver<R: Rng + ?Sized> {
 }
 
 impl<R: Rng + ?Sized> Solver for GraspSolver<R> {
-    fn solve(&mut self) -> Solution {
+    fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
             self.run_generation();
         }
@@ -74,7 +74,7 @@ impl<R: Rng + ?Sized> GraspSolver<R> {
         self.generate_solution(&vehicle_ids);
         self.run_local_search(&vehicle_ids);
 
-        let solution = Solution::new(
+        let solution = VrpSolution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         );
@@ -131,7 +131,7 @@ impl<R: Rng + ?Sized> GraspSolver<R> {
         }
     }
 
-    fn should_update_solution(&self, solution: &Solution) -> bool {
+    fn should_update_solution(&self, solution: &VrpSolution) -> bool {
         solution.is_better_than(&self.solution)
     }
 }

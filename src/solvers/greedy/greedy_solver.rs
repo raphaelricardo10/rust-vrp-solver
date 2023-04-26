@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use crate::solvers::{solution::Solution, solver::Solver};
+use crate::solvers::{solver::Solver, vrp_solution::VrpSolution};
 
 pub(super) trait GreedySolver<R, S, T>
 where
@@ -12,7 +12,7 @@ where
     fn after_solving_callback(&mut self) {}
     fn choose_candidate(&mut self, sequence_id: R, candidate_id: S);
 
-    fn get_solution(&self) -> Solution;
+    fn get_solution(&self) -> VrpSolution;
     fn get_all_sequences(&self) -> Box<dyn Iterator<Item = R> + '_>;
     fn get_all_candidates(&self, sequence_id: R) -> Box<dyn Iterator<Item = (S, T)> + '_>;
     fn stop_condition_met(&self) -> bool;
@@ -45,7 +45,7 @@ impl<T> Solver for T
 where
     T: GreedySolver<u32, u32, f32>,
 {
-    fn solve(&mut self) -> Solution {
+    fn solve(&mut self) -> VrpSolution {
         self.before_solving_callback();
 
         while !self.stop_condition_met() {

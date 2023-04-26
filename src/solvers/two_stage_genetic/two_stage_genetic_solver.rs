@@ -9,8 +9,8 @@ use crate::{
             genetic_solver::{GeneticSolver, GeneticSolverParameters},
             population::Population,
         },
-        solution::Solution,
         solver::Solver,
+        vrp_solution::VrpSolution,
     },
 };
 
@@ -26,7 +26,7 @@ pub struct TwoStageGeneticSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for TwoStageGeneticSolver<'a, R> {
-    fn solve(&mut self) -> Solution {
+    fn solve(&mut self) -> VrpSolution {
         let solutions = self.generate_initial_solutions();
         let population = Population::from(solutions.as_slice());
         self.genetic_solver.update_population(population);
@@ -57,7 +57,7 @@ impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
         }
     }
 
-    fn generate_initial_solutions(&mut self) -> Vec<Solution> {
+    fn generate_initial_solutions(&mut self) -> Vec<VrpSolution> {
         (0..self.population_size)
             .map(|_| self.first_stage_solver.solve())
             .collect()

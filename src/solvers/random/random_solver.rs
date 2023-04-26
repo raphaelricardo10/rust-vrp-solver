@@ -8,7 +8,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::{solution::Solution, solver::Solver},
+    solvers::{solver::Solver, vrp_solution::VrpSolution},
 };
 
 pub struct RandomSolver<R: Rng + ?Sized> {
@@ -17,7 +17,7 @@ pub struct RandomSolver<R: Rng + ?Sized> {
 }
 
 impl<R: Rng + ?Sized> Solver for RandomSolver<R> {
-    fn solve(&mut self) -> Solution {
+    fn solve(&mut self) -> VrpSolution {
         let vehicle_ids: Vec<u32> = self
             .route_service
             .get_vehicles()
@@ -45,7 +45,7 @@ impl<R: Rng + ?Sized> Solver for RandomSolver<R> {
 
         self.route_service.assign_stop_points();
 
-        let solution = Solution::new(
+        let solution = VrpSolution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         );

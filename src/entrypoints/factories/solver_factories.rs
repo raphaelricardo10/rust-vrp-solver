@@ -12,11 +12,11 @@ use crate::{
             genetic_solver::GeneticSolverParameters,
         },
         grasp::grasp_solver::{GraspSolver, GraspSolverParameters},
-        solution::Solution,
         solver::Solver,
         two_stage_genetic::two_stage_genetic_solver::{
             TwoStageGeneticSolver, TwoStageGeneticSolverParameters,
         },
+        vrp_solution::VrpSolution,
     },
 };
 
@@ -75,7 +75,7 @@ where
     )
 }
 
-pub(crate) unsafe fn copy_solution_to_abi(solution: Solution, result_ptr: *mut FFIRoute) {
+pub(crate) unsafe fn copy_solution_to_abi(solution: VrpSolution, result_ptr: *mut FFIRoute) {
     solution
         .routes
         .into_iter()

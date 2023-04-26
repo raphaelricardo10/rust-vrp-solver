@@ -9,7 +9,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteMap,
     },
-    solvers::{solution::Solution, solver::Solver},
+    solvers::{solver::Solver, vrp_solution::VrpSolution},
     stop_swapper::StopSwapper,
 };
 
@@ -31,7 +31,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     population: Population,
     stop_swapper: StopSwapper,
     current_generation: u32,
-    pub solution: Solution,
+    pub solution: VrpSolution,
     best: Individual,
     crossover_op: &'a dyn CrossoverOperator<R>,
     local_search: TwoOptSearcher,
@@ -40,7 +40,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
-    fn solve(&mut self) -> Solution {
+    fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
             loop {
                 let parents = self.selection();
@@ -79,7 +79,7 @@ impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
             .map(|chromosome| (chromosome.vehicle.id, chromosome))
             .collect();
 
-        Solution::new(&route_map, self.best.fitness)
+        VrpSolution::new(&route_map, self.best.fitness)
     }
 }
 

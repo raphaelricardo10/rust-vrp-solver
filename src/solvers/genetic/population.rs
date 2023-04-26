@@ -1,13 +1,13 @@
 use super::individual::Individual;
-use crate::solvers::solution::Solution;
+use crate::solvers::vrp_solution::VrpSolution;
 
 #[derive(Default)]
 pub(crate) struct Population {
     pub(super) individuals: Vec<Individual>,
 }
 
-impl From<&[Solution]> for Population {
-    fn from(solutions: &[Solution]) -> Self {
+impl From<&[VrpSolution]> for Population {
+    fn from(solutions: &[VrpSolution]) -> Self {
         Self {
             individuals: solutions
                 .iter()

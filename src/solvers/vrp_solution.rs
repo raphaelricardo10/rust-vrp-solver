@@ -1,12 +1,12 @@
 use crate::services::route::route_service::RouteMap;
 
 #[derive(Clone)]
-pub struct Solution {
+pub struct VrpSolution {
     pub routes: RouteMap,
     pub total_distance: f32,
 }
 
-impl Default for Solution {
+impl Default for VrpSolution {
     fn default() -> Self {
         Self {
             total_distance: f32::MAX,
@@ -15,7 +15,7 @@ impl Default for Solution {
     }
 }
 
-impl Solution {
+impl VrpSolution {
     pub fn new(routes: &RouteMap, total_distance: f32) -> Self {
         Self {
             total_distance,
@@ -23,7 +23,7 @@ impl Solution {
         }
     }
 
-    pub fn is_better_than(&self, other: &Solution) -> bool {
+    pub fn is_better_than(&self, other: &VrpSolution) -> bool {
         self.total_distance < other.total_distance
     }
 }

@@ -6,7 +6,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::solution::Solution,
+    solvers::vrp_solution::VrpSolution,
 };
 
 use super::greedy_solver::GreedySolver;
@@ -24,8 +24,8 @@ impl GreedySolver<u32, u32, f32> for VrpGreedySolver {
         self.route_service.assign_stop_points();
     }
 
-    fn get_solution(&self) -> Solution {
-        Solution::new(
+    fn get_solution(&self) -> VrpSolution {
+        VrpSolution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         )
