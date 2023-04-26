@@ -40,6 +40,8 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
 }
 
 impl<'a, R: Rng + ?Sized> Solver for GeneticSolver<'a, R> {
+    type ConcreteSolution = VrpSolution;
+
     fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
             loop {

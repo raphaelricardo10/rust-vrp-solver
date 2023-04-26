@@ -45,6 +45,8 @@ impl<T> Solver for T
 where
     T: GreedySolver<u32, u32, f32>,
 {
+    type ConcreteSolution = VrpSolution;
+
     fn solve(&mut self) -> VrpSolution {
         self.before_solving_callback();
 

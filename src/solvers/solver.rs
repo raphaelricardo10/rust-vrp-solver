@@ -1,5 +1,6 @@
-use super::vrp_solution::VrpSolution;
+use super::solution::Solution;
 
 pub trait Solver {
-    fn solve(&mut self) -> VrpSolution;
+    type ConcreteSolution: Solution;
+    fn solve(&mut self) -> Self::ConcreteSolution;
 }

@@ -21,11 +21,13 @@ pub struct TwoStageGeneticSolverParameters {
 
 pub struct TwoStageGeneticSolver<'a, R: Rng + ?Sized> {
     population_size: u32,
-    first_stage_solver: &'a mut dyn Solver,
+    first_stage_solver: &'a mut dyn Solver<ConcreteSolution = VrpSolution>,
     genetic_solver: GeneticSolver<'a, R>,
 }
 
 impl<'a, R: Rng + ?Sized> Solver for TwoStageGeneticSolver<'a, R> {
+    type ConcreteSolution = VrpSolution;
+
     fn solve(&mut self) -> VrpSolution {
         let solutions = self.generate_initial_solutions();
         let population = Population::from(solutions.as_slice());
@@ -38,7 +40,7 @@ impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
     pub(crate) fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
-        first_stage_solver: &'a mut dyn Solver,
+        first_stage_solver: &'a mut dyn Solver<ConcreteSolution = VrpSolution>,
         parameters: TwoStageGeneticSolverParameters,
         crossover_op: &'a dyn CrossoverOperator<R>,
         rng: Box<R>,

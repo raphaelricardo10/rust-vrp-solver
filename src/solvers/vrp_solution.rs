@@ -1,5 +1,7 @@
 use crate::services::route::route_service::RouteMap;
 
+use super::solution::Solution;
+
 #[derive(Clone)]
 pub struct VrpSolution {
     pub routes: RouteMap,
@@ -12,6 +14,19 @@ impl Default for VrpSolution {
             total_distance: f32::MAX,
             routes: Default::default(),
         }
+    }
+}
+
+impl Solution for VrpSolution {
+    type Cost = f32;
+    type Data = RouteMap;
+
+    fn get_cost(&self) -> Self::Cost {
+        self.total_distance
+    }
+
+    fn get_data(&self) -> &Self::Data {
+        &self.routes
     }
 }
 
