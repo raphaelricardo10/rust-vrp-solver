@@ -15,7 +15,11 @@ pub struct VrpGreedySolver {
     route_service: RouteService,
 }
 
-impl GreedySolver<u32, u32, f32> for VrpGreedySolver {
+impl GreedySolver for VrpGreedySolver {
+    type Cost = f32;
+    type SequenceId = u32;
+    type CandidateId = u32;
+
     fn before_solving_callback(&mut self) {
         self.route_service.assign_starting_points();
     }

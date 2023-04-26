@@ -2,22 +2,27 @@ use std::fmt::Display;
 
 use crate::solvers::{solver::Solver, vrp_solution::VrpSolution};
 
-pub(super) trait GreedySolver<R, S, T>
-where
-    R: Copy,
-    S: Display,
-    T: PartialOrd + Display,
-{
+pub(super) trait GreedySolver {
+    type SequenceId: Copy;
+    type CandidateId: Display;
+    type Cost: PartialOrd + Display;
+
     fn before_solving_callback(&mut self) {}
     fn after_solving_callback(&mut self) {}
-    fn choose_candidate(&mut self, sequence_id: R, candidate_id: S);
+    fn choose_candidate(&mut self, sequence_id: Self::SequenceId, candidate_id: Self::CandidateId);
 
     fn get_solution(&self) -> VrpSolution;
-    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = R> + '_>;
-    fn get_all_candidates(&self, sequence_id: R) -> Box<dyn Iterator<Item = (S, T)> + '_>;
+    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = Self::SequenceId> + '_>;
+    fn get_all_candidates(
+        &self,
+        sequence_id: Self::SequenceId,
+    ) -> Box<dyn Iterator<Item = (Self::CandidateId, Self::Cost)> + '_>;
     fn stop_condition_met(&self) -> bool;
 
-    fn get_best_candidate(&self, sequence_id: R) -> Option<(S, T)> {
+    fn get_best_candidate(
+        &self,
+        sequence_id: Self::SequenceId,
+    ) -> Option<(Self::CandidateId, Self::Cost)> {
         self.get_all_candidates(sequence_id).min_by(
             |(first_candidate_id, first_candidate_cost), (second_candidate_id, second_candidate_cost)| {
                 first_candidate_cost
@@ -31,7 +36,7 @@ where
     }
 
     fn run_iteration(&mut self) {
-        let sequence_ids: Vec<R> = self.get_all_sequences().collect();
+        let sequence_ids: Vec<Self::SequenceId> = self.get_all_sequences().collect();
 
         for sequence_id in sequence_ids {
             if let Some((candidate_id, _)) = self.get_best_candidate(sequence_id) {
@@ -41,13 +46,10 @@ where
     }
 }
 
-impl<T> Solver for T
-where
-    T: GreedySolver<u32, u32, f32>,
-{
+impl<T: GreedySolver> Solver for T {
     type ConcreteSolution = VrpSolution;
 
-    fn solve(&mut self) -> VrpSolution {
+    fn solve(&mut self) -> Self::ConcreteSolution {
         self.before_solving_callback();
 
         while !self.stop_condition_met() {
