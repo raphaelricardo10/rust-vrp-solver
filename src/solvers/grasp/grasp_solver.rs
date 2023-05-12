@@ -28,7 +28,6 @@ pub struct GraspSolver<R: Rng + ?Sized> {
 }
 
 impl<R: Rng + ?Sized> Solver<VrpSolution> for GraspSolver<R> {
-
     fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
             self.run_generation();
@@ -80,11 +79,12 @@ impl<R: Rng + ?Sized> GraspSolver<R> {
             self.route_service.total_distance(),
         );
 
-        if self.should_update_solution(&solution) {
-            self.solution = solution;
-            self.times_without_improvement = 0;
-        } else {
-            self.times_without_improvement += 1;
+        match self.should_update_solution(&solution) {
+            true => {
+                self.solution = solution;
+                self.times_without_improvement = 0;
+            }
+            false => self.times_without_improvement += 1,
         }
     }
 

@@ -28,12 +28,13 @@ impl Vehicle {
     }
 
     pub fn load(&mut self, quantity: u32) -> Result<(), VehicleOverloadError> {
-        if !self.can_support_load(quantity) {
-            return Err(VehicleOverloadError::new());
+        match self.can_support_load(quantity) {
+            false => Err(VehicleOverloadError::new()),
+            true => {
+                self.usage += quantity;
+                Ok(())
+            }
         }
-
-        self.usage += quantity;
-        Ok(())
     }
 
     pub fn unload(&mut self, quantity: u32) -> Result<(), NegativeVehicleCapacityError> {

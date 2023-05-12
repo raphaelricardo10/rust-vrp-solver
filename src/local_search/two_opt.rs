@@ -37,11 +37,10 @@ impl TwoOptSearcher {
             self.distance_service.as_ref(),
         ));
 
-        if Self::should_swap_stops(swap_cost) {
-            return Some((swap_candidate.current.index, swap_cost));
+        match Self::should_swap_stops(swap_cost) {
+            true => Some((swap_candidate.current.index, swap_cost)),
+            false => None,
         }
-
-        None
     }
 
     pub fn run(&self, route: &mut Route) {
