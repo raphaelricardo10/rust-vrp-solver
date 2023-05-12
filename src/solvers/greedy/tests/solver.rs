@@ -1,6 +1,10 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::solvers::{greedy::greedy_solver::GreedySolver, solver::SolverCallbacks};
+use crate::solvers::{
+    greedy::greedy_solver::GreedySolver,
+    sequential_solver::{SequentialSolver, SequentialSolverParameters},
+    solver::SolverCallbacks,
+};
 
 use super::solution::TestSolution;
 
@@ -12,6 +16,7 @@ pub(super) struct TestGreedySolver {
 }
 
 impl SolverCallbacks for TestGreedySolver {}
+impl GreedySolver for TestGreedySolver {}
 
 impl TestGreedySolver {
     #[allow(dead_code)]
@@ -25,12 +30,14 @@ impl TestGreedySolver {
     }
 }
 
-impl GreedySolver<TestSolution> for TestGreedySolver {
-    type Cost = u32;
+impl SequentialSolverParameters for TestGreedySolver {
     type SequenceId = u32;
     type CandidateId = u32;
+    type Cost = u32;
+}
 
-    fn choose_candidate(&mut self, sequence_id: Self::SequenceId, candidate_id: Self::CandidateId) {
+impl SequentialSolver<TestSolution, TestGreedySolver> for TestGreedySolver {
+    fn choose_candidate(&mut self, sequence_id: u32, candidate_id: u32) {
         self.solution.insert(
             sequence_id,
             candidate_id,
@@ -47,7 +54,7 @@ impl GreedySolver<TestSolution> for TestGreedySolver {
         self.solution.clone()
     }
 
-    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = Self::SequenceId> + '_> {
+    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = u32> + '_> {
         Box::new(
             self.sequences
                 .iter()
@@ -56,10 +63,7 @@ impl GreedySolver<TestSolution> for TestGreedySolver {
         )
     }
 
-    fn get_all_candidates(
-        &self,
-        _: u32,
-    ) -> Box<dyn Iterator<Item = (Self::CandidateId, Self::Cost)> + '_> {
+    fn get_all_candidates(&self, _: u32) -> Box<dyn Iterator<Item = (u32, u32)> + '_> {
         Box::new(
             self.candidates
                 .iter()

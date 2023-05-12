@@ -1,29 +1,21 @@
-use std::fmt::Display;
-
 use crate::solvers::{
+    sequential_solver::{CandidateChooser, SequentialSolver, SequentialSolverParameters},
     solution::Solution,
-    solver::{Solver, SolverCallbacks},
+    solver::SolverCallbacks,
 };
 
-pub(super) trait GreedySolver<T: Solution> {
-    type SequenceId: Copy;
-    type CandidateId: Display;
-    type Cost: PartialOrd + Display;
+pub trait GreedySolver {}
 
-    fn choose_candidate(&mut self, sequence_id: Self::SequenceId, candidate_id: Self::CandidateId);
-
-    fn get_solution(&self) -> T;
-    fn get_all_sequences(&self) -> Box<dyn Iterator<Item = Self::SequenceId> + '_>;
-    fn get_all_candidates(
-        &self,
-        sequence_id: Self::SequenceId,
-    ) -> Box<dyn Iterator<Item = (Self::CandidateId, Self::Cost)> + '_>;
-    fn stop_condition_met(&self) -> bool;
-
-    fn get_best_candidate(
-        &self,
-        sequence_id: Self::SequenceId,
-    ) -> Option<(Self::CandidateId, Self::Cost)> {
+impl<S, T> CandidateChooser<S, T> for T
+where
+    S: Solution,
+    T: SequentialSolverParameters
+        + GreedySolver
+        + SequentialSolver<S, T>
+        + SolverCallbacks
+        + ?Sized,
+{
+    fn get_best_candidate(&self, sequence_id: T::SequenceId) -> Option<(T::CandidateId, T::Cost)> {
         self.get_all_candidates(sequence_id).min_by(
             |(first_candidate_id, first_candidate_cost), (second_candidate_id, second_candidate_cost)| {
                 first_candidate_cost
@@ -34,29 +26,5 @@ pub(super) trait GreedySolver<T: Solution> {
                     )})
             },
         )
-    }
-
-    fn run_iteration(&mut self) {
-        let sequence_ids: Vec<Self::SequenceId> = self.get_all_sequences().collect();
-
-        for sequence_id in sequence_ids {
-            if let Some((candidate_id, _)) = self.get_best_candidate(sequence_id) {
-                self.choose_candidate(sequence_id, candidate_id);
-            }
-        }
-    }
-}
-
-impl<S: Solution, T: GreedySolver<S> + SolverCallbacks> Solver<S> for T {
-    fn solve(&mut self) -> S {
-        self.before_solving();
-
-        while !self.stop_condition_met() {
-            self.run_iteration();
-        }
-
-        self.after_solving();
-
-        self.get_solution()
     }
 }
