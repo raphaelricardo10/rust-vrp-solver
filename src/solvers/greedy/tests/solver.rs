@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 
-use crate::solvers::greedy::greedy_solver::GreedySolver;
+use crate::solvers::{greedy::greedy_solver::GreedySolver, solver::SolverCallbacks};
 
 use super::solution::TestSolution;
 
@@ -10,6 +10,8 @@ pub(super) struct TestGreedySolver {
     pub(super) costs: BTreeMap<u32, u32>,
     pub(super) solution: TestSolution,
 }
+
+impl SolverCallbacks for TestGreedySolver {}
 
 impl TestGreedySolver {
     #[allow(dead_code)]

@@ -6,7 +6,7 @@ use crate::{
         distance::distance_service::{DistanceMatrix, DistanceService},
         route::route_service::RouteService,
     },
-    solvers::vrp_solution::VrpSolution,
+    solvers::{solver::SolverCallbacks, vrp_solution::VrpSolution},
 };
 
 use super::greedy_solver::GreedySolver;
@@ -15,18 +15,20 @@ pub struct VrpGreedySolver {
     route_service: RouteService,
 }
 
+impl SolverCallbacks for VrpGreedySolver {
+    fn before_solving(&mut self) {
+        self.route_service.assign_starting_points();
+    }
+
+    fn after_solving(&mut self) {
+        self.route_service.assign_stop_points();
+    }
+}
+
 impl GreedySolver<VrpSolution> for VrpGreedySolver {
     type Cost = f32;
     type SequenceId = u32;
     type CandidateId = u32;
-
-    fn before_solving_callback(&mut self) {
-        self.route_service.assign_starting_points();
-    }
-
-    fn after_solving_callback(&mut self) {
-        self.route_service.assign_stop_points();
-    }
 
     fn get_solution(&self) -> VrpSolution {
         VrpSolution::new(
