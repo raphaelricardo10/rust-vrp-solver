@@ -6,6 +6,8 @@ use crate::{
     stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
+use super::local_search::LocalSearch;
+
 pub struct TwoOptSearcher {
     stop_swapper: StopSwapper,
     distance_service: Rc<DistanceService>,
@@ -44,6 +46,26 @@ impl TwoOptSearcher {
     }
 
     pub fn run(&self, route: &mut Route) {
+        for stop_index in 1..route.stops.len() - 1 {
+            let neighborhood = Neighborhood::from((
+                route.stops.as_slice(),
+                stop_index,
+                self.distance_service.as_ref(),
+            ));
+
+            let (swap_candidate_index, distance_change) =
+                match self.find_improvements(&route.stops, &neighborhood) {
+                    Some(candidate_index) => candidate_index,
+                    None => continue,
+                };
+
+            route.swap_stops(stop_index, swap_candidate_index, distance_change);
+        }
+    }
+}
+
+impl LocalSearch<Route> for TwoOptSearcher {
+    fn run(&self, route: &mut Route) {
         for stop_index in 1..route.stops.len() - 1 {
             let neighborhood = Neighborhood::from((
                 route.stops.as_slice(),
