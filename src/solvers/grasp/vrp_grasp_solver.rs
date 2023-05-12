@@ -18,7 +18,7 @@ pub struct GraspSolverParameters {
     pub max_improvement_times: u8,
 }
 
-pub struct GraspSolver<R: Rng + ?Sized> {
+pub struct VrpGraspSolver<R: Rng + ?Sized> {
     rng: Box<R>,
     solution: VrpSolution,
     route_service: RouteService,
@@ -27,7 +27,7 @@ pub struct GraspSolver<R: Rng + ?Sized> {
     parameters: GraspSolverParameters,
 }
 
-impl<R: Rng + ?Sized> Solver<VrpSolution> for GraspSolver<R> {
+impl<R: Rng + ?Sized> Solver<VrpSolution> for VrpGraspSolver<R> {
     fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
             self.run_generation();
@@ -39,7 +39,7 @@ impl<R: Rng + ?Sized> Solver<VrpSolution> for GraspSolver<R> {
     }
 }
 
-impl<R: Rng + ?Sized> GraspSolver<R> {
+impl<R: Rng + ?Sized> VrpGraspSolver<R> {
     pub fn new(
         stops: Vec<Stop>,
         vehicles: Vec<Vehicle>,

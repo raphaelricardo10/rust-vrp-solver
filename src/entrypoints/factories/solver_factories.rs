@@ -11,7 +11,7 @@ use crate::{
             crossover::crossover_operator::CrossoverOperator,
             genetic_solver::GeneticSolverParameters,
         },
-        grasp::grasp_solver::{GraspSolver, GraspSolverParameters},
+        grasp::vrp_grasp_solver::{GraspSolverParameters, VrpGraspSolver},
         solver::Solver,
         two_stage_genetic::two_stage_genetic_solver::{
             TwoStageGeneticSolver, TwoStageGeneticSolverParameters,
@@ -29,7 +29,7 @@ pub(crate) unsafe fn grasp_solver_factory<R>(
     arg_sizes: ArgSizes,
     parameters: GraspSolverParameters,
     rng: Box<R>,
-) -> GraspSolver<R>
+) -> VrpGraspSolver<R>
 where
     R: Rng + ?Sized,
 {
@@ -37,7 +37,7 @@ where
     let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
     let distances = distance_matrix_factory(distances_ptr, arg_sizes.distances);
 
-    GraspSolver::new(stops, vehicles, &distances, parameters, rng)
+    VrpGraspSolver::new(stops, vehicles, &distances, parameters, rng)
 }
 
 pub(crate) unsafe fn two_stage_genetic_solver_factory<'a, R>(

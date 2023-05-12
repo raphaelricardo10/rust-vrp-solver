@@ -4,7 +4,7 @@ use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
     solvers::{
         genetic::crossover::order_crossover::OrderCrossover,
-        grasp::grasp_solver::GraspSolverParameters, solver::Solver,
+        grasp::vrp_grasp_solver::GraspSolverParameters, solver::Solver,
     },
 };
 

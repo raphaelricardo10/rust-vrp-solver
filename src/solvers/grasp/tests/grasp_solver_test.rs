@@ -1,11 +1,11 @@
 use crate::services::distance::distance_service::DistanceMatrix;
-use crate::solvers::grasp::grasp_solver::GraspSolverParameters;
+use crate::solvers::grasp::vrp_grasp_solver::GraspSolverParameters;
 use crate::solvers::solver::Solver;
 use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::rstest;
 
-use crate::{domain::stop::Stop, solvers::grasp::grasp_solver::GraspSolver};
+use crate::{domain::stop::Stop, solvers::grasp::vrp_grasp_solver::VrpGraspSolver};
 
 use crate::tests::fixtures::distances_fixture::distances;
 use crate::tests::fixtures::stops_fixture::stops;
@@ -25,7 +25,7 @@ fn grasp_solution_is_correct(
         max_improvement_times: 3,
     };
 
-    let mut solver = GraspSolver::new(stops, vehicles, &distances, parameters, Box::new(rng));
+    let mut solver = VrpGraspSolver::new(stops, vehicles, &distances, parameters, Box::new(rng));
     let solution = solver.solve();
 
     let solution_v1 = &solution.routes.get(&0).unwrap().stops;
