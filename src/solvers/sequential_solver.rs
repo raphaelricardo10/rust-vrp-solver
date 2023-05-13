@@ -16,7 +16,10 @@ where
     S: Solution,
     P: SequentialSolverParameters + ?Sized,
 {
-    fn get_best_candidate(&self, sequence_id: P::SequenceId) -> Option<(P::CandidateId, P::Cost)>;
+    fn get_best_candidate(
+        &self,
+        candidates: Box<dyn Iterator<Item = (P::CandidateId, P::Cost)> + '_>,
+    ) -> Option<P::CandidateId>;
 }
 
 pub trait SequentialSolver<S, P>
@@ -34,27 +37,17 @@ where
         &self,
         sequence_id: P::SequenceId,
     ) -> Box<dyn Iterator<Item = (P::CandidateId, P::Cost)> + '_>;
-}
 
-trait IterationAlgorithm<S, T>
-where
-    S: Solution,
-    T: SequentialSolverParameters + CandidateChooser<S, T> + SequentialSolver<S, T> + ?Sized,
-{
-    fn run_iteration(&mut self);
-}
+    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<S, P>;
 
-impl<S, T> IterationAlgorithm<S, T> for T
-where
-    S: Solution,
-    T: SequentialSolverParameters + CandidateChooser<S, T> + SequentialSolver<S, T> + ?Sized,
-{
     fn run_iteration(&mut self) {
-        let sequence_ids: Vec<T::SequenceId> = self.get_all_sequences().collect();
+        let sequence_ids: Vec<P::SequenceId> = self.get_all_sequences().collect();
 
         for sequence_id in sequence_ids {
-            if let Some((candidate_id, _)) = self.get_best_candidate(sequence_id) {
-                self.choose_candidate(sequence_id, candidate_id);
+            let candidates = self.get_all_candidates(sequence_id);
+            match self.get_candidate_chooser().get_best_candidate(candidates) {
+                Some(candidate_id) => self.choose_candidate(sequence_id, candidate_id),
+                None => (),
             }
         }
     }
@@ -64,7 +57,6 @@ impl<S, T> Solver<S> for T
 where
     S: Solution,
     T: SequentialSolverParameters
-        + CandidateChooser<S, T>
         + SequentialSolver<S, T>
         + SolverCallbacks,
 {

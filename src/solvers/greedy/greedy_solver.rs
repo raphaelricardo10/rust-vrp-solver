@@ -4,19 +4,29 @@ use crate::solvers::{
     solver::SolverCallbacks,
 };
 
-pub trait GreedySolver {}
+#[derive(Clone, Copy)]
+pub struct GreedySolver;
 
-impl<S, T> CandidateChooser<S, T> for T
+impl<S, T> CandidateChooser<S, T> for GreedySolver
 where
     S: Solution,
     T: SequentialSolverParameters
-        + GreedySolver
         + SequentialSolver<S, T>
         + SolverCallbacks
         + ?Sized,
 {
-    fn get_best_candidate(&self, sequence_id: T::SequenceId) -> Option<(T::CandidateId, T::Cost)> {
-        self.get_all_candidates(sequence_id).min_by(
+    fn get_best_candidate(
+        &self,
+        candidates: Box<
+            dyn Iterator<
+                Item = (
+                    <T as SequentialSolverParameters>::CandidateId,
+                    <T as SequentialSolverParameters>::Cost,
+                ),
+            > + '_,
+        >,
+    ) -> Option<<T as SequentialSolverParameters>::CandidateId> {
+        let chosen = candidates.min_by(
             |(first_candidate_id, first_candidate_cost), (second_candidate_id, second_candidate_cost)| {
                 first_candidate_cost
                     .partial_cmp(second_candidate_cost)
@@ -25,6 +35,8 @@ where
                         first_candidate_cost, second_candidate_cost, first_candidate_id, second_candidate_id
                     )})
             },
-        )
+        )?;
+
+        Some(chosen.0)
     }
 }

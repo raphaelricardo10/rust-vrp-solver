@@ -7,7 +7,7 @@ use crate::{
         route::route_service::RouteService,
     },
     solvers::{
-        sequential_solver::{SequentialSolver, SequentialSolverParameters},
+        sequential_solver::{CandidateChooser, SequentialSolver, SequentialSolverParameters},
         solver::SolverCallbacks,
         vrp_solution::VrpSolution,
     },
@@ -17,9 +17,8 @@ use super::greedy_solver::GreedySolver;
 
 pub struct VrpGreedySolver {
     route_service: RouteService,
+    candidate_chooser: GreedySolver,
 }
-
-impl GreedySolver for VrpGreedySolver {}
 
 impl SolverCallbacks for VrpGreedySolver {
     fn before_solving(&mut self) {
@@ -64,6 +63,10 @@ impl SequentialSolver<VrpSolution, VrpGreedySolver> for VrpGreedySolver {
     fn get_all_candidates(&self, sequence_id: u32) -> Box<dyn Iterator<Item = (u32, f32)> + '_> {
         Box::new(self.route_service.get_distances_from(sequence_id))
     }
+
+    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<VrpSolution, VrpGreedySolver> {
+        &self.candidate_chooser
+    }
 }
 
 impl VrpGreedySolver {
@@ -73,6 +76,7 @@ impl VrpGreedySolver {
         stops: Vec<Stop>,
     ) -> VrpGreedySolver {
         VrpGreedySolver {
+            candidate_chooser: GreedySolver {},
             route_service: RouteService::new(
                 stops.clone(),
                 vehicles,
