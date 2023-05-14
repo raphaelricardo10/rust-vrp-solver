@@ -7,7 +7,9 @@ use crate::{
         route::route_service::RouteService,
     },
     solvers::{
-        sequential_solver::{CandidateChooser, SequentialSolver, SequentialSolverParameters},
+        sequential_solver::{
+            CandidateChooser, SequentialSolver, SequentialSolverParameters, SolutionGetter,
+        },
         solver::SolverCallbacks,
         vrp_solution::VrpSolution,
     },
@@ -36,14 +38,16 @@ impl SequentialSolverParameters for VrpGreedySolver {
     type Cost = f32;
 }
 
-impl SequentialSolver<VrpSolution, VrpGreedySolver> for VrpGreedySolver {
+impl SolutionGetter<VrpSolution> for VrpGreedySolver {
     fn get_solution(&self) -> VrpSolution {
         VrpSolution::new(
             self.route_service.get_all_routes(),
             self.route_service.total_distance(),
         )
     }
+}
 
+impl SequentialSolver<VrpGreedySolver> for VrpGreedySolver {
     fn stop_condition_met(&self) -> bool {
         !self.route_service.has_available_stop()
     }
@@ -64,7 +68,7 @@ impl SequentialSolver<VrpSolution, VrpGreedySolver> for VrpGreedySolver {
         Box::new(self.route_service.get_distances_from(sequence_id))
     }
 
-    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<VrpSolution, VrpGreedySolver> {
+    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<VrpGreedySolver> {
         &self.candidate_chooser
     }
 }

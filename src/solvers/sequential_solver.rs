@@ -11,9 +11,15 @@ pub trait SequentialSolverParameters {
     type Cost: PartialOrd + Display;
 }
 
-pub trait CandidateChooser<S, P>
+pub trait SolutionGetter<S>
 where
     S: Solution,
+{
+    fn get_solution(&self) -> S;
+}
+
+pub trait CandidateChooser<P>
+where
     P: SequentialSolverParameters + ?Sized,
 {
     fn get_best_candidate(
@@ -22,14 +28,12 @@ where
     ) -> Option<P::CandidateId>;
 }
 
-pub trait SequentialSolver<S, P>
+pub trait SequentialSolver<P>
 where
-    S: Solution,
     P: SequentialSolverParameters + ?Sized,
 {
     fn choose_candidate(&mut self, sequence_id: P::SequenceId, candidate_id: P::CandidateId);
 
-    fn get_solution(&self) -> S;
     fn stop_condition_met(&self) -> bool;
     fn get_all_sequences(&self) -> Box<dyn Iterator<Item = P::SequenceId> + '_>;
 
@@ -38,7 +42,7 @@ where
         sequence_id: P::SequenceId,
     ) -> Box<dyn Iterator<Item = (P::CandidateId, P::Cost)> + '_>;
 
-    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<S, P>;
+    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<P>;
 
     fn run_iteration(&mut self) {
         let sequence_ids: Vec<P::SequenceId> = self.get_all_sequences().collect();
@@ -56,9 +60,7 @@ where
 impl<S, T> Solver<S> for T
 where
     S: Solution,
-    T: SequentialSolverParameters
-        + SequentialSolver<S, T>
-        + SolverCallbacks,
+    T: SequentialSolverParameters + SequentialSolver<T> + SolverCallbacks + SolutionGetter<S>,
 {
     fn solve(&mut self) -> S {
         self.before_solving();

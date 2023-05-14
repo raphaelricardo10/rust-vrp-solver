@@ -1,29 +1,24 @@
 use crate::solvers::{
     sequential_solver::{CandidateChooser, SequentialSolver, SequentialSolverParameters},
-    solution::Solution,
     solver::SolverCallbacks,
 };
 
 #[derive(Clone, Copy)]
 pub struct GreedySolver;
 
-impl<S, T> CandidateChooser<S, T> for GreedySolver
+impl<T> CandidateChooser<T> for GreedySolver
 where
-    S: Solution,
-    T: SequentialSolverParameters
-        + SequentialSolver<S, T>
-        + SolverCallbacks
-        + ?Sized,
+    T: SequentialSolverParameters + SequentialSolver<T> + SolverCallbacks + ?Sized,
 {
     fn get_best_candidate(
         &self,
         candidates: Box<
             dyn Iterator<
-                Item = (
-                    <T as SequentialSolverParameters>::CandidateId,
-                    <T as SequentialSolverParameters>::Cost,
-                ),
-            > + '_,
+                    Item = (
+                        <T as SequentialSolverParameters>::CandidateId,
+                        <T as SequentialSolverParameters>::Cost,
+                    ),
+                > + '_,
         >,
     ) -> Option<<T as SequentialSolverParameters>::CandidateId> {
         let chosen = candidates.min_by(

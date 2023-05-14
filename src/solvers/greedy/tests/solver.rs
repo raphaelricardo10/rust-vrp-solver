@@ -2,7 +2,9 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use crate::solvers::{
     greedy::greedy_solver::GreedySolver,
-    sequential_solver::{CandidateChooser, SequentialSolver, SequentialSolverParameters},
+    sequential_solver::{
+        CandidateChooser, SequentialSolver, SequentialSolverParameters, SolutionGetter,
+    },
     solver::SolverCallbacks,
 };
 
@@ -37,7 +39,13 @@ impl SequentialSolverParameters for TestGreedySolver {
     type Cost = u32;
 }
 
-impl SequentialSolver<TestSolution, TestGreedySolver> for TestGreedySolver {
+impl SolutionGetter<TestSolution> for TestGreedySolver {
+    fn get_solution(&self) -> TestSolution {
+        self.solution.clone()
+    }
+}
+
+impl SequentialSolver<TestGreedySolver> for TestGreedySolver {
     fn choose_candidate(&mut self, sequence_id: u32, candidate_id: u32) {
         self.solution.insert(
             sequence_id,
@@ -49,10 +57,6 @@ impl SequentialSolver<TestSolution, TestGreedySolver> for TestGreedySolver {
             true => (),
             false => panic!("the candidate {} should be available", candidate_id),
         };
-    }
-
-    fn get_solution(&self) -> TestSolution {
-        self.solution.clone()
     }
 
     fn get_all_sequences(&self) -> Box<dyn Iterator<Item = u32> + '_> {
@@ -76,7 +80,7 @@ impl SequentialSolver<TestSolution, TestGreedySolver> for TestGreedySolver {
         self.candidates.is_empty()
     }
 
-    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<TestSolution, TestGreedySolver> {
+    fn get_candidate_chooser(&self) -> &dyn CandidateChooser<TestGreedySolver> {
         &self.candidate_chooser
     }
 }
