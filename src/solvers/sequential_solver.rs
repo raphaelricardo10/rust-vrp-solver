@@ -6,7 +6,7 @@ use super::{
 };
 
 pub trait SequentialSolverParameters {
-    type CandidateId: Display;
+    type CandidateId: Copy + Display;
     type SequenceId: Copy + Display;
     type Cost: PartialOrd + Display;
 }
