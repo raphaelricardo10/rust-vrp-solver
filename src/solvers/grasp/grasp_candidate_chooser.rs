@@ -4,15 +4,9 @@ use rand::{seq::SliceRandom, Rng};
 
 use crate::solvers::sequential_solver::{CandidateChooser, SequentialSolverParameters};
 
-#[repr(C)]
-pub struct GraspSolverParameters {
-    pub rcl_size: usize,
-    pub max_improvement_times: u8,
-}
-
 pub struct GraspCandidateChooser<R: Rng + ?Sized> {
-    parameters: GraspSolverParameters,
-    rng: RefCell<R>,
+    pub rcl_size: usize,
+    pub rng: RefCell<R>,
 }
 
 impl<P, R> CandidateChooser<P> for GraspCandidateChooser<R>
@@ -37,7 +31,7 @@ where
             },
         );
 
-        let rcl_size = min(self.parameters.rcl_size, candidates.len());
+        let rcl_size = min(self.rcl_size, candidates.len());
         let mut rng = self.rng.borrow_mut();
 
         Some(candidates[0..rcl_size].choose(rng.deref_mut())?.0)
