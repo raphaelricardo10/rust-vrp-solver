@@ -1,8 +1,14 @@
+use std::rc::Rc;
+
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
-    services::distance::distance_service::DistanceMatrix,
+    services::{
+        distance::distance_service::{DistanceMatrix, DistanceService},
+        route::route_service::RouteService,
+    },
     solvers::{
-        solver::Solver, vrp_sequential::vrp_sequential_solver::VrpSequentialSolver, vrp_solution::VrpSolution,
+        solver::Solver, vrp_sequential::vrp_sequential_solver::VrpSequentialSolver,
+        vrp_solution::VrpSolution,
     },
 };
 
@@ -15,12 +21,14 @@ pub struct VrpGreedySolver {
 impl VrpGreedySolver {
     pub fn new(vehicles: Vec<Vehicle>, distances: &DistanceMatrix, stops: Vec<Stop>) -> Self {
         Self {
-            greedy_solver: VrpSequentialSolver::new(
-                vehicles,
-                distances,
-                stops,
-                Box::new(GreedyCandidateChooser {}),
-            ),
+            greedy_solver: VrpSequentialSolver {
+                candidate_chooser: Box::new(GreedyCandidateChooser),
+                route_service: RouteService::new(
+                    stops.clone(),
+                    vehicles,
+                    Rc::new(DistanceService::new(stops, distances)),
+                ),
+            },
         }
     }
 }

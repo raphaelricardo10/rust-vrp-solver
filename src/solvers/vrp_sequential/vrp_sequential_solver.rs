@@ -1,11 +1,5 @@
-use std::rc::Rc;
-
 use crate::{
-    domain::{stop::Stop, vehicle::Vehicle},
-    services::{
-        distance::distance_service::{DistanceMatrix, DistanceService},
-        route::route_service::RouteService,
-    },
+    services::route::route_service::RouteService,
     solvers::{
         sequential::sequential_solver::{
             CandidateChooser, SequentialSolver, SequentialSolverParameters, SolutionGetter,
@@ -16,8 +10,8 @@ use crate::{
 };
 
 pub struct VrpSequentialSolver {
-    route_service: RouteService,
-    candidate_chooser: Box<dyn CandidateChooser<Self>>,
+    pub route_service: RouteService,
+    pub candidate_chooser: Box<dyn CandidateChooser<Self>>,
 }
 
 impl SolverCallbacks for VrpSequentialSolver {
@@ -68,23 +62,5 @@ impl SequentialSolver<Self> for VrpSequentialSolver {
 
     fn get_candidate_chooser(&self) -> &dyn CandidateChooser<Self> {
         self.candidate_chooser.as_ref()
-    }
-}
-
-impl VrpSequentialSolver {
-    pub fn new(
-        vehicles: Vec<Vehicle>,
-        distances: &DistanceMatrix,
-        stops: Vec<Stop>,
-        candidate_chooser: Box<dyn CandidateChooser<Self>>,
-    ) -> VrpSequentialSolver {
-        VrpSequentialSolver {
-            candidate_chooser,
-            route_service: RouteService::new(
-                stops.clone(),
-                vehicles,
-                Rc::new(DistanceService::new(stops, distances)),
-            ),
-        }
     }
 }
