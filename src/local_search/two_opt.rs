@@ -7,7 +7,7 @@ use crate::{
     stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
-use super::local_search::LocalSearch;
+use super::local_searcher::LocalSearcher;
 
 pub struct TwoOptSearcher {
     stop_swapper: StopSwapper,
@@ -65,7 +65,7 @@ impl TwoOptSearcher {
     }
 }
 
-impl LocalSearch<VrpSolution> for TwoOptSearcher {
+impl LocalSearcher<VrpSolution> for TwoOptSearcher {
     fn run(&self, solution: &mut VrpSolution) {
         for (_, route) in solution.routes.iter_mut() {
             self.run(route);

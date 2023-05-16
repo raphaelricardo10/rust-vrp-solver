@@ -1,5 +1,5 @@
 use crate::{
-    local_search::local_search::LocalSearch,
+    local_search::local_searcher::LocalSearcher,
     solvers::{solution::Solution, solver::Solver},
 };
 
@@ -15,7 +15,7 @@ pub struct GraspSolver<S: Solution + Default + Clone> {
     times_without_improvement: u8,
     best_solution: S,
     first_stage_solver: Box<dyn SolverWithGraspCallbacks<S>>,
-    local_searcher: Box<dyn LocalSearch<S> + 'static>,
+    local_searcher: Box<dyn LocalSearcher<S> + 'static>,
 }
 
 impl<S> GraspSolver<S>
@@ -25,7 +25,7 @@ where
     pub fn new(
         max_improvement_times: u8,
         first_stage_solver: Box<dyn SolverWithGraspCallbacks<S>>,
-        local_searcher: Box<dyn LocalSearch<S> + 'static>,
+        local_searcher: Box<dyn LocalSearcher<S> + 'static>,
     ) -> Self {
         Self {
             local_searcher,
