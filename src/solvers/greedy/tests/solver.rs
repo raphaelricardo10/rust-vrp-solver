@@ -1,8 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use crate::solvers::{
-    greedy::greedy_solver::GreedySolver,
-    sequential_solver::{
+    greedy::greedy_candidate_chooser::GreedyCandidateChooser,
+    sequential::sequential_solver::{
         CandidateChooser, SequentialSolver, SequentialSolverParameters, SolutionGetter,
     },
     solver::SolverCallbacks,
@@ -15,7 +15,7 @@ pub(super) struct TestGreedySolver {
     pub(super) sequences: BTreeSet<u32>,
     pub(super) costs: BTreeMap<u32, u32>,
     pub(super) solution: TestSolution,
-    pub(super) candidate_chooser: GreedySolver,
+    pub(super) candidate_chooser: GreedyCandidateChooser,
 }
 
 impl SolverCallbacks for TestGreedySolver {}
@@ -28,7 +28,7 @@ impl TestGreedySolver {
             sequences: sequences.iter().copied().collect(),
             costs: costs.iter().copied().collect(),
             solution: Default::default(),
-            candidate_chooser: GreedySolver {},
+            candidate_chooser: GreedyCandidateChooser {},
         }
     }
 }
