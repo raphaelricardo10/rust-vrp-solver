@@ -3,6 +3,7 @@ use std::rc::Rc;
 use crate::{
     domain::{route::Route, stop::Stop},
     services::distance::distance_service::DistanceService,
+    solvers::vrp_solution::VrpSolution,
     stop_swapper::{neighborhood::Neighborhood, StopSwapper},
 };
 
@@ -64,22 +65,10 @@ impl TwoOptSearcher {
     }
 }
 
-impl LocalSearch<Route> for TwoOptSearcher {
-    fn run(&self, route: &mut Route) {
-        for stop_index in 1..route.stops.len() - 1 {
-            let neighborhood = Neighborhood::from((
-                route.stops.as_slice(),
-                stop_index,
-                self.distance_service.as_ref(),
-            ));
-
-            let (swap_candidate_index, distance_change) =
-                match self.find_improvements(&route.stops, &neighborhood) {
-                    Some(candidate_index) => candidate_index,
-                    None => continue,
-                };
-
-            route.swap_stops(stop_index, swap_candidate_index, distance_change);
+impl LocalSearch<VrpSolution> for TwoOptSearcher {
+    fn run(&self, solution: &mut VrpSolution) {
+        for (_, route) in solution.routes.iter_mut() {
+            self.run(route);
         }
     }
 }
