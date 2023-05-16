@@ -60,12 +60,7 @@ impl SequentialSolver<TestGreedySolver> for TestGreedySolver {
     }
 
     fn get_all_sequences(&self) -> Box<dyn Iterator<Item = u32> + '_> {
-        Box::new(
-            self.sequences
-                .iter()
-                .enumerate()
-                .map(|(sequence_id, _)| u32::try_from(sequence_id).unwrap()),
-        )
+        Box::new(self.sequences.iter().copied())
     }
 
     fn get_all_candidates(&self, _: u32) -> Box<dyn Iterator<Item = (u32, u32)> + '_> {
