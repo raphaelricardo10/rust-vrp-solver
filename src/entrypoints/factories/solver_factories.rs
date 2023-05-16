@@ -29,9 +29,9 @@ pub(crate) unsafe fn grasp_solver_factory<R>(
     arg_sizes: ArgSizes,
     parameters: GraspSolverParameters,
     rng: Box<R>,
-) -> VrpGraspSolver<R>
+) -> VrpGraspSolver
 where
-    R: Rng + ?Sized,
+    R: Rng + 'static,
 {
     let stops = vector_factory(stops_ptr, arg_sizes.stops);
     let vehicles = vector_factory(vehicles_ptr, arg_sizes.vehicles);
