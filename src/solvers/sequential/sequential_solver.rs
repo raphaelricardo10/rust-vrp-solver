@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{
+use crate::solvers::{
     solution::Solution,
     solver::{Solver, SolverCallbacks},
 };

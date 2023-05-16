@@ -2,7 +2,7 @@ use std::{cell::RefCell, cmp::min, ops::DerefMut};
 
 use rand::{seq::SliceRandom, Rng};
 
-use crate::solvers::sequential_solver::{CandidateChooser, SequentialSolverParameters};
+use crate::solvers::sequential::sequential_solver::{CandidateChooser, SequentialSolverParameters};
 
 pub struct GraspCandidateChooser<R: Rng + ?Sized> {
     pub rcl_size: usize,
