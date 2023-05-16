@@ -49,9 +49,10 @@ where
 
         for sequence_id in sequence_ids {
             let candidates = self.get_all_candidates(sequence_id);
-            match self.get_candidate_chooser().get_best_candidate(candidates) {
-                Some(candidate_id) => self.choose_candidate(sequence_id, candidate_id),
-                None => (),
+            let candidate_id = self.get_candidate_chooser().get_best_candidate(candidates);
+
+            if let Some(candidate_id) = candidate_id {
+                self.choose_candidate(sequence_id, candidate_id);
             }
         }
     }
