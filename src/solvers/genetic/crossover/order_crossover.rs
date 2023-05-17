@@ -7,7 +7,7 @@ use crate::{
 use super::crossover_operator::CrossoverOperator;
 
 #[derive(Clone)]
-pub(crate) struct OrderCrossover {
+pub struct OrderCrossover {
     max_of_tries: u8,
 }
 
@@ -28,7 +28,7 @@ impl<R: Rng + ?Sized> CrossoverOperator<R> for OrderCrossover {
 }
 
 impl OrderCrossover {
-    pub(crate) fn new(max_of_tries: u8) -> Self {
+    pub fn new(max_of_tries: u8) -> Self {
         Self { max_of_tries }
     }
 }

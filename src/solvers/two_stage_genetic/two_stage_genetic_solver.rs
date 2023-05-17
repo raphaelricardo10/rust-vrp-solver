@@ -35,7 +35,7 @@ impl<'a, R: Rng + ?Sized> Solver<VrpSolution> for TwoStageGeneticSolver<'a, R> {
 }
 
 impl<'a, R: Rng + ?Sized> TwoStageGeneticSolver<'a, R> {
-    pub(crate) fn new(
+    pub fn new(
         stops: Vec<Stop>,
         distances: &DistanceMatrix,
         first_stage_solver: &'a mut dyn Solver<VrpSolution>,

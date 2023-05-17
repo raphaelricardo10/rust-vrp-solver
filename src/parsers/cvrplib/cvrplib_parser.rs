@@ -9,25 +9,22 @@ use crate::{
 
 use super::sections::{Demand, Header, Node};
 
-pub(crate) struct CvrpLibParser {
-    pub(crate) content: String,
-    pub(crate) number_of_vehicles: u32,
+pub struct CvrpLibParser {
+    pub content: String,
+    pub number_of_vehicles: u32,
 }
 
 impl CvrpLibParser {
     pub(super) fn get_header_value<'a>(lines: &mut Lines<'a>) -> &'a str {
         const ERROR_MESSAGE: &str = "failed parsing header section";
 
-        let result = lines
+        lines
             .next()
             .expect(ERROR_MESSAGE)
             .trim()
             .split(" : ")
             .nth(1)
-            .expect(ERROR_MESSAGE);
-
-        print!("{}", result);
-        result
+            .expect(ERROR_MESSAGE)
     }
 
     pub(super) fn generate_pair_combinations<'a, T: Copy>(

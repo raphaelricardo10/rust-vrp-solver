@@ -20,7 +20,7 @@ impl Default for Individual {
 }
 
 #[derive(Clone)]
-pub(crate) struct Individual {
+pub struct Individual {
     pub(super) fitness: f32,
     pub(super) chromosomes: Vec<Chromosome>,
 }
