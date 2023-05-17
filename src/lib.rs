@@ -5,3 +5,4 @@ pub mod services;
 pub mod solvers;
 pub mod stop_swapper;
 pub mod tests;
+mod parsers;
