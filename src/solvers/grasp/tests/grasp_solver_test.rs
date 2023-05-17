@@ -12,7 +12,7 @@ use crate::tests::fixtures::stops_fixture::stops;
 use crate::tests::fixtures::vehicles_fixture::{vehicle_factory, VehicleFactory};
 
 #[rstest]
-fn grasp_solution_is_correct(
+fn test_grasp_solution_is_correct(
     distances: DistanceMatrix,
     stops: Vec<Stop>,
     vehicle_factory: VehicleFactory,
