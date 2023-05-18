@@ -24,11 +24,11 @@ impl StopSwapper {
         false
     }
 
-    fn swap_non_consecutive_neighborhoods<'b>(
-        neighborhood1: &'b Neighborhood<'b>,
-        neighborhood2: &'b Neighborhood<'b>,
+    fn swap_non_consecutive_neighborhoods<'a>(
+        neighborhood1: &'a Neighborhood,
+        neighborhood2: &'a Neighborhood,
         distance_service: &DistanceService,
-    ) -> (Neighborhood<'b>, Neighborhood<'b>) {
+    ) -> (Neighborhood, Neighborhood) {
         let swapped_neighborhood_1 = Neighborhood::new(
             neighborhood1.previous,
             neighborhood2.current,
@@ -46,11 +46,11 @@ impl StopSwapper {
         (swapped_neighborhood_1, swapped_neighborhood_2)
     }
 
-    fn swap_consecutive_neighborhoods<'b>(
-        mut neighborhood1: &'b Neighborhood<'b>,
-        mut neighborhood2: &'b Neighborhood<'b>,
+    fn swap_consecutive_neighborhoods<'a>(
+        mut neighborhood1: &'a Neighborhood,
+        mut neighborhood2: &'a Neighborhood,
         distance_service: &DistanceService,
-    ) -> (Neighborhood<'b>, Neighborhood<'b>) {
+    ) -> (Neighborhood, Neighborhood) {
         if neighborhood1.previous.stop.id == neighborhood2.current.stop.id {
             std::mem::swap(&mut neighborhood1, &mut neighborhood2);
         }
