@@ -33,17 +33,7 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
             max_improvement_times: 10,
         };
 
-        let crossover_operator = OrderCrossover::new(3);
-
-        let genetic_parameters = TwoStageGeneticSolverParameters {
-            population_size: 1000,
-            genetic_solver_parameters: GeneticSolverParameters {
-                elite_size: 300,
-                mutation_rate: 0.5,
-                max_generations: 100,
-                local_search_rate: 0.2,
-            },
-        };
+        let crossover_operator = OrderCrossover::new(50);
 
         let mut grasp_solver = VrpGraspSolver::new(
             stops.clone(),
@@ -53,16 +43,27 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
             thread_rng(),
         );
 
-        let mut genetic_solver = TwoStageGeneticSolver::new(
-            stops,
-            &distances,
-            &mut grasp_solver,
-            genetic_parameters,
-            &crossover_operator,
-            Box::new(thread_rng()),
-        );
-
         c.bench_function(instance, |b| {
+            let genetic_parameters: TwoStageGeneticSolverParameters =
+                TwoStageGeneticSolverParameters {
+                    population_size: 1000,
+                    genetic_solver_parameters: GeneticSolverParameters {
+                        elite_size: 300,
+                        mutation_rate: 0.00,
+                        max_generations: 1000,
+                        local_search_rate: 0.2,
+                    },
+                };
+
+            let mut genetic_solver = TwoStageGeneticSolver::new(
+                stops.clone(),
+                &distances,
+                &mut grasp_solver,
+                genetic_parameters,
+                &crossover_operator,
+                Box::new(thread_rng()),
+            );
+
             b.iter(|| {
                 let solution = genetic_solver.solve();
                 println!("Solution: {:?}", solution.total_distance);
