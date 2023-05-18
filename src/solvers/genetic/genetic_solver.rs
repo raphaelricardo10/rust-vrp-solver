@@ -31,6 +31,7 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
     population: Population,
     stop_swapper: StopSwapper,
     current_generation: u32,
+    initial_population: Population,
     pub solution: VrpSolution,
     best: Individual,
     crossover_op: &'a dyn CrossoverOperator<R>,
@@ -79,6 +80,8 @@ impl<'a, R: Rng + ?Sized> Solver<VrpSolution> for GeneticSolver<'a, R> {
             .map(|chromosome| (chromosome.vehicle.id, chromosome))
             .collect();
 
+        self.population = self.initial_population.clone();
+
         VrpSolution::new(&route_map, self.best.fitness)
     }
 }
@@ -96,9 +99,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
 
         Self {
             rng,
-            population,
             parameters,
             crossover_op,
+            population: population.clone(),
+            initial_population: population,
             best: Default::default(),
             solution: Default::default(),
             current_generation: Default::default(),

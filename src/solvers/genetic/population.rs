@@ -1,7 +1,7 @@
 use super::individual::Individual;
 use crate::solvers::vrp_solution::VrpSolution;
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 pub(crate) struct Population {
     pub(super) individuals: Vec<Individual>,
 }
