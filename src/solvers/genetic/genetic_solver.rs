@@ -43,31 +43,31 @@ pub struct GeneticSolver<'a, R: Rng + ?Sized> {
 impl<'a, R: Rng + ?Sized> Solver<VrpSolution> for GeneticSolver<'a, R> {
     fn solve(&mut self) -> VrpSolution {
         while !self.stop_condition_met() {
-            loop {
-                let parents = self.selection();
+            let parents = self.selection();
 
-                let (parent1_index, parent1) = &parents[0];
-                let (parent2_index, parent2) = &parents[1];
+            let (parent1_index, parent1) = &parents[0];
+            let (parent2_index, parent2) = &parents[1];
 
-                let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
-                    Some(offsprings) => offsprings,
-                    None => break,
-                };
+            let (offspring1, offspring2) = match self.crossover(parent1, parent2) {
+                Some(offsprings) => offsprings,
+                None => continue,
+            };
 
-                if self.should_update_best(&offspring1) {
-                    self.best = offspring1.clone();
-                }
-
-                if self.should_update_best(&offspring2) {
-                    self.best = offspring2.clone();
-                }
-
-                self.population.individuals[*parent1_index] = offspring1;
-                self.population.individuals[*parent2_index] = offspring2;
-            }
+            self.population.individuals[*parent1_index] = offspring1;
+            self.population.individuals[*parent2_index] = offspring2;
 
             self.mutation();
             self.apply_local_search();
+
+            self.best = self
+                .population
+                .individuals
+                .iter()
+                .min_by(|individual_1, individual_2| {
+                    individual_1.fitness.total_cmp(&individual_2.fitness)
+                })
+                .unwrap()
+                .clone();
 
             self.current_generation += 1;
         }
