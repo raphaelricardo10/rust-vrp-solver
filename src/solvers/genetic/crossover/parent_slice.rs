@@ -3,6 +3,7 @@ use std::{cmp, collections::HashSet};
 use rand::Rng;
 
 use crate::{
+    domain::vehicle::Vehicle,
     services::distance::distance_service::DistanceService,
     solvers::genetic::individual::{Chromosome, Gene, Individual},
 };
@@ -73,7 +74,8 @@ impl ParentSlice {
         chromosome: Chromosome,
         distance_service: &DistanceService,
     ) -> Option<Chromosome> {
-        let mut offspring_chromosome = Chromosome::new(chromosome.vehicle);
+        let offspring_vehicle = Vehicle::new(chromosome.vehicle.id, chromosome.vehicle.capacity);
+        let mut offspring_chromosome = Chromosome::new(offspring_vehicle);
 
         offspring_chromosome.add_stop(chromosome.stops[0], 0.0).ok();
 
