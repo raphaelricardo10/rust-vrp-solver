@@ -32,11 +32,11 @@ fn can_optimize_route(
     two_opt.run(&mut route);
 
     assert_eq!(route.stops.get(0).unwrap().id, 0);
-    assert_eq!(route.stops.get(1).unwrap().id, 2);
+    assert_eq!(route.stops.get(1).unwrap().id, 1);
     assert_eq!(route.stops.get(2).unwrap().id, 3);
-    assert_eq!(route.stops.get(3).unwrap().id, 1);
+    assert_eq!(route.stops.get(3).unwrap().id, 2);
     assert_eq!(route.stops.get(4).unwrap().id, 4);
     assert_eq!(route.stops.get(5).unwrap().id, 0);
 
-    assert_eq!(route.total_distance(), 11.5);
+    assert_eq!(route.total_distance(), 9.5);
 }

@@ -47,20 +47,35 @@ impl TwoOptSearcher {
     }
 
     pub fn run(&self, route: &mut Route) {
-        for stop_index in 1..route.stops.len() - 1 {
-            let neighborhood = Neighborhood::from((
-                route.stops.as_slice(),
-                stop_index,
-                self.distance_service.as_ref(),
-            ));
+        let mut found_improvement = false;
 
-            let (swap_candidate_index, distance_change) =
-                match self.find_improvements(&route.stops, &neighborhood) {
-                    Some(candidate_index) => candidate_index,
-                    None => continue,
-                };
+        while !found_improvement {
+            found_improvement = false;
 
-            route.swap_stops(stop_index, swap_candidate_index, distance_change);
+            for stop_index_1 in 1..route.stops.len() - 2 {
+                for stop_index_2 in (stop_index_1 + 1)..route.stops.len() - 1 {
+                    let neighborhood_1 = Neighborhood::from((
+                        route.stops.as_slice(),
+                        stop_index_1,
+                        self.distance_service.as_ref(),
+                    ));
+
+                    let neighborhood_2 = Neighborhood::from((
+                        route.stops.as_slice(),
+                        stop_index_2,
+                        self.distance_service.as_ref(),
+                    ));
+
+                    let swap_cost = self
+                        .stop_swapper
+                        .calculate_swap_cost(&neighborhood_1, &neighborhood_2);
+
+                    if swap_cost < 0.0 {
+                        route.swap_stops(stop_index_1, stop_index_2, swap_cost);
+                        found_improvement = true;
+                    }
+                }
+            }
         }
     }
 }
