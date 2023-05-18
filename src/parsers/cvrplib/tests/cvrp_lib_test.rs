@@ -1,5 +1,3 @@
-use std::fs;
-
 use rstest::rstest;
 
 use crate::parsers::{
@@ -96,18 +94,10 @@ fn test_can_generate_all_pair_combinations() {
 
 #[rstest]
 fn test_parse_the_whole_file() {
-    match fs::read_to_string("./src/parsers/cvrplib/tests/A-n32-k5.vrp") {
-        Ok(content) => {
-            let vrp_inputs = CvrpLibParser {
-                content,
-                number_of_vehicles: 5,
-            }
-            .parse();
+    let vrp_inputs =
+        CvrpLibParser::from_file("./src/parsers/cvrplib/tests/A-n32-k5.vrp", 5).parse();
 
-            assert_eq!(vrp_inputs.stops.len(), 32);
-            assert_eq!(vrp_inputs.vehicles.len(), 5);
-            assert_eq!(vrp_inputs.distances.len(), 1024);
-        }
-        Err(error) => panic!("Error reading file: {:?}", error),
-    }
+    assert_eq!(vrp_inputs.stops.len(), 32);
+    assert_eq!(vrp_inputs.vehicles.len(), 5);
+    assert_eq!(vrp_inputs.distances.len(), 1024);
 }

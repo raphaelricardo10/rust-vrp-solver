@@ -1,5 +1,5 @@
 use geo::{point, EuclideanDistance};
-use std::{iter::zip, str::Lines};
+use std::{fs, iter::zip, str::Lines};
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
@@ -15,6 +15,16 @@ pub struct CvrpLibParser {
 }
 
 impl CvrpLibParser {
+    pub fn from_file(path: &str, number_of_vehicles: u32) -> Self {
+        match fs::read_to_string(path) {
+            Ok(content) => Self {
+                content,
+                number_of_vehicles,
+            },
+            Err(error) => panic!("Error reading file: {:?}", error),
+        }
+    }
+
     pub(super) fn get_header_value<'a>(lines: &mut Lines<'a>) -> &'a str {
         const ERROR_MESSAGE: &str = "failed parsing header section";
 
