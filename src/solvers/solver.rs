@@ -7,4 +7,5 @@ pub trait Solver<T: Solution> {
 pub trait SolverCallbacks {
     fn before_solving(&mut self) {}
     fn after_solving(&mut self) {}
+    fn on_exit(&mut self) {}
 }

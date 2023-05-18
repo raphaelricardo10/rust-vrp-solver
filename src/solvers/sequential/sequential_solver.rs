@@ -72,6 +72,10 @@ where
 
         self.after_solving();
 
-        self.get_solution()
+        let solution = self.get_solution();
+
+        self.on_exit();
+
+        solution
     }
 }

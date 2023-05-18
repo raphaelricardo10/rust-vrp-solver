@@ -22,6 +22,10 @@ impl SolverCallbacks for VrpSequentialSolver {
     fn after_solving(&mut self) {
         self.route_service.assign_stop_points();
     }
+
+    fn on_exit(&mut self) {
+        self.route_service.reset();
+    }
 }
 
 impl SequentialSolverParameters for VrpSequentialSolver {
