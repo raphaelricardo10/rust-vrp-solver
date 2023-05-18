@@ -33,12 +33,18 @@ impl<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Sized> Offspring<'a, R, T> 
         distance_service: &DistanceService,
     ) -> Option<()> {
         for _ in 0..self.crossover_op.max_of_tries() {
-            self.individual = self.crossover_op.run(
+            let individual = self.crossover_op.run(
                 self.parent1.clone(),
                 self.parent2.clone(),
                 rng,
                 distance_service,
-            )?;
+            );
+
+            if individual.is_none(){
+                continue;
+            }
+
+            self.individual = individual.unwrap();
 
             if self.has_evolved() {
                 return Some(());
