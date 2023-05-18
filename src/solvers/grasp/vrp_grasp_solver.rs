@@ -15,10 +15,7 @@ use crate::{
     },
 };
 
-use super::{
-    grasp_candidate_chooser::GraspCandidateChooser,
-    grasp_solver::{GraspSolver, GraspSolverCallbacks, SolverWithGraspCallbacks},
-};
+use super::{grasp_candidate_chooser::GraspCandidateChooser, grasp_solver::GraspSolver};
 
 #[repr(C)]
 pub struct GraspSolverParameters {
@@ -35,14 +32,6 @@ impl Solver<VrpSolution> for VrpGraspSolver {
         self.grasp_solver.solve()
     }
 }
-
-impl GraspSolverCallbacks for VrpSequentialSolver {
-    fn after_iteration(&mut self) {
-        self.route_service.reset();
-    }
-}
-
-impl SolverWithGraspCallbacks<VrpSolution> for VrpSequentialSolver {}
 
 impl VrpGraspSolver {
     pub fn new<R: Rng + 'static>(
