@@ -142,21 +142,10 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     pub(super) fn mutation(&mut self) {
         let stop_swapper = &self.stop_swapper;
 
-        let mutated_individuals: Vec<&mut Individual> =
-            self.population
-                .individuals
-                .iter_mut()
-                .filter(|_| {
-                    self.rng.gen_bool(
-                        self.parameters.mutation_rate.try_into().expect(
-                            "it should be possible to convert the local search rate to f64",
-                        ),
-                    )
-                })
-                .collect();
-
-        for individual in mutated_individuals {
-            individual.swap_random_genes(stop_swapper, &mut self.rng);
+        for individual in self.population.individuals.iter_mut() {
+            if self.rng.gen_bool(self.parameters.mutation_rate.into()) {
+                individual.swap_random_genes(stop_swapper, &mut self.rng);
+            }
         }
     }
 
