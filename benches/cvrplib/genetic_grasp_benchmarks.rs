@@ -36,7 +36,7 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
         let crossover_operator = OrderCrossover::new(3);
 
         let genetic_parameters = TwoStageGeneticSolverParameters {
-            population_size: 200,
+            population_size: 1000,
             genetic_solver_parameters: GeneticSolverParameters {
                 elite_size: 300,
                 mutation_rate: 0.5,
