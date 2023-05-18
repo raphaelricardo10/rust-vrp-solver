@@ -198,8 +198,4 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     fn stop_condition_met(&self) -> bool {
         self.current_generation >= self.parameters.max_generations
     }
-
-    fn should_update_best(&self, individual: &Individual) -> bool {
-        individual.fitness < self.best.fitness
-    }
 }
