@@ -16,6 +16,7 @@ pub type StopMap = HashMap<u32, Stop>;
 pub type RouteMap = BTreeMap<u32, Route>;
 
 pub struct RouteService {
+    depot: Stop,
     routes: RouteMap,
     all_stops: Vec<Stop>,
     available_stops: StopMap,
@@ -29,6 +30,7 @@ impl RouteService {
         distance_service: Rc<DistanceService>,
     ) -> Self {
         Self {
+            depot: stops[0],
             distance_service,
             all_stops: stops.clone(),
             routes: Self::map_routes(vehicles),
@@ -131,8 +133,8 @@ impl RouteService {
     }
 
     pub fn assign_starting_points(&mut self) {
-        let starting_stop = self.available_stops.remove(&0).unwrap_or_else(|| {
-            panic!("the stop depot (stop 0) should be available");
+        let starting_stop = self.available_stops.remove(&self.depot.id).unwrap_or_else(|| {
+            panic!("the stop depot {} should be available", self.depot.id);
         });
 
         for route in &mut self.routes.values_mut() {
