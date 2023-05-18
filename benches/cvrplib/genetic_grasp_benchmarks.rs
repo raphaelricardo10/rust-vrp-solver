@@ -24,7 +24,7 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
             stops,
             vehicles,
             distances,
-        } = InstanceRepository::get_instance(instance);
+        } = InstanceRepository::get_instance(instance, 5);
 
         let rcl_size = (stops.len() as f32 * 0.3).round() as usize;
 
@@ -62,7 +62,13 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
             Box::new(thread_rng()),
         );
 
-        c.bench_function(instance, |b| b.iter(|| genetic_solver.solve()));
+        c.bench_function(instance, |b| {
+            b.iter(|| {
+                let solution = genetic_solver.solve();
+                println!("Solution: {:?}", solution.total_distance);
+                solution
+            })
+        });
     }
 }
 
