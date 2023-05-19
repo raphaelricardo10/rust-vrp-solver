@@ -1,7 +1,7 @@
 use std::rc::Rc;
 
 use crate::{
-    domain::{route::Route, stop::Stop},
+    domain::route::Route,
     services::distance::distance_service::DistanceService,
     solvers::vrp_solution::VrpSolution,
     stop_swapper::{neighborhood::Neighborhood, StopSwapper},
@@ -22,35 +22,13 @@ impl TwoOptSearcher {
         }
     }
 
-    fn should_swap_stops(swap_cost: f32) -> bool {
-        swap_cost < 0.0
-    }
-
-    fn find_improvements(
-        &self,
-        stops: &Vec<Stop>,
-        neighborhood: &Neighborhood,
-    ) -> Option<(usize, f32)> {
-        let (swap_candidate_index, swap_cost) =
-            self.stop_swapper.get_minimum_swap_cost(neighborhood, stops);
-
-        let swap_candidate = Neighborhood::from((
-            stops.as_slice(),
-            swap_candidate_index,
-            self.distance_service.as_ref(),
-        ));
-
-        match Self::should_swap_stops(swap_cost) {
-            true => Some((swap_candidate.current.index, swap_cost)),
-            false => None,
-        }
-    }
-
     pub fn run(&self, route: &mut Route) {
-        let mut found_improvement = false;
+        if route.stops.len() < 3 {
+            return;
+        }
 
-        while !found_improvement {
-            found_improvement = false;
+        loop {
+            let mut found_improvement = false;
 
             for stop_index_1 in 1..route.stops.len() - 2 {
                 for stop_index_2 in (stop_index_1 + 1)..route.stops.len() - 1 {
@@ -75,6 +53,10 @@ impl TwoOptSearcher {
                         found_improvement = true;
                     }
                 }
+            }
+
+            if !found_improvement {
+                break;
             }
         }
     }
