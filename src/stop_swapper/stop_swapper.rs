@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use crate::{domain::stop::Stop, services::distance::distance_service::DistanceService};
+use crate::services::distance::distance_service::DistanceService;
 
 use super::neighborhood::Neighborhood;
 
