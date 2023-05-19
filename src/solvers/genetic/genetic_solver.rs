@@ -59,7 +59,7 @@ impl<'a, R: Rng + ?Sized> Solver<VrpSolution> for GeneticSolver<'a, R> {
             self.mutation();
             self.apply_local_search();
 
-            self.best = self
+            let best_in_generation = self
                 .population
                 .individuals
                 .iter()
@@ -68,6 +68,10 @@ impl<'a, R: Rng + ?Sized> Solver<VrpSolution> for GeneticSolver<'a, R> {
                 })
                 .unwrap()
                 .clone();
+
+            if best_in_generation.fitness < self.best.fitness {
+                self.best = best_in_generation;
+            }
 
             self.current_generation += 1;
         }
