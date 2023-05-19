@@ -20,18 +20,6 @@ fn can_calculate_neighborhood_swap_cost(
 }
 
 #[rstest]
-fn can_get_the_minimum_swap_cost(
-    stop_swapper: StopSwapper,
-    neighborhood_factory: NeighborhoodFactory,
-) {
-    let neighborhood = neighborhood_factory.make_neighborhood(1);
-
-    let swap_cost = stop_swapper.get_minimum_swap_cost(&neighborhood, &neighborhood_factory.stops);
-
-    assert_eq!(swap_cost.1, -5.0);
-}
-
-#[rstest]
 fn can_calculate_neighborhood_swap_cost_of_consecutive_swaps(
     stop_swapper: StopSwapper,
     neighborhood_factory: NeighborhoodFactory,

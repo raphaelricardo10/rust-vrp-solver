@@ -97,35 +97,4 @@ impl StopSwapper {
         (swapped_neighborhood1.cost + swapped_neighborhood2.cost)
             - (neighborhood1.cost + neighborhood2.cost)
     }
-
-    pub(crate) fn get_minimum_swap_cost(
-        &self,
-        neighborhood: &Neighborhood,
-        stops: &Vec<Stop>,
-    ) -> (usize, f32) {
-        stops
-            .iter()
-            .take(stops.len() - 1)
-            .enumerate()
-            .skip(neighborhood.next.index - 1)
-            .map(|(stop_index, _)| {
-                (
-                    stop_index,
-                    self.calculate_swap_cost(
-                        neighborhood,
-                        &Neighborhood::from((
-                            stops.as_slice(),
-                            stop_index,
-                            self.distance_service.as_ref(),
-                        )),
-                    ),
-                )
-            })
-            .min_by(|(_, cost1), (_, cost2)| {
-                cost1.partial_cmp(cost2).unwrap_or_else(|| {
-                    panic!("it should be possible to compare the swap costs {cost1} and {cost2}")
-                })
-            })
-            .expect("the stops vector should not be empty")
-    }
 }
