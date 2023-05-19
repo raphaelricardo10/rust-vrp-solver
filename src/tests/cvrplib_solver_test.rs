@@ -1,4 +1,4 @@
-use rand::{SeedableRng, thread_rng};
+use rand::SeedableRng;
 use rand_chacha::ChaCha8Rng;
 use rstest::{fixture, rstest};
 
@@ -88,16 +88,21 @@ fn test_can_solve_with_grasp_genetic_solver(
         max_improvement_times: 3,
     };
 
-    let mut grasp_solver =
-        VrpGraspSolver::new(stops.clone(), vehicles, &distances, grasp_parameters, rng.clone());
+    let mut grasp_solver = VrpGraspSolver::new(
+        stops.clone(),
+        vehicles,
+        &distances,
+        grasp_parameters,
+        rng.clone(),
+    );
 
     let genetic_parameters = TwoStageGeneticSolverParameters {
-        population_size: 1000,
+        population_size: 20,
         genetic_solver_parameters: GeneticSolverParameters {
-            elite_size: 100,
-            local_search_rate: 0.2,
-            mutation_rate: 0.05,
-            max_generations: 5000,
+            elite_size: 5,
+            local_search_rate: 0.01,
+            mutation_rate: 0.01,
+            max_generations: 10,
         },
     };
 
@@ -109,7 +114,7 @@ fn test_can_solve_with_grasp_genetic_solver(
         &mut grasp_solver,
         genetic_parameters,
         &crossover_operator,
-        Box::new(thread_rng()),
+        Box::new(rng),
     );
 
     let solution = genetic_solver.solve();

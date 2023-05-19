@@ -1,5 +1,6 @@
 use criterion::{criterion_group, Criterion};
-use rand::thread_rng;
+use rand::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 use vrp_solver::{
     parsers::vrp_parser::VrpInputs,
     solvers::{
@@ -30,7 +31,7 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
 
         let grasp_parameters = GraspSolverParameters {
             rcl_size,
-            max_improvement_times: 10,
+            max_improvement_times: 100,
         };
 
         let crossover_operator = OrderCrossover::new(50);
@@ -40,20 +41,22 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
             vehicles,
             &distances,
             grasp_parameters,
-            thread_rng(),
+            ChaCha20Rng::from_entropy(),
         );
 
         c.bench_function(instance, |b| {
             let genetic_parameters: TwoStageGeneticSolverParameters =
                 TwoStageGeneticSolverParameters {
-                    population_size: 1000,
+                    population_size: 200,
                     genetic_solver_parameters: GeneticSolverParameters {
-                        elite_size: 300,
-                        mutation_rate: 0.00,
+                        elite_size: 5,
+                        mutation_rate: 0.05,
                         max_generations: 1000,
-                        local_search_rate: 0.2,
+                        local_search_rate: 0.3,
                     },
                 };
+
+            let rng = ChaCha20Rng::from_entropy();
 
             let mut genetic_solver = TwoStageGeneticSolver::new(
                 stops.clone(),
@@ -61,7 +64,7 @@ pub fn genetic_grasp_benchmark(c: &mut Criterion) {
                 &mut grasp_solver,
                 genetic_parameters,
                 &crossover_operator,
-                Box::new(thread_rng()),
+                Box::new(rng),
             );
 
             b.iter(|| {

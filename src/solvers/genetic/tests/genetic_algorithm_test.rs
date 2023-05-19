@@ -32,7 +32,7 @@ fn test_genetic_algorithm_can_generate_a_good_route(
     let parameters = TwoStageGeneticSolverParameters {
         population_size: 10,
         genetic_solver_parameters: GeneticSolverParameters {
-            elite_size: 3,
+            elite_size: 5,
             max_generations: 10,
             local_search_rate: 0.2,
             mutation_rate: 0.05,
