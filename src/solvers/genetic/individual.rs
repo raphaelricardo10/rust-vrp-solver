@@ -96,28 +96,13 @@ impl Individual {
             })
     }
 
-    pub(crate) fn insert_gene(&mut self, address: GeneAddress, gene: Gene) {
-        self.chromosomes
-            .get_mut(address.0)
-            .unwrap_or_else(|| {
-                panic!("the chromosome {0} should exist", address.0);
-            })
-            .stops[address.1] = gene;
-    }
-
     pub(crate) fn swap_genes(
         &mut self,
         address1: GeneAddress,
         address2: GeneAddress,
         fitness_change: f32,
     ) {
-        let gene1 = self.get_gene(address1);
-        let gene2 = self.get_gene(address2);
-
-        let aux = gene1;
-        self.insert_gene(address1, gene2);
-        self.insert_gene(address2, aux);
-
+        self.chromosomes[address1.0].swap_stops(address1.1, address2.1, fitness_change);
         self.fitness += fitness_change;
     }
 
