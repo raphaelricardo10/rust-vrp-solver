@@ -99,3 +99,29 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     assert_ne!(offspring.fitness, 0.0);
 }
+
+#[rstest]
+fn test_can_insert_parent_slice_with_correct_fitness(
+    stops: Vec<Stop>,
+    route_factory: RouteFactory,
+    distance_service: DistanceService,
+) {
+    let chromosome = route_factory(stops[..3].to_vec());
+    let insertion_point = (0, 1);
+
+    let mut offspring = Individual::new(vec![chromosome]);
+
+    let slice = ParentSlice::new(stops[3..4].to_vec(), &distance_service);
+
+    offspring.insert_parent_slice(slice, insertion_point, &distance_service);
+
+    assert_eq!(
+        offspring.chromosomes[0].total_distance().floor(),
+        offspring.chromosomes[0]
+            .stops
+            .windows(2)
+            .map(|w| distance_service.get_distance(&w[1], &w[0]))
+            .sum::<f32>()
+            .floor()
+    );
+}
