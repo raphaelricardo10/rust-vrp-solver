@@ -28,29 +28,40 @@ impl Individual {
         insertion_point: GeneAddress,
         distance_service: &DistanceService,
     ) {
-        let distance_before = match self.chromosomes[insertion_point.0].stops.len() == 1 {
+        let genes = &self.chromosomes[insertion_point.0].stops;
+        let beginning_of_slice = insertion_point.1;
+        let end_of_slice = insertion_point.1 + 1;
+
+        let current_distance = match genes.len() == 1 {
+            true => 0.0,
+            false => {
+                distance_service.get_distance(&genes[beginning_of_slice], &genes[end_of_slice])
+            }
+        };
+
+        let new_distance_before = distance_service.get_distance(
+            &genes[beginning_of_slice],
+            parent_slice
+                .slice
+                .first()
+                .expect("the parent slice should not be empty"),
+        );
+
+        let new_distance_after = match genes.len() == 1 {
             true => 0.0,
             false => distance_service.get_distance(
-                &self.chromosomes[insertion_point.0].stops[insertion_point.1 - 1],
                 parent_slice
                     .slice
-                    .first()
+                    .last()
                     .expect("the parent slice should not be empty"),
+                &genes[end_of_slice],
             ),
         };
 
-        let distance_after = distance_service.get_distance(
-            parent_slice
-                .slice
-                .last()
-                .expect("the parent slice should not be empty"),
-            &self.chromosomes[insertion_point.0].stops[insertion_point.1],
-        );
-
         self.chromosomes[insertion_point.0].add_multiple_stops_at(
             parent_slice.slice,
-            insertion_point.1,
-            parent_slice.cost + distance_before + distance_after,
+            end_of_slice,
+            parent_slice.cost + new_distance_before + new_distance_after - current_distance,
         );
 
         self.update_fitness();
