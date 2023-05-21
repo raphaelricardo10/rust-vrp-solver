@@ -1,4 +1,3 @@
-use geo::{point, EuclideanDistance};
 use std::{fs, iter::zip, str::Lines};
 
 use crate::{
@@ -45,6 +44,19 @@ impl CvrpLibParser {
                 .iter()
                 .flat_map(|src| items.iter().map(move |&dest| (*src, dest))),
         )
+    }
+
+    pub(super) fn generate_distance_matrix(nodes: &[Node]) -> DistanceMatrix {
+        Self::generate_pair_combinations(nodes)
+            .map(|(source_node, destination_node)| {
+                let distance = f32::sqrt(
+                    (destination_node.x_position - source_node.x_position).pow(2) as f32
+                        + (destination_node.y_position - source_node.y_position).pow(2) as f32,
+                );
+
+                ((source_node.id, destination_node.id), distance)
+            })
+            .collect()
     }
 
     pub(super) fn parse_header<'a>(lines: &mut Lines<'a>) -> Header<'a> {
@@ -121,15 +133,7 @@ impl VrpParser for CvrpLibParser {
             .map(|id| Vehicle::new(id, header.capacity))
             .collect();
 
-        let distances: DistanceMatrix = Self::generate_pair_combinations(&nodes)
-            .map(|(src, dest)| {
-                let src_point = point!(x: f32::from(src.x_position), y: f32::from(src.y_position));
-                let dest_point =
-                    point!(x: f32::from(dest.x_position), y: f32::from(dest.y_position));
-
-                ((src.id, dest.id), src_point.euclidean_distance(&dest_point))
-            })
-            .collect();
+        let distances: DistanceMatrix = Self::generate_distance_matrix(&nodes);
 
         VrpInputs {
             stops,
