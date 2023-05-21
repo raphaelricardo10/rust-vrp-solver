@@ -23,7 +23,14 @@ impl Population {
         Self { individuals }
     }
 
-    pub(super) fn get_k_bests(&self, k: usize) -> &[Individual] {
+    pub(super) fn get_k_bests(&mut self, k: usize) -> &[Individual] {
+        self.individuals.sort_by(|individual1, individual2| {
+            individual1
+                .fitness
+                .partial_cmp(&individual2.fitness)
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+
         &self.individuals[..k]
     }
 }
