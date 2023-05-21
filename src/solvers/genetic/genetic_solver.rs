@@ -168,22 +168,12 @@ impl<'a, R: Rng + ?Sized> GeneticSolver<'a, R> {
     }
 
     pub(super) fn apply_local_search(&mut self) {
-        let selected_individuals: Vec<&mut Individual> =
-            self.population
-                .individuals
-                .iter_mut()
-                .filter(|_| {
-                    self.rng.gen_bool(
-                        self.parameters.local_search_rate.try_into().expect(
-                            "it should be possible to convert the local search rate to f64",
-                        ),
-                    )
-                })
-                .collect();
-
-        for individual in selected_individuals {
-            for chromosome in individual.chromosomes.iter_mut() {
-                self.local_search.run(chromosome);
+        for individual in self.population.individuals.iter_mut() {
+            if self.rng.gen_bool(self.parameters.local_search_rate as f64) {
+                for chromosome in individual.chromosomes.iter_mut() {
+                    self.local_search.run(chromosome);
+                }
+                individual.update_fitness();
             }
         }
     }

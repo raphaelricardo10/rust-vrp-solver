@@ -67,5 +67,11 @@ impl LocalSearcher<VrpSolution> for TwoOptSearcher {
         for (_, route) in solution.routes.iter_mut() {
             self.run(route);
         }
+
+        solution.total_distance = solution
+            .routes
+            .iter()
+            .map(|(_, route)| route.total_distance())
+            .sum();
     }
 }
