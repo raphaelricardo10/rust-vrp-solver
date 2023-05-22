@@ -79,23 +79,6 @@ impl Individual {
         self.fitness = Self::calculate_fitness(&self.chromosomes);
     }
 
-    pub(crate) fn get_gene(&self, address: GeneAddress) -> Gene {
-        *self
-            .chromosomes
-            .get(address.0)
-            .unwrap_or_else(|| {
-                panic!("the chromosome {0} should exist", address.0);
-            })
-            .stops
-            .get(address.1)
-            .unwrap_or_else(|| {
-                panic!(
-                    "the gene {0} should exist in chromosome {1}",
-                    address.1, address.0
-                );
-            })
-    }
-
     pub(crate) fn swap_genes(
         &mut self,
         address1: GeneAddress,
