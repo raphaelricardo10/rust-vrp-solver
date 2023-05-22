@@ -1,4 +1,5 @@
-use rand::thread_rng;
+use rand::SeedableRng;
+use rand_chacha::ChaCha20Rng;
 
 use crate::{
     domain::{stop::Stop, vehicle::Vehicle},
@@ -38,7 +39,7 @@ pub unsafe extern "C" fn grasp_genetic_solver(
         distances_ptr,
         arg_sizes,
         grasp_solver_parameters,
-        Box::new(thread_rng()),
+        Box::new(ChaCha20Rng::from_entropy()),
     );
 
     let mut crossover_op = OrderCrossover::new(genetic_solver_parameters.max_crossover_tries);
@@ -50,7 +51,7 @@ pub unsafe extern "C" fn grasp_genetic_solver(
         &mut grasp_solver,
         &mut crossover_op,
         genetic_solver_parameters,
-        Box::new(thread_rng()),
+        Box::new(ChaCha20Rng::from_entropy()),
     );
 
     let solution = genetic_solver.solve();
