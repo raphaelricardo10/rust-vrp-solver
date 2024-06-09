@@ -29,7 +29,7 @@ fn test_can_drop_gene_duplicates(mut parent_slice_factory: ParentSliceFactory) {
     let (parent, slice) = parent_slice_factory(2);
 
     let chromosome_without_duplicates =
-        Individual::drop_gene_duplicates(&parent.chromosomes[0], &slice.gene_set);
+        ParentSlice::drop_gene_duplicates(&parent.chromosomes[0], &slice.gene_set);
 
     assert_eq!(chromosome_without_duplicates.len(), 3);
 
@@ -43,7 +43,7 @@ fn test_can_drop_all_genes_from_duplicates(mut parent_slice_factory: ParentSlice
     let (parent, slice) = parent_slice_factory(3);
 
     let chromosome_without_duplicates =
-        Individual::drop_gene_duplicates(&parent.chromosomes[0], &slice.gene_set);
+        ParentSlice::drop_gene_duplicates(&parent.chromosomes[0], &slice.gene_set);
 
     assert_eq!(chromosome_without_duplicates.len(), 2);
     assert_eq!(chromosome_without_duplicates[0].id, 0);
@@ -95,7 +95,7 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     let slice = ParentSlice::new(stops[1..=3].to_vec(), &distance_service);
 
-    offspring.insert_parent_slice(slice, insertion_point, &distance_service);
+    slice.insert_parent_slice(&mut offspring, insertion_point, &distance_service);
 
     assert_ne!(offspring.fitness, 0.0);
 }
@@ -113,7 +113,7 @@ fn test_can_insert_parent_slice_with_correct_fitness(
 
     let slice = ParentSlice::new(stops[3..4].to_vec(), &distance_service);
 
-    offspring.insert_parent_slice(slice, insertion_point, &distance_service);
+    slice.insert_parent_slice(&mut offspring, insertion_point, &distance_service);
 
     assert_eq!(
         offspring.chromosomes[0].total_distance().floor(),

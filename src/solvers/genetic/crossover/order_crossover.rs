@@ -1,10 +1,11 @@
 use rand::Rng;
 
 use crate::{
-    services::distance::distance_service::DistanceService, solvers::genetic::individual::Individual,
+    services::distance::distance_service::DistanceService,
+    solvers::genetic::individual::{Chromosome, GeneAddress, Individual},
 };
 
-use super::crossover_operator::CrossoverOperator;
+use super::{crossover_operator::CrossoverOperator, parent_slice::ParentSlice};
 
 #[derive(Clone)]
 pub struct OrderCrossover {
@@ -19,7 +20,22 @@ impl<R: Rng + ?Sized> CrossoverOperator<R> for OrderCrossover {
         rng: &mut R,
         distance_service: &DistanceService,
     ) -> Option<Individual> {
-        parent1.crossover_with(parent2, rng, distance_service)
+        let parent_slice = ParentSlice::from((&parent1, &mut *rng, distance_service));
+
+        let mut offspring_chromosomes: Vec<Chromosome> = Vec::new();
+
+        for chromosome in parent2.chromosomes {
+            let merged_chromosome = parent_slice.merge_into(chromosome, distance_service)?;
+
+            offspring_chromosomes.push(merged_chromosome);
+        }
+
+        let mut offspring = Individual::new(offspring_chromosomes);
+        let insertion_point: GeneAddress = offspring.choose_random_gene(rng);
+
+        parent_slice.insert_parent_slice(&mut offspring, insertion_point, distance_service);
+
+        Some(offspring)
     }
 
     fn max_of_tries(&self) -> u8 {

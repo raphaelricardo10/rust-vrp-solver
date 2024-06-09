@@ -1,4 +1,5 @@
 use crate::services::distance::distance_service::DistanceService;
+use crate::solvers::genetic::crossover::crossover_operator::CrossoverOperator;
 use crate::solvers::genetic::crossover::offspring::Offspring;
 use crate::solvers::genetic::crossover::order_crossover::OrderCrossover;
 use crate::solvers::genetic::crossover::tests::order_crossover::fixtures::parents_fixture::Parents;
@@ -20,8 +21,10 @@ fn test_can_generate_a_offspring(
     let parent1 = individual_factory(1);
     let parent2 = individual_factory(1);
 
-    let offspring = parent1
-        .crossover_with(parent2, &mut rng, &distance_service)
+    let crossover_op = OrderCrossover::new(0);
+
+    let offspring = crossover_op
+        .run(parent1, parent2, &mut rng, &distance_service)
         .unwrap();
 
     assert_ne!(offspring.fitness, 0.0);
