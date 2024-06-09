@@ -9,6 +9,8 @@ use crate::{
 
 use super::parent_slice::ParentSlice;
 
+const EMPTY_PARENT_SLICE_MESSAGE: &str = "the parent slice should not be empty";
+
 impl Individual {
     pub(super) fn drop_gene_duplicates(
         chromosome: &Chromosome,
@@ -44,7 +46,7 @@ impl Individual {
             parent_slice
                 .slice
                 .first()
-                .expect("the parent slice should not be empty"),
+                .expect(EMPTY_PARENT_SLICE_MESSAGE),
         );
 
         let new_distance_after = match genes.len() == 1 {
@@ -53,7 +55,7 @@ impl Individual {
                 parent_slice
                     .slice
                     .last()
-                    .expect("the parent slice should not be empty"),
+                    .expect(EMPTY_PARENT_SLICE_MESSAGE),
                 &genes[end_of_slice],
             ),
         };
