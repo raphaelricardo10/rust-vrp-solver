@@ -95,7 +95,7 @@ fn test_can_insert_parent_slice_in_empty_offspring(
 
     let slice = ParentSlice::new(stops[1..=3].to_vec(), &distance_service);
 
-    slice.insert_parent_slice(&mut offspring, insertion_point, &distance_service);
+    slice.insert_at_individual(&mut offspring, insertion_point, &distance_service);
 
     assert_ne!(offspring.fitness, 0.0);
 }
@@ -113,7 +113,7 @@ fn test_can_insert_parent_slice_with_correct_fitness(
 
     let slice = ParentSlice::new(stops[3..4].to_vec(), &distance_service);
 
-    slice.insert_parent_slice(&mut offspring, insertion_point, &distance_service);
+    slice.insert_at_individual(&mut offspring, insertion_point, &distance_service);
 
     assert_eq!(
         offspring.chromosomes[0].total_distance().floor(),

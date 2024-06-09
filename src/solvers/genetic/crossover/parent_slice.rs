@@ -60,7 +60,7 @@ impl ParentSlice {
             .collect()
     }
 
-    pub(super) fn insert_parent_slice(
+    pub(super) fn insert_at_individual(
         self,
         individual: &mut Individual,
         insertion_point: GeneAddress,

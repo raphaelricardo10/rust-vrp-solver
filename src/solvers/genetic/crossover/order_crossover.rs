@@ -33,7 +33,7 @@ impl<R: Rng + ?Sized> CrossoverOperator<R> for OrderCrossover {
         let mut offspring = Individual::new(offspring_chromosomes);
         let insertion_point: GeneAddress = offspring.choose_random_gene(rng);
 
-        parent_slice.insert_parent_slice(&mut offspring, insertion_point, distance_service);
+        parent_slice.insert_at_individual(&mut offspring, insertion_point, distance_service);
 
         Some(offspring)
     }
