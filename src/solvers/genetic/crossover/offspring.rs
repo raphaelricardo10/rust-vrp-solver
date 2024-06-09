@@ -40,7 +40,7 @@ impl<'a, R: Rng + ?Sized, T: CrossoverOperator<R> + ?Sized> Offspring<'a, R, T> 
                 distance_service,
             );
 
-            if individual.is_none(){
+            if individual.is_none() {
                 continue;
             }
 

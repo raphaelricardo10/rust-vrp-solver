@@ -1,2 +1,2 @@
-pub mod vrp_parser;
 pub mod cvrplib;
+pub mod vrp_parser;

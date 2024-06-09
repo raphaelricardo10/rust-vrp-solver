@@ -133,9 +133,12 @@ impl RouteService {
     }
 
     pub fn assign_starting_points(&mut self) {
-        let starting_stop = self.available_stops.remove(&self.depot.id).unwrap_or_else(|| {
-            panic!("the stop depot {} should be available", self.depot.id);
-        });
+        let starting_stop = self
+            .available_stops
+            .remove(&self.depot.id)
+            .unwrap_or_else(|| {
+                panic!("the stop depot {} should be available", self.depot.id);
+            });
 
         for route in &mut self.routes.values_mut() {
             route.add_stop(starting_stop, 0.0).unwrap_or_else(|_| {
@@ -177,8 +180,12 @@ impl RouteService {
             .get_current_stop()
             .unwrap_or_else(|| panic!("it should exist a route for the vehicle {vehicle_id}"));
 
-        let distances = self.get_feasible_stops(route)
-            .map(move |stop| (stop.id, self.distance_service.get_distance(current_stop, stop)));
+        let distances = self.get_feasible_stops(route).map(move |stop| {
+            (
+                stop.id,
+                self.distance_service.get_distance(current_stop, stop),
+            )
+        });
 
         Box::new(distances)
     }
