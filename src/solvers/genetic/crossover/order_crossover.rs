@@ -26,7 +26,6 @@ impl<R: Rng + ?Sized> CrossoverOperator<R> for OrderCrossover {
 
         for chromosome in parent2.chromosomes {
             let merged_chromosome = parent_slice.merge_into(chromosome, distance_service)?;
-
             offspring_chromosomes.push(merged_chromosome);
         }
 
