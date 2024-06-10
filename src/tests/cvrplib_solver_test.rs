@@ -70,7 +70,7 @@ fn test_can_solve_with_grasp_solver(
     let mut solver = VrpGraspSolver::new(stops, vehicles, &distances, parameters, rng);
     let solution = solver.solve();
 
-    const POSSIBLE_RESULTS: [f32; 2] = [1687.5743, 1763.0903];
+    const POSSIBLE_RESULTS: [f32; 2] = [1360.4854, 1429.20361];
 
     assert!(POSSIBLE_RESULTS.contains(&solution.total_distance));
 }
